@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../../../../2024_02_feb/experiments/app-playground/.idea/app-playground.iml" filepath="$PROJECT_DIR$/../../../../2024_02_feb/experiments/app-playground/.idea/app-playground.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/personal_website.iml" filepath="$PROJECT_DIR$/.idea/personal_website.iml" />
     </modules>
   </component>
