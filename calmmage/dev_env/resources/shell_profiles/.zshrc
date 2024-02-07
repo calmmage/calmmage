@@ -28,7 +28,11 @@ more: knowledge base, similar.
 "
 
 # add alias to add alias to ~/.alias
-aa() { echo "alias $1=\"$2\"" >> ~/.alias; source ~/.alias; }
+aa() {
+    echo "" >> ~/.alias
+    echo "# $3" >> ~/.alias
+    echo "alias $1=\"$2\"" >> ~/.alias; source ~/.alias
+}
 
 move_and_link() {
     mv "$1" "$2" && ln -s "$2/${1##*/}" "$1"
