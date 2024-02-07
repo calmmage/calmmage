@@ -1,0 +1,1 @@
+- [ ]  Todo: Re-view zoom recording of a video with aik -> add init commands to setup.sh
