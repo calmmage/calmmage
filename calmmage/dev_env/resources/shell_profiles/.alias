@@ -1,15 +1,24 @@
-alias help="echo \"$HELP\""
-alias subl="/Applications/Sublime\ Text.app/Contents/MacOS/sublime_text"
+# alias help="echo \"$HELP\""
+# open code with sublime
+alias subl='open -a Sublime\ Text'
+# open dir with vscode
+alias code='open -a Visual\ Studio\ Code'
 
-alias ghc="gh copilot"
+
+# alias ghc="gh copilot"
+# Explain with github CLI copilot
 alias aie="gh copilot explain"
-alias ai-help="gh copilot explain"
-alias ai="gh copilot suggest"
+# Suggestions with github CLI copilot
+alias ais="gh copilot suggest"
+# alias ai-help="gh copilot explain"
+# Suggest shell command with github CLI copilot
+alias ai="gh copilot suggest -t shell"
 
-alias gcu="(gcloud compute ssh --zone "europe-west1-b" "instance-default-mar-2023"  --project "jarvis-mar-2022-pub")"
-
-# move path and add backlink
+# move path and add backlink from old location to new
 alias mva=move_and_link
-# find project
+
+# find project in the projects dir
 alias fp=find_project
+
+# find text in file
 alias find_=find_what_where

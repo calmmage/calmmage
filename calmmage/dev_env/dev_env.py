@@ -414,11 +414,11 @@ class CalmmageDevEnv:
         # add to the .alias
         aliases = {
             # latest dir
-            self.seasonal_projects_dir / "latest": ["cd_1", "cdl", "cd_latest"],
+            self.seasonal_projects_dir / "latest": ["cd1", "cdl", "cd_latest"],
             # playground
-            self.root_dir / "playground": ["cd_2", "cdp", "cd_playground"],
+            self.root_dir / "playground": ["cd2", "cdp", "cd_playground"],
             # structured
-            self.root_dir / "code" / "structured": ["cd_3", "cds", "cd_structured"],
+            self.root_dir / "code" / "structured": ["cd3", "cds", "cd_structured"],
         }
         for target in aliases:
             for alias in aliases[target]:
