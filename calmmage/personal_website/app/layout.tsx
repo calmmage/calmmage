@@ -40,7 +40,7 @@ export default function RootLayout({
         {/*<GlobalNav />*/}
         <Sidebar />
         {/*{children}*/}
-        <div className="lg:pl-72">
+        <div className="flex justify-center pt-[150px]">
           <div className="mx-auto max-w-4xl space-y-8 px-2 pt-20 lg:px-8 lg:py-8">
 
             {/*<div className="bg-vc-border-gradient rounded-lg p-px shadow-lg shadow-black/20">*/}
