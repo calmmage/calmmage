@@ -1,0 +1,170 @@
+{
+  "main": {
+    "id": "695bc598101da05d",
+    "type": "split",
+    "children": [
+      {
+        "id": "556eab8a516921f5",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "5bd1817d51f098ad",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "_system/obsidian_templates/New Cheat Sheet.md",
+                "mode": "source",
+                "source": true
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "e8405e1bc518fb4e",
+    "type": "split",
+    "children": [
+      {
+        "id": "38e04a8354ccec9b",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "5bd669937a4edfa9",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "03b89af26183a8ef",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "4b39fa0c25e9c285",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "c3336464e161fca9",
+    "type": "split",
+    "children": [
+      {
+        "id": "5e811c6fbc50360b",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "62d82306cdb869fd",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "_system/obsidian_templates/New Cheat Sheet.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "4c21433d2d24b8f0",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "_system/obsidian_templates/New Cheat Sheet.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "0bbb208eb6d620ea",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "98308d5e7d3edfe7",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "_system/obsidian_templates/New Cheat Sheet.md"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false
+    }
+  },
+  "active": "5bd1817d51f098ad",
+  "lastOpenFiles": [
+    "_mvp_publish/beta/cheatsheets/Raycast Cheatsheet.md",
+    "_system/obsidian_templates/New Case.md",
+    "_system/obsidian_templates/New Cheat Sheet.md",
+    "getting-started.md",
+    "_mvp_publish/inbox.md",
+    "_mvp_publish/beta/cheatsheets",
+    "_mvp_publish/beta/content/index.md",
+    "_mvp_publish/beta/content/inbox.md",
+    "_mvp_publish/beta/content",
+    "_mvp_publish/beta",
+    "_mvp_publish/questions.md",
+    "attachments/Pasted image 20240208030336.png",
+    "_system/obsidian_templates",
+    "_system",
+    "attachments/Pasted image 20240208030641.png",
+    "attachments/Pasted image 20240208030347.png",
+    "_mvp_publish/ideas.md",
+    "_mvp_publish/focus.md",
+    "_mvp_publish/content/inbox.md"
+  ]
+}
