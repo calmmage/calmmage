@@ -15,7 +15,6 @@ const numCubes = 100;
 const numTrails = 20;
 const R = 4;
 const SCALE = 0.05;
-const POSITION_SCALE = 0.0077;
 const REACTION_STRENGTH = 0.02;
 const REACT_USE_DISTANCE = true;
 
@@ -28,14 +27,32 @@ const TRAIL_FOLLOW_SPEED = 0.03;
 const TRAIL_FOLLOW_USE_DISTANCE = true;
 const TIME_SPEED = 0.0005;
 
+// const POSITION_SCALE = 0.0077;
+// WIDTH_SCALE = 1;
+const H = 900;
+const W = 1100;
+WIDTH_SCALE = Math.min(window.innerWidth / W, 1);
+POSITION_SCALE = WIDTH_SCALE * 0.0077;
+
+// Add resize listener
+window.addEventListener('resize', () => {
+    WIDTH_SCALE = Math.min(window.innerWidth / W, 1);
+    POSITION_SCALE = WIDTH_SCALE * 0.0077;
+    // Reset camera aspect ratio and renderer size
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// init
 for (let i = 0; i < numCubes; i++) {
     cube = new THREE.Mesh(
         new THREE.BoxGeometry(SCALE, SCALE, SCALE),
         new THREE.MeshBasicMaterial({color: 0xffffff})
     );
     const angle = (i / numCubes) * Math.PI * 2;
-    cube.position.x = Math.sin(angle) * R;
-    cube.position.y = Math.cos(angle) * R;
+    cube.position.x = Math.sin(angle) * R * WIDTH_SCALE;
+    cube.position.y = Math.cos(angle) * R * WIDTH_SCALE;
     cubes.push(cube);
     scene.add(cube);
 
@@ -43,8 +60,8 @@ for (let i = 0; i < numCubes; i++) {
         new THREE.BoxGeometry(SCALE, SCALE, SCALE),
         new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: 0})
     );
-    targetCube.position.x = Math.sin(angle) * R;
-    targetCube.position.y = Math.cos(angle) * R;
+    targetCube.position.x = Math.sin(angle) * R* WIDTH_SCALE;
+    targetCube.position.y = Math.cos(angle) * R* WIDTH_SCALE;
     targetCube.range = R;
     targetCube.offset = angle;
     targets.push(targetCube);
@@ -96,8 +113,8 @@ function updateCubes() {
     targets.forEach(cube => {
         let theta = time * 2 * Math.PI + cube.offset;
         let radius = cube.range;
-        cube.position.x = radius * Math.cos(theta);
-        cube.position.y = radius * Math.sin(2 * theta) / 2;
+        cube.position.x = WIDTH_SCALE * radius * Math.cos(theta);
+        cube.position.y = WIDTH_SCALE * radius * Math.sin(2 * theta) / 2;
     });
     // all the rest of the cubes just follow their target
     cubes.forEach((cube, i) => {
@@ -111,8 +128,8 @@ function updateCubes() {
             x /= distance;
             y /= distance;
         }
-        cube.position.x += x;
-        cube.position.y += y;
+        cube.position.x += x ;
+        cube.position.y += y ;
     });
     trails.forEach((trail, i) => {
         distance = Math.sqrt((trail.position.x - trailTargets[i].position.x) ** 2 + (trail.position.y - trailTargets[i].position.y) ** 2);

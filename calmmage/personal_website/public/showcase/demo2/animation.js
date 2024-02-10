@@ -13,17 +13,47 @@ const trails = [];
 const trailTargets = [];
 const numCubes = 100;
 const numTrails = 20;
-const R = 2;
+const R = 3;
 const SCALE = 0.1;
-const POSITION_SCALE = 0.5
+let POSITION_SCALE = 0.0077;
+const REACTION_STRENGTH = 0.02;
+const REACT_USE_DISTANCE = true;
+
+
+// funniest to play with
+const REACTION_DISTANCE = 1.3;
+const FOLLOW_SPEED = 0.005;
+const FOLLOW_USE_DISTANCE = false;
+const TRAIL_FOLLOW_SPEED = 0.01;
+const TRAIL_FOLLOW_USE_DISTANCE = true;
+const TIME_SPEED = 0.0005;
+
+
+// const POSITION_SCALE = 0.0077;
+// WIDTH_SCALE = 1;
+const H = 900;
+const W = 1100;
+let WIDTH_SCALE = Math.min(window.innerWidth / W, 1);
+POSITION_SCALE = WIDTH_SCALE * 0.0077;
+
+// Add resize listener
+window.addEventListener('resize', () => {
+    WIDTH_SCALE = Math.min(window.innerWidth / W, 1);
+    POSITION_SCALE = WIDTH_SCALE * 0.0077;
+    // Reset camera aspect ratio and renderer size
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
 for (let i = 0; i < numCubes; i++) {
     cube = new THREE.Mesh(
         new THREE.BoxGeometry(SCALE, SCALE, SCALE),
         new THREE.MeshBasicMaterial({color: 0xffffff})
     );
     const angle = (i / numCubes) * Math.PI * 2;
-    cube.position.x = Math.sin(angle) * R;
-    cube.position.y = Math.cos(angle) * R;
+    cube.position.x = Math.sin(angle) * R * WIDTH_SCALE;
+    cube.position.y = Math.cos(angle) * R * WIDTH_SCALE;
     cubes.push(cube);
     scene.add(cube);
 
@@ -31,8 +61,8 @@ for (let i = 0; i < numCubes; i++) {
         new THREE.BoxGeometry(SCALE, SCALE, SCALE),
         new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: 0})
     );
-    targetCube.position.x = Math.sin(angle) * R;
-    targetCube.position.y = Math.cos(angle) * R;
+    targetCube.position.x = Math.sin(angle) * R * WIDTH_SCALE;
+    targetCube.position.y = Math.cos(angle) * R * WIDTH_SCALE;
     targetCube.range = R;
     targetCube.offset = angle;
     targets.push(targetCube);
@@ -43,7 +73,7 @@ for (let i = 0; i < numCubes; i++) {
     for (let j = 0; j < numTrails; j++) {
         trail = new THREE.Mesh(
             new THREE.PlaneGeometry(SCALE, SCALE, SCALE),
-            new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: 1.0 - (j / numTrails)})
+            new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: 0.8 * (1.0 - (j / numTrails))})
         );
         trail.position.x = cube.position.x;
         trail.position.y = cube.position.y;
@@ -58,15 +88,21 @@ for (let i = 0; i < numCubes; i++) {
 
 // Add interactivity
 document.addEventListener('mousemove', (event) => {
-    mouseX = (event.clientX / window.innerWidth) * 2 - 1; // 1245
-    mouseY = -(event.clientY / window.innerHeight) * 2 + 1;  // 1014
-    // mouseX *= POSITION_SCALE;
-    // mouseY *= POSITION_SCALE;
+    mouseX = event.clientX - window.innerWidth / 2; // 1245
+    mouseY = window.innerHeight / 2 - event.clientY;  // 1014
+    mouseX *= POSITION_SCALE;
+    mouseY *= POSITION_SCALE;
     cubes.forEach(cube => {
         distance = Math.sqrt((cube.position.x - mouseX) ** 2 + (cube.position.y - mouseY) ** 2);
-        if (distance < 2) {
-            cube.position.x +=  (cube.position.x - mouseX) / distance
-            cube.position.y +=  (cube.position.y - mouseY) / distance
+        if (distance < REACTION_DISTANCE) {
+            x = (mouseX - cube.position.x) * REACTION_STRENGTH;
+            y = (mouseY - cube.position.y) * REACTION_STRENGTH;
+            if (REACT_USE_DISTANCE) {
+                x /= distance;
+                y /= distance;
+            }
+            cube.position.x -= x;
+            cube.position.y -= y;
         }
     })
 });
@@ -74,21 +110,40 @@ document.addEventListener('mousemove', (event) => {
 let time = 0;
 
 function updateCubes() {
-  time += 0.002;
-  targets.forEach(cube => {
-    cube.position.x = Math.sin(time + cube.offset) * cube.range;
-    cube.position.y = Math.cos(time + cube.offset) * cube.range;
-  });
-  // all the rest of the cubes just follow their target
+    time += TIME_SPEED;
+    targets.forEach(cube => {
+        cube.position.x = Math.sin(time + cube.offset) * cube.range * WIDTH_SCALE;
+        cube.position.y = Math.cos(time + cube.offset) * cube.range * WIDTH_SCALE;
+    });
+    // all the rest of the cubes just follow their target
     cubes.forEach((cube, i) => {
         distance = Math.sqrt((cube.position.x - targets[i].position.x) ** 2 + (cube.position.y - targets[i].position.y) ** 2);
-        cube.position.x += (targets[i].position.x - cube.position.x) * 0.01 * distance;
-        cube.position.y += (targets[i].position.y - cube.position.y) * 0.01 * distance;
+        x = (targets[i].position.x - cube.position.x) * FOLLOW_SPEED;
+        y = (targets[i].position.y - cube.position.y) * FOLLOW_SPEED;
+        if (FOLLOW_USE_DISTANCE) {
+            x *= distance;
+            y *= distance;
+        } else {
+            x /= distance;
+            y /= distance;
+        }
+        cube.position.x += x;
+        cube.position.y += y;
     });
     trails.forEach((trail, i) => {
         distance = Math.sqrt((trail.position.x - trailTargets[i].position.x) ** 2 + (trail.position.y - trailTargets[i].position.y) ** 2);
-        trail.position.x += (trailTargets[i].position.x - trail.position.x) * 0.01 * distance;
-        trail.position.y += (trailTargets[i].position.y - trail.position.y) * 0.01 * distance;
+        x = (trailTargets[i].position.x - trail.position.x) * TRAIL_FOLLOW_SPEED;
+        y = (trailTargets[i].position.y - trail.position.y) * TRAIL_FOLLOW_SPEED;
+        if (TRAIL_FOLLOW_USE_DISTANCE) {
+            x *= distance;
+            y *= distance;
+        } else {
+            x /= distance;
+            y /= distance;
+        }
+        trail.position.x += x;
+        trail.position.y += y;
+
     });
 
 }
