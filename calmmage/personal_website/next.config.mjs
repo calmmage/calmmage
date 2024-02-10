@@ -6,7 +6,9 @@ import withNextra from 'nextra'
 
 const nextraConfig = withNextra({
       theme: 'nextra-theme-docs',
-      themeConfig: './theme.config.tsx'
+      themeConfig: './theme.config.tsx',
+      NextConfig: {
+            output: "standalone",
+      },
 })
-
 export default nextraConfig;
