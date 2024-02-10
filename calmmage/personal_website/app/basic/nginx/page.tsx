@@ -3,34 +3,37 @@ export default function Page() {
         <div className="p-8">
             <h1 className="text-3xl font-bold mb-4">NGINX Configuration Instructions</h1>
 
-            <h2 className="text-2xl font-semibold mt-6 mb-2">Generating New SSL Certificate</h2>
-            <p className="mb-1">Launch Admin PowerShell:</p>
-            <pre className="bg-gray-200 p-4 rounded">Start PowerShell as Administrator</pre>
-            <p className="mb-1">Run the following command:</p>
-            <pre className="bg-gray-200 p-4 rounded mb-4">certbot certonly --standalone -d calmmage.com</pre>
+            <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
+                <div className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30">
+                    <h2 className="mb-3 text-2xl font-semibold">Generating New SSL Certificate</h2>
+                    <p className="m-0 max-w-[30ch] text-sm opacity-50">
+                        Launch Admin PowerShell and run:
+                        <code className="block bg-gray-800 p-2 rounded mt-2">certbot certonly --standalone -d calmmage.com</code>
+                    </p>
+                </div>
 
-            <h2 className="text-2xl font-semibold mt-6 mb-2">Port Forwarding</h2>
-            <p className="mb-1">Access your router settings:</p>
-            <ul className="list-disc pl-8 mb-4">
-                <li>Go to <a href="http://192.168.1.1" className="text-blue-500 underline">192.168.1.1</a></li>
-                <li>Navigate to Advanced Settings - Security - Port Forwarding</li>
-            </ul>
+                <div className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30">
+                    <h2 className="mb-3 text-2xl font-semibold">Port Forwarding</h2>
+                    <p className="m-0 max-w-[30ch] text-sm opacity-50">
+                        Access your router at <a href="http://192.168.1.1" className="text-blue-500 underline">192.168.1.1</a>, navigate to Port Forwarding.
+                    </p>
+                </div>
 
-            <h2 className="text-2xl font-semibold mt-6 mb-2">Adding New Subdomain Routing</h2>
-            <p className="mb-1">Open PowerShell and navigate to your NGINX directory:</p>
-            <pre className="bg-gray-200 p-4 rounded">cd 'K:/Program Files/nginx'</pre>
-            <p className="mb-1">Edit NGINX Configuration:</p>
-            <ul className="list-disc pl-8 mb-4">
-                <li>Path to NGINX conf: 'K:/Program Files/nginx/conf/nginx.conf'</li>
-                <li>Add/Edit server blocks as needed</li>
-                <li>Save changes</li>
-            </ul>
-            <p className="mb-1">Restart NGINX:</p>
-            <pre className="bg-gray-200 p-4 rounded mb-1">Start PowerShell as Administrator</pre>
-            <pre className="bg-gray-200 p-4 rounded mb-4">nginx -s reload</pre>
+                <div className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30">
+                    <h2 className="mb-3 text-2xl font-semibold">Adding New Subdomain Routing</h2>
+                    <p className="m-0 max-w-[30ch] text-sm opacity-50">
+                        Edit NGINX Config at 'K:/Program Files/nginx/conf/nginx.conf' and reload NGINX.
+                        <code className="block bg-gray-800 p-2 rounded mt-2">nginx -s reload</code>
+                    </p>
+                </div>
 
-            <h2 className="text-2xl font-semibold mt-6 mb-2">Setup domain calmmage.com</h2>
-            <p className="mb-4"><a href="https://apple-emu-f57h.squarespace.com/config/domains/managed/calmmage.com/dns-settings" className="text-blue-500 underline" target="_blank" rel="noopener noreferrer">DNS Settings</a></p>
+                <div className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30">
+                    <h2 className="mb-3 text-2xl font-semibold">Setup domain calmmage.com</h2>
+                    <p className="m-0 max-w-[30ch] text-sm opacity-50">
+                        Configure DNS settings at: <a href="https://apple-emu-f57h.squarespace.com/config/domains/managed/calmmage.com/dns-settings" className="text-blue-500 underline" target="_blank" rel="noopener noreferrer">Squarespace DNS Settings</a>
+                    </p>
+                </div>
+            </div>
         </div>
     );
 }
