@@ -8,16 +8,16 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: {
-    default: 'Next.js App Router',
-    template: '%s | Next.js App Router',
+    default: 'Calmmage Home',
+    template: '%s | Calmmage Home',
   },
   description:
-    'A playground to explore new Next.js App Router features such as nested layouts, instant loading states, streaming, and component level data fetching.',
+    'What did the cow say? "Moo!"',
   openGraph: {
-    title: 'Next.js App Router Playground',
+    title: 'Calmmage Home Playground',
     description:
-      'A playground to explore new Next.js App Router features such as nested layouts, instant loading states, streaming, and component level data fetching.',
-    images: [`/api/og?title=Next.js App Router`],
+      'Hah! You got me!',
+    images: [`/api/og?title=Calmmage Home`],
   },
   twitter: {
     card: 'summary_large_image',
