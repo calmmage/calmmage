@@ -2,7 +2,7 @@ import React from 'react'
 import { DocsThemeConfig } from 'nextra-theme-docs'
 
 const config: DocsThemeConfig = {
-  logo: <span>Calmmage Nextra</span>,
+  logo: <span>Calmmage Home</span>,
   project: {
     link: 'https://github.com/calmmage/calmmage'
   },
