@@ -9,6 +9,11 @@ export const sections: { name: string; items: Item[] }[] = [
     name: 'Sections',
     items: [
       {
+        name: 'Home',
+        slug: '',
+        description: 'Main page of the website',
+      },
+      {
         name: 'Profile',
         slug: 'basic',
         description: 'About me',
