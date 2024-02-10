@@ -7,6 +7,7 @@ export default function Page() {
   return (
       <div>
 
+        {/*<div className="space-y-8" style={{ zIndex: 10 }}>*/}
         <div className="space-y-8">
           {/*<h1 className="text-xl font-medium text-gray-300">Examples</h1>*/}
 
@@ -45,22 +46,16 @@ export default function Page() {
           </div>
         </div>
         <div className="flex z-1 min-h-screen flex-col items-center justify-between p-24">
-          {/*<main>*/}
           <div style={{padding: '20px'}}>
-            {/*<h1>Main Page</h1>*/}
-            {/*<h2>Embedded Page</h2>*/}
-            {/*<div style={{border: '2px solid purple', padding: '10px'}}>*/}
-            <div  style={{ position: 'absolute', top: "0%", left: "30%", zIndex: 1 }}>
+            <div style={{position: 'absolute', top: "0%", left: "30%", zIndex: -1}}>
               <iframe scrolling="no"
-
-                  src="/particles/index.html"
-                  style={{ width: '1000px', height: '1000px', border: 'none', opacity: '50%'}}
+                      src="/particles/index.html"
+                      style={{width: '1000px', height: '1000px', border: 'none', opacity: '100%'}}
                   // style={{width: '100%', height: '500px', border: 'none'}}
-                  title="Particles Animation"
+                      title="Particles Animation"
               ></iframe>
             </div>
           </div>
-          {/*<div*/}
           {/*    className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">*/}
           {/*  /!*<p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">*!/*/}
           {/*  /!*  Get started by editing&nbsp;*!/*/}
@@ -175,6 +170,6 @@ export default function Page() {
             </a>
           </div>
         </div>
-        </div>
-        );
-        }
+      </div>
+  );
+}
