@@ -51,7 +51,7 @@ export default function Page() {
               <iframe scrolling="no"
                       src="/particles/index.html"
                       // style={{width: '1000px', height: '1000px', border: 'none', opacity: '100%'}}
-                  style={{width: '100%', height: '100%', border: 'none'}}
+                  style={{width: '100svh', height: '100svh', border: 'none'}}
                       title="Particles Animation"
               ></iframe>
             {/*</div>*/}
