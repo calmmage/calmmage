@@ -1,7 +1,6 @@
 'use client';
 
 import { sections, type Item } from '@/lib/sections';
-// import { NextLogo } from '#/ui/next-logo';
 import Link from 'next/link';
 import { useSelectedLayoutSegment } from 'next/navigation';
 import { MenuAlt2Icon, XIcon } from '@heroicons/react/solid';
@@ -11,7 +10,7 @@ import Byline from './byline';
 
 export function GlobalNav() {
     const [isOpen, setIsOpen] = useState(false);
-    const close = () => setIsOpen(false);
+    const onClose = () => setIsOpen(false);
 
     return (
         <div className="fixed top-0 z-10 flex w-full flex-col border-b border-gray-800 bg-black lg:bottom-0 lg:z-auto lg:w-72 lg:border-b-0 lg:border-r lg:border-gray-800">
@@ -19,13 +18,8 @@ export function GlobalNav() {
                 <Link
                     href="/"
                     className="group flex w-full items-center gap-x-2.5"
-                    onClick={close}
+                    onClick={onClose}
                 >
-                    {/*<div className="h-7 w-7 rounded-full border border-white/30 group-hover:border-white/50">*/}
-                    {/*    /!*<NextLogo />*!/*/}
-                    {/*    <h1> NextLogo should have been here</h1>*/}
-                    {/*</div>*/}
-
                     <h3 className="font-semibold tracking-wide text-gray-400 group-hover:text-gray-50">
                         App Router
                     </h3>
@@ -62,7 +56,7 @@ export function GlobalNav() {
 
                                 <div className="space-y-1">
                                     {section.items.map((item) => (
-                                        <GlobalNavItem key={item.slug} item={item} close={close} />
+                                        <GlobalNavItem key={item.slug} item={item} onClose={onClose} />
                                     ))}
                                 </div>
                             </div>
@@ -76,18 +70,18 @@ export function GlobalNav() {
 }
 
 export function GlobalNavItem({
-                           item,
-                           close,
-                       }: {
+    item,
+    onClose,
+}: {
     item: Item;
-    close: () => false | void;
+    onClose: () => false | void;
 }) {
     const segment = useSelectedLayoutSegment();
     const isActive = item.slug === segment;
 
     return (
         <Link
-            onClick={close}
+            onClick={onClose}
             href={`/${item.slug}`}
             className={clsx(
                 'block rounded-md px-3 py-2 text-sm font-medium hover:text-gray-300',

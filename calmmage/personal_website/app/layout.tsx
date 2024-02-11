@@ -1,8 +1,6 @@
 import '@/styles/globals.css';
 // import "./customized/globals.css";
-import { AddressBar } from '@/ui/address-bar';
 import Byline from '@/ui/byline';
-import { GlobalNav } from '@/ui/global-nav';
 import { Sidebar } from '@/ui/sidebar';
 import { Metadata } from 'next';
 
@@ -25,21 +23,30 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-                                     children,
-                                   }: Readonly<{
+  children,
+}: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
       <html lang="en">
-      <body className="flex">
-      <Sidebar/>
+      <body
+          style={{
+            flexDirection: 'column',
+            height: '100svh',
+            backgroundImage: 'url(/grid.svg)'
+          }}
+          className="flex bg-gray-1100"
+      >
+        <Sidebar />
 
-      <div className="flex-grow">
-        <div className="mx-auto max-w-full space-y-8 px-2 pt-20 lg:px-8 lg:py-8">
-          {children}
-          <Byline className="fixed sm:hidden"/>
+        <div
+            style={{ position: 'relative', height: '100svh' }}
+            className="flex-grow">
+          <div style={{ position: 'relative', height: '100%' }} className="mx-auto max-w-full space-y-8 px-2 lg:px-8 lg:py-8">
+            {children}
+            {/*<Byline className="fixed sm:hidden"/>*/}
+          </div>
         </div>
-      </div>
       </body>
       </html>
   );
