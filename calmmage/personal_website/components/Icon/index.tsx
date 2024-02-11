@@ -4,9 +4,13 @@ import Image from "next/image";
 export const CMIcons = {
   close: "/close.svg",
   burger: "/burger.svg",
+  home: "/home.svg",
+  knowledge: "/knowledge-icon.svg",
+  profile: "/profile.svg",
+  showCase: "/show-case.svg",
 };
 
-interface DAIconProps {
+interface CMIconProps {
   iconName: keyof typeof CMIcons;
   width?: number;
   height?: number;
@@ -21,7 +25,7 @@ export default function CMIcon({
   edgeLength = 24,
   className,
   ...rest
-}: DAIconProps) {
+}: CMIconProps) {
   return (
     <div
       style={{
