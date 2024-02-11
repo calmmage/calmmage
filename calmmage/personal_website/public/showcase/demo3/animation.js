@@ -1,3 +1,5 @@
+// Animation: Lemniscate of Bernoulli
+
 // Create the Three.js scene
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -23,7 +25,7 @@ const REACT_USE_DISTANCE = true;
 // funniest to play with
 const REACTION_DISTANCE = 1.3;
 const FOLLOW_SPEED = 0.015;
-const FOLLOW_USE_DISTANCE = true;
+let FOLLOW_USE_DISTANCE = true;
 const TRAIL_FOLLOW_SPEED = 0.03;
 const TRAIL_FOLLOW_USE_DISTANCE = true;
 const TIME_SPEED = 0.0005;
@@ -33,12 +35,13 @@ const TIME_SPEED = 0.0005;
 const H = 900;
 const W = 1100;
 WIDTH_SCALE = Math.min(window.innerWidth / W, 1);
-POSITION_SCALE = WIDTH_SCALE * 0.0077;
+let POSITION_MULT = 0.006;
+POSITION_SCALE = WIDTH_SCALE * POSITION_MULT;
 
 // Add resize listener
 window.addEventListener('resize', () => {
     WIDTH_SCALE = Math.min(window.innerWidth / W, 1);
-    POSITION_SCALE = WIDTH_SCALE * 0.0077;
+    POSITION_SCALE = WIDTH_SCALE * POSITION_MULT;
     // Reset camera aspect ratio and renderer size
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
@@ -87,17 +90,13 @@ for (let i = 0; i < numCubes; i++) {
 }
 
 // Add interactivity
-document.addEventListener('mousemove', (event) => {
-    mouseX = event.clientX - window.innerWidth / 2; // 1245
-    mouseY = window.innerHeight / 2 - event.clientY;  // 1014
-    mouseX *= POSITION_SCALE;
-    mouseY *= POSITION_SCALE;
+function scatterCubes(cubes, sourceX, sourceY, reaction_strength, reaction_distance, reaction_use_distance = false) {
     cubes.forEach(cube => {
-        distance = Math.sqrt((cube.position.x - mouseX) ** 2 + (cube.position.y - mouseY) ** 2);
-        if (distance < REACTION_DISTANCE) {
-            x = (mouseX - cube.position.x) * REACTION_STRENGTH;
-            y = (mouseY - cube.position.y) * REACTION_STRENGTH;
-            if (REACT_USE_DISTANCE) {
+        let distance = Math.sqrt((cube.position.x - sourceX) ** 2 + (cube.position.y - sourceY) ** 2);
+        if ((reaction_distance === 0) || distance < reaction_distance) {
+            x = (sourceX - cube.position.x) * reaction_strength;
+            y = (sourceY - cube.position.y) * reaction_strength;
+            if (reaction_use_distance) {
                 x /= distance;
                 y /= distance;
             }
@@ -105,6 +104,35 @@ document.addEventListener('mousemove', (event) => {
             cube.position.y -= y;
         }
     })
+}
+
+// Add interactivity
+document.addEventListener('mousemove', (event) => {
+    mouseX = event.clientX - window.innerWidth / 2; // 1245
+    mouseY = window.innerHeight / 2 - event.clientY;  // 1014
+    mouseX *= POSITION_SCALE;
+    mouseY *= POSITION_SCALE;
+    scatterCubes(cubes, mouseX, mouseY, REACTION_STRENGTH, REACTION_DISTANCE, REACT_USE_DISTANCE);
+});
+
+const CLICK_REACTION_STRENGTH = 1;
+const SCATTER_DURATION = 50;
+
+document.addEventListener('click', (event) => {
+    mouseX = event.clientX - window.innerWidth / 2; // 1245
+    mouseY = window.innerHeight / 2 - event.clientY;  // 1014
+    mouseX *= POSITION_SCALE;
+    mouseY *= POSITION_SCALE;
+    FOLLOW_USE_DISTANCE = false;
+    for (let i = 0; i < SCATTER_DURATION; i++) {
+        setTimeout(() => {
+            scatterCubes(cubes, mouseX, mouseY, CLICK_REACTION_STRENGTH, 5, true);
+        }, i*10);
+    }
+    setTimeout(() => {
+        FOLLOW_USE_DISTANCE = true;
+    }, SCATTER_DURATION*10 * 2);
+
 });
 
 let time = 0;
