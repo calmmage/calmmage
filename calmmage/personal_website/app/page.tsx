@@ -1,16 +1,17 @@
 import { sections } from '@/lib/sections';
-import Image from "next/image";
 import Link from 'next/link';
 
 
 export default function Page() {
   return (
-      <div>
-
-        {/*<div className="space-y-8" style={{ zIndex: 10 }}>*/}
-        <div className="space-y-8" style={{ maxWidth: '1024px', margin: '0 auto' }}>
-          {/*<h1 className="text-xl font-medium text-gray-300">Examples</h1>*/}
-
+      <section>
+        <div
+          className="space-y-8"
+          style={{
+            maxWidth: '1024px',
+            margin: '0 auto',
+            paddingTop: '50px'
+        }}>
           <div className="space-y-10 text-white">
             {sections.map((section) => {
               return (
@@ -57,6 +58,6 @@ export default function Page() {
             {/*</div>*/}
           </div>
         </div>
-      </div>
+      </section>
   );
 }
