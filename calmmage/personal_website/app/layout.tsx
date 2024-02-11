@@ -29,13 +29,22 @@ export default function RootLayout({
 }>) {
   return (
       <html lang="en">
-      <body className="flex">
+      <body
+          style={{
+            flexDirection: 'column',
+            height: '100svh',
+            // backgroundImage: 'url(/grid.svg)'
+          }}
+          className="flex bg-gray-1100"
+      >
         <Sidebar />
 
-        <div className="flex-grow">
-          <div className="mx-auto max-w-full space-y-8 px-2 pt-20 lg:px-8 lg:py-8">
+        <div
+            style={{ position: 'relative', height: '100svh' }}
+            className="flex-grow">
+          <div style={{ position: 'relative', height: '100%' }} className="mx-auto max-w-full space-y-8 px-2 pt-20 lg:px-8 lg:py-8">
             {children}
-            <Byline className="fixed sm:hidden"/>
+            {/*<Byline className="fixed sm:hidden"/>*/}
           </div>
         </div>
       </body>

@@ -1,9 +1,8 @@
 'use client';
 // Sidebar.tsx
-import Link from 'next/link';
 import { sections } from '@/lib/sections';
 import { GlobalNavItem } from '@/ui/global-nav';
-import { useState } from "react";
+import {useEffect, useLayoutEffect, useState} from "react";
 import classNames from "classnames";
 import CMIcon from "@/components/Icon";
 
@@ -11,10 +10,17 @@ export function Sidebar() {
   const [isOpen, setIsOpen] = useState(true);
   const onClose = () => setIsOpen(!isOpen);
 
+  useLayoutEffect(() => {
+      // если после рендеринга элемента размер window < 768px (условные размеры окна телефона) то скрываем меню
+      if (window && window.innerWidth <= 768) {
+          setIsOpen(false);
+      }
+  }, []);
+
   return (
       <div
           style={{
-              height: '100svh',
+              height: '64px',
               width: '300px',
               // flex flex-col =>
               display: 'flex',
@@ -46,11 +52,14 @@ export function Sidebar() {
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '40px',
-                  padding: '20px',
                   // это мы делаем анимацию при клике
-                  transform: isOpen ? 'translateX(0)' : 'translateX(-300px)',
+                  transform: isOpen ? 'translateX(0)' : 'translateX(-310px)',
                   // время анимации
-                  transition: '0.8s'
+                  transition: '0.8s',
+                  position: 'absolute',
+                  zIndex: '10',
+                  top: '56px',
+                  boxShadow: '5px 6px 24px rgba(255, 255, 255, 0.2)',
               }}
               className="bg-gray-900 text-white overflow-auto"
           >
@@ -74,5 +83,3 @@ export function Sidebar() {
       </div>
   );
 };
-
-// export default Sidebar;
