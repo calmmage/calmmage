@@ -1,3 +1,5 @@
+const NGINXConfigPath = `K:/Program Files/nginx/conf/nginx.conf`;
+
 export default function Page() {
     return (
         <div className="p-8">
@@ -22,7 +24,7 @@ export default function Page() {
                 <div className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30">
                     <h2 className="mb-3 text-2xl font-semibold">Adding New Subdomain Routing</h2>
                     <p className="m-0 max-w-[30ch] text-sm opacity-50">
-                        Edit NGINX Config at 'K:/Program Files/nginx/conf/nginx.conf' and reload NGINX.
+                        Edit NGINX Config at {NGINXConfigPath} and reload NGINX.
                         <code className="block bg-gray-800 p-2 rounded mt-2">nginx -s reload</code>
                     </p>
                 </div>
