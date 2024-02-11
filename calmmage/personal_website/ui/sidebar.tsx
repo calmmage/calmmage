@@ -59,7 +59,7 @@ export function Sidebar() {
                   position: 'absolute',
                   zIndex: '10',
                   top: '56px',
-                  boxShadow: '5px 6px 24px rgba(255, 255, 255, 0.2)',
+                  boxShadow: '5px 6px 10px rgba(255, 255, 255, 0.2)',
               }}
               className="bg-gray-900 text-white overflow-auto"
           >

@@ -33,7 +33,7 @@ export default function RootLayout({
           style={{
             flexDirection: 'column',
             height: '100svh',
-            // backgroundImage: 'url(/grid.svg)'
+            backgroundImage: 'url(/grid.svg)'
           }}
           className="flex bg-gray-1100"
       >
@@ -42,7 +42,7 @@ export default function RootLayout({
         <div
             style={{ position: 'relative', height: '100svh' }}
             className="flex-grow">
-          <div style={{ position: 'relative', height: '100%' }} className="mx-auto max-w-full space-y-8 px-2 pt-20 lg:px-8 lg:py-8">
+          <div style={{ position: 'relative', height: '100%' }} className="mx-auto max-w-full space-y-8 px-2 lg:px-8 lg:py-8">
             {children}
             {/*<Byline className="fixed sm:hidden"/>*/}
           </div>

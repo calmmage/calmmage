@@ -59,7 +59,7 @@ export default function Page() {
               <iframe scrolling="no"
                       src="/particles/index.html"
                   style={{
-                      width: '100svw',
+                      width: '180svw',
                       height: '100%',
                       border: 'none'
                   }}
