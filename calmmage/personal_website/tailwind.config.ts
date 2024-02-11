@@ -3,9 +3,9 @@ import { Config } from 'tailwindcss';
 
 export default {
   content: [
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
-    './pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './ui/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,md,mdx}',
+    './pages/**/*.{js,ts,jsx,tsx,md,mdx}',
+    './ui/**/*.{js,ts,jsx,tsx,md,mdx}',
   ],
   future: {
     hoverOnlyWhenSupported: true,
