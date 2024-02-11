@@ -16,7 +16,6 @@ const numCubes = 100;
 const numTrails = 20;
 const R = 3;
 const SCALE = 0.1;
-let POSITION_SCALE = 0.0077;
 const REACTION_STRENGTH = 0.02;
 const REACT_USE_DISTANCE = true;
 
@@ -35,12 +34,13 @@ const TIME_SPEED = 0.0005;
 const H = 900;
 const W = 1100;
 let WIDTH_SCALE = Math.min(window.innerWidth / W, 1);
-POSITION_SCALE = WIDTH_SCALE * 0.0077;
+let POSITION_MULT = 0.01;
+let POSITION_SCALE = WIDTH_SCALE * POSITION_MULT;
 
 // Add resize listener
 window.addEventListener('resize', () => {
     WIDTH_SCALE = Math.min(window.innerWidth / W, 1);
-    POSITION_SCALE = WIDTH_SCALE * 0.0077;
+    POSITION_SCALE = WIDTH_SCALE * POSITION_MULT;
     // Reset camera aspect ratio and renderer size
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
