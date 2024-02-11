@@ -1,3 +1,11 @@
+# Foam Docs
+
+This is the documentation for the [Foam](https://foambubble.github.io/foam/) project.
+
+Foam is a VSCode-based personal knowledge management based on Markdown
+
+Foam has built-in support for publishing your notes as a static website
+
 # Using Foam
 
 Foam is a collection VS Code extensions and recipes that power up the editor
