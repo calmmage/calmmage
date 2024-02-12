@@ -4,8 +4,8 @@ from pathlib import Path
 # noinspection PyUnresolvedReferences
 import pytest
 
-from calmlib.tools.dev_env_setup.dev_env import CalmmageDevEnv
-from calmlib.tools.dev_env_setup.presets import latest_preset
+from calmmage.dev_env import CalmmageDevEnv
+from calmmage.dev_env.presets import latest_preset
 
 
 def test_monthly_job(tmp_path):

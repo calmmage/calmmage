@@ -5,8 +5,8 @@ from pathlib import Path
 # noinspection PyUnresolvedReferences
 import pytest
 
-from calmlib.tools.dev_env_setup.dev_env import CalmmageDevEnv
-from calmlib.tools.dev_env_setup.presets import latest_preset
+from calmmage.dev_env import CalmmageDevEnv
+from calmmage.dev_env.presets import latest_preset
 
 # todo
 def test_new_github_project():
@@ -37,7 +37,8 @@ if __name__ == '__main__':
     # template_name = 'FAIL'
     template_name = 'bot-template'
     # env.
-    make_repo_from_template(c, name, template_name)
+    # env =
+    # env.make_repo_from_template(c, name, template_name)
     
     # tmp_path = Path(f'./tmp/root_dir_{timestamp}').absolute()
     # print(tmp_path)
