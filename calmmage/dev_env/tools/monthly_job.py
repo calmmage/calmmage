@@ -1,4 +1,4 @@
-from calmlib.tools.dev_env_setup.dev_env import (
+from calmmage.dev_env  import (
     CalmmageDevEnv,
     DEFAULT_ROOT_DIR,
     DEFAULT_APP_DATA_DIR,
