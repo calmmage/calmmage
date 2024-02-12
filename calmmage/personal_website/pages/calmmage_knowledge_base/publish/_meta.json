@@ -1,8 +1,8 @@
 {
-  "inbox": "A",
-  "focus": "B",
-  "ideas": "C",
-  "questions": "D",
-  "drafts": "E",
-  "beta": "F"
+  "inbox": "Completed Cases",
+  "focus": "Focus Case",
+  "ideas": "Ideas",
+  "questions": "Open Questions",
+  "drafts": "Solutions Drafts",
+  "beta": "Experimental Sections"
 }
