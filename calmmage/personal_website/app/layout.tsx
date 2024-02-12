@@ -1,7 +1,6 @@
-import '@/styles/globals.css';
 // import "./customized/globals.css";
-import Byline from '@/ui/byline';
-import { Sidebar } from '@/ui/sidebar';
+
+import '@/styles/globals.css';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -31,22 +30,13 @@ export default function RootLayout({
       <html lang="en">
       <body
           style={{
-            flexDirection: 'column',
             height: '100svh',
-            backgroundImage: 'url(/grid.svg)'
+            width: '100svw',
+            backgroundImage: 'url(/grid.svg)',
+            position: 'relative',
           }}
-          className="flex bg-gray-1100"
       >
-        <Sidebar />
-
-        <div
-            style={{ position: 'relative', height: '100svh' }}
-            className="flex-grow">
-          <div style={{ position: 'relative', height: '100%' }} className="mx-auto max-w-full space-y-8 px-2 lg:px-8 lg:py-8">
-            {children}
-            {/*<Byline className="fixed sm:hidden"/>*/}
-          </div>
-        </div>
+        {children}
       </body>
       </html>
   );
