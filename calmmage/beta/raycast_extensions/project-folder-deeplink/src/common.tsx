@@ -1,47 +1,72 @@
-import { Clipboard } from "@raycast/api";
+import { Clipboard, showToast, Toast } from "@raycast/api";
 import fs from "fs";
 // import { ActionPanel, List, Action } from "@raycast/api";
 import { exec, ExecException } from "child_process";
 import { getFinderDir } from "./get-finder-dir";
+import { showHUD } from "@raycast/api";
+
+
+export const checkPathExists = (path: string) => {
+  console.log(`Checking if path exists: ${path}`);
+  path = path.trim();
+  if (path === "") {
+
+    console.log(`path is empty: ${path}`);
+    return false;
+  }
+  console.log(`Path is not empty, proceeding: ${path}`);
+  try {
+    return fs.existsSync(path) || fs.existsSync(fs.realpathSync(path));
+  } catch (error) {
+    console.log(`Error checking path: ${error}`);
+    return false;
+  }
+}
 
 export const tools = [
+  "subl",
   "pycharm",
   "vscode",
   // "terminal", 
-  "warp", 
-  "subl",
+  "warp",
   "finder"
 ];
 
 export const appNameDict: { [key: string]: string } = {
+  "subl": "Sublime Text",
   "vscode": "Visual Studio Code",
   "pycharm": "PyCharm Professional Edition",
   // "terminal": "Terminal",
   "warp": "Warp",
-  "subl": "Sublime Text",
   "finder": "Finder"
 };
 
 export const toolNameDict: { [key: string]: string } = {
+  "subl": "Sublime",
   "vscode": "VS Code",
   "pycharm": "PyCharm",
   // "terminal": "Terminal",
   "warp": "Warp",
-  "subl": "Sublime",
   "finder": "Finder"
 };
 
 // todo: add a way to set the default tool via Raycast
 export const defaultTool = "vscode";
 
-export const openPathInTool = (path: string, tool: string) => {
+export const openPathInTool = async (path: string, tool: string) => {
   
   //todo: check if path exists (broken now)
-  // if (!fs.existsSync(path)) {
+  if (!checkPathExists(path)) {
   //   // todo: rewrite all logs to display output in Raycast
-  //   console.log(`Path does not exist: ${path}`);
-  //   return;
-  // }
+    const message = `Path does not exist: ${path}`;
+    console.log(message);
+    showToast({
+      title: "Path does not exist",
+      message: message,
+      style: Toast.Style.Failure
+    });
+    return;
+  }
 
   let appName = appNameDict[tool];
   let toolName = toolNameDict[tool];
@@ -51,6 +76,7 @@ export const openPathInTool = (path: string, tool: string) => {
     console.log(`Using default tool: ${toolName}`);
   }
 
+  await showHUD(`Opening ${path} in ${toolName}`);
   console.log(`Opening ${path} in ${toolName}`);
   const command = "open -a \"" + appName + "\" " + path;
 
@@ -63,7 +89,7 @@ export const openPathInTool = (path: string, tool: string) => {
       console.error(`Error opening ${path} in ${appName}: ${stderr}`);
       return;
     }
-    console.log(`Opened ${path} in ${appName}: ${stdout}`);
+    console.log(`Opened ${path} in ${appName}`);
   });
 
 };
@@ -77,24 +103,11 @@ export const openPathInTool = (path: string, tool: string) => {
 //     .catch(() => false);
 // }
 
-export const checkPathExists = (path: string) => {
-  console.log(`Checking if path exists: ${path}`);
-  path = path.trim();
-  if (path === "") {
-    return false;
-  }
-  console.log(`Path is not empty, proceeding: ${path}`);
-  try {
-    return fs.existsSync(path) || fs.existsSync(fs.realpathSync(path));
-  } catch (error) {
-    console.log(`Error checking path: ${error}`);
-    return false;
-  }
-}
+import clipboardy from 'clipboardy';
 
-export const getClipboardPath = async () => {
+export const getClipboardPath = () => {
   try {
-    const path = await Clipboard.readText();
+    const path = clipboardy.readSync();
     if (path) {
       // strip any leading/trailing whitespace
       return path.trim();
@@ -104,13 +117,13 @@ export const getClipboardPath = async () => {
     }
   } catch (error) {
     console.log(`Could not read from clipboard. Reason: ${error}`);
+    return "";
   }
-  return "";
 }
 
 export const copyToClipboard = async (text: string) => {
   try {
-    await Clipboard.paste(text);
+    await Clipboard.copy(text);
   } catch (error) {
     console.log(`Could not write to clipboard. Reason: ${error}`);
   }
@@ -157,7 +170,7 @@ const COMMAND_NAME = "open-dir-manual";
 // - raycast://extensions/engineering-friends/project-folder-deeplink/open-dir-manual?arguments=
 //     - arguments = URL-encoded JSON object.
 
-export function generateDeeplink(tool: string, path: string): string {
+export function generateDeeplink(path: string, tool: string): string {
   const argumentsObject = {
     path: path,
     tool: tool
