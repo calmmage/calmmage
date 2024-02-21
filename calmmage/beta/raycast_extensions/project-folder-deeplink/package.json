@@ -1,0 +1,106 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "project-folder-deeplink",
+  "title": "Project Folder Deeplink",
+  "description": "Open a project folder with a specified tool",
+  "icon": "icons8-compass-64-2.png",
+  "author": "petr_lavrov",
+  "owner": "engineering-friends",
+  "categories": [
+    "Developer Tools",
+    "Applications"
+  ],
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "open-dir",
+      "title": "Open dir",
+      "subtitle": "Open a project folder in selected app",
+      "description": "Open a provided path with one of the following apps:\n- Pycharm\n- VSCode\n- Sublime Text\n- Finder\n- Warp\n",
+      "mode": "view",
+      "arguments": [
+        {
+          "name": "path",
+          "type": "text",
+          "required": false,
+          "placeholder": "default: clipboard or current Finder dir"
+        }
+      ]
+    },
+    {
+      "name": "open-dir-clipboard",
+      "title": "[Dev] Open dir from clipboard",
+      "subtitle": "Open the path from clipboard in selected app",
+      "description": "Open the path from clipboard with one of the following apps:\n- Pycharm\n- VSCode\n- Sublime Text\n- Finder\n- Warp\n",
+      "mode": "view"
+    },
+    {
+      "name": "get-dir-link",
+      "title": "Get dir link from clipboard",
+      "subtitle": "Get a Raycast deep link for the path in the clipboard",
+      "description": "Get a Raycast deep link for the path in the clipboard in the selected tool",
+      "mode": "view",
+      "arguments": [
+        {
+          "name": "path",
+          "type": "text",
+          "required": false,
+          "placeholder": "default: clipboard or current Finder dir"
+        },
+        {
+          "name": "tool",
+          "type": "text",
+          "required": false,
+          "placeholder": "default: configured tool"
+        }
+      ]
+    },
+    {
+      "name": "sample-command",
+      "title": "[Dev] Sample Command",
+      "subtitle": "Open hardcoded path in selected app",
+      "description": "Open a hardcoded path with one of the following apps:\n- Pycharm\n- VSCode\n- Sublime Text\n- Finder\n- Warp\n",
+      "mode": "view"
+    },
+    {
+      "name": "open-dir-manual",
+      "title": "[Dev] Open dir manually",
+      "subtitle": "Open a project folder in selected app",
+      "description": "Open a provided path with one of the following apps:\n- Pycharm\n- VSCode\n- Sublime Text\n- Finder\n- Warp\n",
+      "mode": "view",
+      "arguments": [
+        {
+          "name": "path",
+          "type": "text",
+          "required": false,
+          "placeholder": "default: clipboard or current Finder dir"
+        },
+        {
+          "name": "tool",
+          "type": "text",
+          "required": false,
+          "placeholder": "default: Show selection menu"
+        }
+      ]
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.67.1",
+    "@raycast/utils": "^1.12.5"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^1.0.6",
+    "@types/node": "20.8.10",
+    "@types/react": "18.2.27",
+    "eslint": "^8.51.0",
+    "prettier": "^3.0.3",
+    "typescript": "^5.2.2"
+  },
+  "scripts": {
+    "build": "ray build -e dist",
+    "dev": "ray develop",
+    "fix-lint": "ray lint --fix",
+    "lint": "ray lint",
+    "publish": "npx @raycast/api@latest publish"
+  }
+}
