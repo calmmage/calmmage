@@ -1,8 +1,9 @@
 
-import { getPath, tools, toolNameDict, checkPathExists, openPathInTool} from './common';
+import { getPath, tools, toolNameDict, openPathInTool} from './core';
 import { Toast, showToast, ActionPanel, List, Action } from "@raycast/api";
 
 import { LaunchProps } from "@raycast/api";
+import { checkPathExists } from "./utils/path_utils";
 
 const openPathFromUserInTool = async (path: string, tool: string) => {
     // get clipboard path if no path provided

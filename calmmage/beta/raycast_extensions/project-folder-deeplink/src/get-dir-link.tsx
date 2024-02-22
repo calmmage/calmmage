@@ -1,6 +1,9 @@
-import { checkPathExists, copyHyperlinkToClipboard, createTinyURL, generateDeeplinkArgs, getClipboardPath } from './common';
-import { toolNameDict } from './common';
+
+import { toolNameDict } from './core';
 import { LaunchProps, showHUD, showToast, Toast } from "@raycast/api";
+import { checkPathExists } from "./utils/path_utils";
+import { createTinyURL, generateDeeplink } from "./utils/url_utils";
+import { copyHyperlinkToClipboard, getClipboardPath } from "./utils/clipboard_utils";
 
 export default async function GetDirLink(props: LaunchProps<{ arguments?: Arguments.GetDirLink }>) {
     let path = props.arguments?.path || "";
@@ -43,9 +46,9 @@ export default async function GetDirLink(props: LaunchProps<{ arguments?: Argume
             });
             return;
         }
-        deeplink = generateDeeplinkArgs({path: path, tool: tool}, "open-dir-manual");
+        deeplink = generateDeeplink({path: path, tool: tool}, "open-dir-manual");
     } else {
-        deeplink = generateDeeplinkArgs({path: path}, "open-dir");
+        deeplink = generateDeeplink({path: path}, "open-dir");
     }
     // console.log(`generating TinyURL`);
     const tinyurl = await createTinyURL(deeplink);

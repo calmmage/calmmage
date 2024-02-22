@@ -1,5 +1,5 @@
 
-import { openPathInTool } from './common';
+import { openPathInTool } from './core';
 import { LaunchProps} from "@raycast/api";
 
 // Command:  open the provided dir in the selected tool
