@@ -39,7 +39,7 @@
       "title": "Get dir link from clipboard",
       "subtitle": "Get a Raycast deep link for the path in the clipboard",
       "description": "Get a Raycast deep link for the path in the clipboard in the selected tool",
-      "mode": "view",
+      "mode": "no-view",
       "arguments": [
         {
           "name": "path",
@@ -86,7 +86,9 @@
   ],
   "dependencies": {
     "@raycast/api": "^1.67.1",
-    "@raycast/utils": "^1.12.5"
+    "@raycast/utils": "^1.12.5",
+    "axios": "^1.6.7",
+    "dotenv": "^16.4.5"
   },
   "devDependencies": {
     "@raycast/eslint-config": "^1.0.6",

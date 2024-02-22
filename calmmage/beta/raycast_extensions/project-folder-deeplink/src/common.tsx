@@ -7,16 +7,24 @@ import { showHUD } from "@raycast/api";
 
 
 export const checkPathExists = (path: string) => {
-  console.log(`Checking if path exists: ${path}`);
+  console.log(`Checking if path exists: "${path}"`);
   path = path.trim();
-  if (path === "") {
-
-    console.log(`path is empty: ${path}`);
+  if (path.includes("\n")) {
+    console.log("Path contains multiple lines, returning false");
     return false;
   }
-  console.log(`Path is not empty, proceeding: ${path}`);
+
+  if (path === "") {
+    console.log("Path is empty, returning false");
+    return false;
+  }
+  // console.log(`Path is not empty, proceeding: ${path}`);
+  // todo: figure out how to handle this better 
+  //  - for now realpathSync is used to resolve symlinks 
+  //  - but on missing paths it always throws an error
+  //  so it's either true or an error - clunky. But works.
   try {
-    return fs.existsSync(path) || fs.existsSync(fs.realpathSync(path));
+    return fs.existsSync(fs.realpathSync(path));
   } catch (error) {
     console.log(`Error checking path: ${error}`);
     return false;
@@ -103,21 +111,24 @@ export const openPathInTool = async (path: string, tool: string) => {
 //     .catch(() => false);
 // }
 
-import clipboardy from 'clipboardy';
-
-export const getClipboardPath = () => {
+export const getClipboardPath = async () => {
   try {
-    const path = clipboardy.readSync();
+    let path = await Clipboard.readText() || "";
+    path = path.trim();
     if (path) {
       // strip any leading/trailing whitespace
-      return path.trim();
+      return path;
     } else {
-      console.log("Clipboard content is undefined");
-      return "";
+      const msg = "Clipboard content is empty";
+      console.log(msg);
+      throw new Error(msg);
+      // return "";
     }
   } catch (error) {
-    console.log(`Could not read from clipboard. Reason: ${error}`);
-    return "";
+    const msg = `Could not read from clipboard. Reason: ${error}`;
+    console.log(msg);
+    throw new Error(msg);
+    // return "";
   }
 }
 
@@ -186,3 +197,18 @@ export function generateDeeplink(path: string, tool: string): string {
     .replace("{command}", COMMAND_NAME)
     .replace("{arguments}", argumentsString);
 }
+
+export async function copyHtmlToClipboard(html: string) {
+  const htmlContent: Clipboard.Content = {
+    html: html,
+  };
+  await Clipboard.copy(htmlContent);
+// console.log('HTML copied to clipboard');
+}
+  
+export async function copyHyperlinkToClipboard(name: string, link: string) {
+    // const hyperlink = `[${name}](${link})`;
+    const hyperlink = `<a href="${link}">${name}</a>`;
+    await copyHtmlToClipboard(hyperlink);
+    // console.log(`Copied to clipboard: ${hyperlink}`);
+    }

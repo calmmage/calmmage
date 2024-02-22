@@ -25,15 +25,12 @@ const openPathFromUserInTool = async (path: string, tool: string) => {
 
 // Command:  open the provided dir in the selected tool
 export default function OpenDir(props: LaunchProps<{ arguments?: Arguments.OpenDir }>) {
-    let path = props.arguments?.path || "";
-    if (!checkPathExists(path)) {
-        // todo: check if path exists and if not - get path from clipboard (sync!!)
-      console.log("Path does not exist, getting path from data");
-      path = getClipboardPath();
-    }
+    const path = props.arguments?.path || "";
+    // if (!checkPathExists(path)) {
+    // todo: check if path exists and if not - get path from clipboard (sync!!)
     return (
       <List>
-        <List.Section title={`Opening ${path}`} >
+        <List.Section title={`Opening ${path || "dir"}`} >
         {tools.map((tool) => (
           <List.Item
             key={tool}
