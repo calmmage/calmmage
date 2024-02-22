@@ -1,8 +1,9 @@
-import { getPreferenceValues, showHUD, showToast, Toast } from "@raycast/api";
+import { getPreferenceValues } from "@raycast/api";
 import { exec, ExecException } from "child_process";
 import { getFinderDir } from "./utils/get-finder-dir";
 import { checkPathExists } from "./utils/path-utils";
 import { getClipboardPath } from "./utils/clipboard-utils";
+import { logWithHUD, logWithToast } from "./utils/raycast-utils";
 
 export interface App {
   key: string; // unique key
@@ -10,15 +11,19 @@ export interface App {
   name: string; // name of the app to call
 }
 
+const preferences = getPreferenceValues<Preferences>();
+
 export const appsDict: { [key: string]: App } = {
-  "subl": { key: "subl", name: "Sublime Text", title: "Sublime" },
+  // todo: this is hacky way to add default app to the list of apps. 
+  //  Should I rework this to avoid issues in the future?
+  "" : { key: "", name: "", title: `Default (${preferences.defaultApp})` },
+  // "subl": { key: "subl", name: "Sublime Text", title: "Sublime" },
   "vscode": { key: "vscode", name: "Visual Studio Code", title: "VS Code" },
-  "pycharm": { key: "pycharm", name: "PyCharm Professional Edition", title: "PyCharm" },
-  "warp": { key: "warp", name: "Warp", title: "Warp" },
+  // "pycharm": { key: "pycharm", name: "PyCharm Professional Edition", title: "PyCharm" },
+  // "warp": { key: "warp", name: "Warp", title: "Warp" },
   "finder": { key: "finder", name: "Finder", title: "Finder" }
 };
 
-const preferences = getPreferenceValues<Preferences>();
 const extraApps = preferences.extraApps?.split(',').map(app => app.trim()) || [];
 
 for (const app of extraApps) {
@@ -50,25 +55,17 @@ export const getApp = (key: string): App => {
   return appsDict[key];
 };
 
-export const openPathInTool = async (path: string, tool: string) => {
-
+export const openPathInApp = async (path: string, tool: string) => {
   // check if path exists
   if (!checkPathExists(path)) {
     // todo: rewrite all logs to display output in Raycast
     const message = `Path does not exist: ${path}`;
-    console.log(message);
-    await showToast({
-      title: "No path selected / Path does not exist",
-      message: message,
-      style: Toast.Style.Failure
-    });
+    await logWithToast(message, "No path selected / Path does not exist");
     return;
   }
 
   const app = getApp(tool);
-
-  await showHUD(`Opening ${path} in ${app.title}`);
-  console.log(`Opening ${path} in ${app.title}`);
+  await logWithHUD(`Opening ${path} in ${app.title}`);
   const command = `open -a "${app.name}" ${path}`;
 
   exec(command, (error: ExecException | null, stdout: string, stderr: string) => {

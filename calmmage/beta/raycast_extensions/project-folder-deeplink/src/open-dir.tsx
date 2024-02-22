@@ -1,10 +1,10 @@
 
-import { getPath, appsDict, openPathInTool} from './core';
+import { getPath, appsDict, openPathInApp} from './core';
 import { ActionPanel, List, Action } from "@raycast/api";
 import { LaunchProps } from "@raycast/api";
 import { exitCommand } from './utils/raycast-utils';
 
-const openPathFromUserInTool = async (path: string, tool: string) => {
+const openPathFromUserInApp = async (path: string, tool: string) => {
   // get clipboard path if no path provided
   if (!path) {
     path = await getPath();
@@ -15,7 +15,7 @@ const openPathFromUserInTool = async (path: string, tool: string) => {
     exitCommand();
   }, 1000);
 
-  openPathInTool(path, tool);
+  await openPathInApp(path, tool);
 }
 
 // ------------------------------
@@ -76,7 +76,7 @@ export default function OpenDir(props: LaunchProps<{ arguments?: Arguments.OpenD
                 <Action
                   title={`Open in ${app.title}`}
                   onAction={() => {
-                    openPathFromUserInTool(path, app.key);
+                    openPathFromUserInApp(path, app.key);
                     // closeMainWindow();
                   }
                 }

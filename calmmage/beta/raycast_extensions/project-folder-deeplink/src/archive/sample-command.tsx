@@ -1,13 +1,13 @@
 // Command: Open hardcoded path in the selected tool
 
-import { tools, toolNameDict, openPathInTool} from '../core';
+import { tools, toolNameDict, openPathInApp} from '../core';
 import { ActionPanel, List, Action } from "@raycast/api";
 
 const hardcodedPath = "/Users/calm/work/code/structured/tools/calmmage/calmmage/beta/raycast_extensions/project-folder-deeplink/dev";
 
 
 const openHardcodedPathInTool = (tool: string) => {
-    return openPathInTool(hardcodedPath, tool);
+    return openPathInApp(hardcodedPath, tool);
 }
 
 // Command 1: Open path from clipboard in a tool

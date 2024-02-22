@@ -1,4 +1,4 @@
-import { appsDict, openPathInTool } from "../core";
+import { appsDict, openPathInApp } from "../core";
 import { Toast, showToast, ActionPanel, List, Action } from "@raycast/api";
 import { checkPathExists } from "../utils/path-utils";
 import { getClipboardPath } from "../utils/clipboard-utils";
@@ -18,7 +18,7 @@ const openPathFromClipboardInTool = async (tool: string) => {
         return;
     }
 
-    return openPathInTool(path, tool);
+    return openPathInApp(path, tool);
 }
 
 

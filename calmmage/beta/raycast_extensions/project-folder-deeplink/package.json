@@ -2,7 +2,7 @@
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "project-folder-deeplink",
   "title": "Project Folder Deeplink",
-  "description": "Open a project folder with a specified tool",
+  "description": "Open a project folder with a specified app",
   "icon": "icons8-compass-64-2.png",
   "author": "petr_lavrov",
   "owner": "engineering-friends",
@@ -32,7 +32,8 @@
       "title": "Extra Apps",
       "description": "comma-separated list of extra apps to open project folders with",
       "type": "textfield",
-      "required": false
+      "required": false,
+      "default": "PyCharm Professional Edition, Warp, Sublime Text, WebStorm"
     }
   ],
   "commands": [
@@ -55,7 +56,7 @@
       "name": "get-dir-link",
       "title": "Get dir link",
       "subtitle": "Get a https link to open provided path in selected app",
-      "description": "Get a Raycast deep link for the path in the clipboard in the selected tool",
+      "description": "Get a Raycast deep link for the path in the clipboard in the selected app",
       "mode": "no-view",
       "arguments": [
         {
@@ -66,11 +67,11 @@
           "description": "If empty - will use the path from the clipboard or the current Finder dir. If not empty - will use the provided path."
         },
         {
-          "name": "tool",
+          "name": "app",
           "type": "text",
           "required": false,
           "placeholder": "subl, pycharm, vscode, warp, or finder",
-          "description": "If empty - will show the selection menu later. If not empty - will use the provided tool. Available tools: subl, pycharm, vscode, warp, or finder."
+          "description": "If empty - will show the selection menu later. If not empty - will use the provided app. Available apps: subl, pycharm, vscode, warp, or finder."
         }
       ]
     },
@@ -88,7 +89,7 @@
           "placeholder": "default: clipboard or current Finder dir"
         },
         {
-          "name": "tool",
+          "name": "app",
           "type": "text",
           "required": false,
           "placeholder": "default: Show selection menu"
