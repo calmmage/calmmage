@@ -4,7 +4,7 @@ import { ActionPanel, List, Action } from "@raycast/api";
 import { LaunchProps } from "@raycast/api";
 import { exitCommand } from './utils/raycast-utils';
 
-const openPathFromUserInApp = async (path: string, tool: string) => {
+const openPathFromUserInApp = async (path: string, app: string) => {
   // get clipboard path if no path provided
   if (!path) {
     path = await getPath();
@@ -15,7 +15,7 @@ const openPathFromUserInApp = async (path: string, tool: string) => {
     exitCommand();
   }, 1000);
 
-  await openPathInApp(path, tool);
+  await openPathInApp(path, app);
 }
 
 // ------------------------------

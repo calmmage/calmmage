@@ -24,7 +24,7 @@
       "title": "Default App",
       "description": "Default app to open project folders",
       "type": "textfield",
-      "default": "finder",
+      "default": "auto",
       "required": false
     },
     {
@@ -33,7 +33,23 @@
       "description": "comma-separated list of extra apps to open project folders with",
       "type": "textfield",
       "required": false,
-      "default": "PyCharm Professional Edition, Warp, Sublime Text, WebStorm"
+      "default": "PyCharm Professional Edition, Sublime Text, WebStorm"
+    },
+    {
+      "name": "extraRules",
+      "title": "Extra regexp rules",
+      "description": "comma-separated list of extra regexp rules to auto-pick the app by path",
+      "type": "textfield",
+      "required": false,
+      "default": "**.ts: vscode, **.py: pycharm"
+    },
+    {
+      "name": "defaultAutoApp",
+      "title": "Default Auto App",
+      "description": "Default app to use if the path is not matched by any regexp rule",
+      "type": "textfield",
+      "default": "sublime",
+      "required": false
     }
   ],
   "commands": [

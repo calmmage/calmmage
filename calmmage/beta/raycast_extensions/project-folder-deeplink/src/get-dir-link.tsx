@@ -1,11 +1,11 @@
 
-import { getApp, getPath } from './core';
+import { appsDict, getApp, getAppByRegexp, getPath, isValidAppKey } from './core';
 
-import { LaunchProps, showHUD, showToast, Toast } from "@raycast/api";
+import { LaunchProps } from "@raycast/api";
 import { checkPathExists } from "./utils/path-utils";
 import { createTinyURL, generateDeeplink } from "./utils/url-utils";
 import { copyHyperlinkToClipboard } from "./utils/clipboard-utils";
-import { logWithToast } from './utils/raycast-utils';
+import { logWithHUD, logWithToast } from './utils/raycast-utils';
 
 export default async function GetDirLink(props: LaunchProps<{ arguments?: Arguments.GetDirLink }>) {
     let path = props.arguments?.path || "";
@@ -31,35 +31,37 @@ export default async function GetDirLink(props: LaunchProps<{ arguments?: Argume
         return;
     }
 
-    const tool = props.arguments?.app || "";
+    let app = props.arguments?.app || "";
     let deeplink = undefined;
-    let app = undefined;
-    let name = `Open ${path}`;
+    // let name = `Open ${path}`;
     // let name = `Open ${path}`.replace('/', '\\');
-    // let name = path.split('/').pop() || 'dir';
-    name = `Open ${name}`;
-    if (tool) {
-        try {
-            app = getApp(tool);
-            deeplink = generateDeeplink({path: path, tool: tool}, "open-dir-manual");
-            name += ` in ${app.title}`;
-        } catch (error) {
-            console.log(`Could not get app for tool: ${tool}. Reason: ${error}`);
-            await showToast({
-                style: Toast.Style.Failure,
-                title: "Could not get app for tool",
-                message: "tool: " + tool + ", error: " + error,
-            });
-            return;
+    let name = `Open ${path.split('/').pop() || 'dir'}`;
+    if (!app || app === "auto") {
+        app = getAppByRegexp(path);
+        if (!app) {
+            console.log(`Could not find app for path: ${path}`);
+            deeplink = generateDeeplink({path: path}, "open-dir");
+        } else {
+            console.log(`Found app for path: ${path} - ${app}`)
+            if (!isValidAppKey(app)) {
+                logWithToast(`Invalid app key: ${app}, available keys: ${Object.keys(appsDict)}`, "Invalid app key");
+                return;
+            }
+            deeplink = generateDeeplink({path: path, app: app}, "open-dir-manual");
+            name += ` in ${getApp(app).title}`;
         }
     } else {
-        deeplink = generateDeeplink({path: path}, "open-dir");
-    }
+        if (!isValidAppKey(app)) {
+            logWithToast(`Invalid app key: ${app}, available keys: ${Object.keys(appsDict)}`, "Invalid app key");
+            return;
+        }
+        deeplink = generateDeeplink({path: path, app: app}, "open-dir-manual");
+        name += ` in ${getApp(app).title}`;
+    } 
     // console.log(`generating TinyURL`);
     const tinyurl = await createTinyURL(deeplink);
     // console.log(`TinyURL: ${tinyurl}`);
     await copyHyperlinkToClipboard(name, tinyurl);
     
-    console.log(`Copied to clipboard: ${tinyurl}: ${deeplink}`);
-    showHUD(`Copied link to ${path}`);
+    logWithHUD(`Copied link to ${path}: ${tinyurl}`);
 }
