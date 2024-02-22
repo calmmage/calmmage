@@ -1,9 +1,10 @@
 
-import { toolNameDict } from './core';
+import { getApp } from './core';
+
 import { LaunchProps, showHUD, showToast, Toast } from "@raycast/api";
-import { checkPathExists } from "./utils/path_utils";
-import { createTinyURL, generateDeeplink } from "./utils/url_utils";
-import { copyHyperlinkToClipboard, getClipboardPath } from "./utils/clipboard_utils";
+import { checkPathExists } from "./utils/path-utils";
+import { createTinyURL, generateDeeplink } from "./utils/url-utils";
+import { copyHyperlinkToClipboard, getClipboardPath } from "./utils/clipboard-utils";
 
 export default async function GetDirLink(props: LaunchProps<{ arguments?: Arguments.GetDirLink }>) {
     let path = props.arguments?.path || "";
@@ -35,31 +36,31 @@ export default async function GetDirLink(props: LaunchProps<{ arguments?: Argume
 
     const tool = props.arguments?.tool || "";
     let deeplink = undefined;
+    let app = undefined;
+    let name = `Open ${path}`;
+    // let name = `Open ${path}`.replace('/', '\\');
+    // let name = path.split('/').pop() || 'dir';
+    name = `Open ${name}`;
     if (tool) {
-        // deeplink = generateDeeplink(path, tool);
-        if (!(tool in toolNameDict)) {
-            console.log("Invalid tool specified");
+        try {
+            app = getApp(tool);
+            deeplink = generateDeeplink({path: path, tool: tool}, "open-dir-manual");
+            name += ` in ${app.title}`;
+        } catch (error) {
+            console.log(`Could not get app for tool: ${tool}. Reason: ${error}`);
             await showToast({
                 style: Toast.Style.Failure,
-                title: "Invalid tool specified",
-                message: "Please provide a valid tool, values: " + Object.keys(toolNameDict).join(", ") + " or leave empty for default tool."
+                title: "Could not get app for tool",
+                message: "tool: " + tool + ", error: " + error,
             });
             return;
         }
-        deeplink = generateDeeplink({path: path, tool: tool}, "open-dir-manual");
     } else {
         deeplink = generateDeeplink({path: path}, "open-dir");
     }
     // console.log(`generating TinyURL`);
     const tinyurl = await createTinyURL(deeplink);
     // console.log(`TinyURL: ${tinyurl}`);
-    let name = `Open ${path}`;
-    // let name = `Open ${path}`.replace('/', '\\');
-    // let name = path.split('/').pop() || 'dir';
-    name = `Open ${name}`;
-    if (tool) {
-        name += ` in ${toolNameDict[tool]}`;
-    }
     await copyHyperlinkToClipboard(name, tinyurl);
     
     console.log(`Copied to clipboard: ${tinyurl}: ${deeplink}`);

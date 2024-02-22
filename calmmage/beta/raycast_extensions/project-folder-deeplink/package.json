@@ -11,6 +11,30 @@
     "Applications"
   ],
   "license": "MIT",
+  "preferences": [
+    {
+      "name": "tinyurlApiToken",
+      "title": "TinyURL API Token",
+      "description": "API token for TinyURL - required to make deepkinks clickable",
+      "type": "password",
+      "required": true
+    },
+    {
+      "name": "defaultApp",
+      "title": "Default App",
+      "description": "Default app to open project folders",
+      "type": "textfield",
+      "default": "finder",
+      "required": false
+    },
+    {
+      "name": "extraApps",
+      "title": "Extra Apps",
+      "description": "comma-separated list of extra apps to open project folders with",
+      "type": "textfield",
+      "required": false
+    }
+  ],
   "commands": [
     {
       "name": "open-dir",

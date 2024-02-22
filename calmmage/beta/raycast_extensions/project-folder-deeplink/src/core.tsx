@@ -1,79 +1,86 @@
-import { showHUD, showToast, Toast } from "@raycast/api";
+import { getPreferenceValues, showHUD, showToast, Toast } from "@raycast/api";
 import { exec, ExecException } from "child_process";
-import { getFinderDir } from "./get-finder-dir";
-import dotenv from "dotenv";
-import { checkPathExists } from "./utils/path_utils";
-import { filepath } from "./utils/url_utils";
-import { getClipboardPath } from "./utils/clipboard_utils";
+import { getFinderDir } from "./utils/get-finder-dir";
+import { checkPathExists } from "./utils/path-utils";
+import { getClipboardPath } from "./utils/clipboard-utils";
 
+export interface App {
+  key: string; // unique key
+  title: string; // title to display
+  name: string; // name of the app to call
+}
 
-export const tools = [
-  "subl",
-  "pycharm",
-  "vscode",
-  // "terminal", 
-  "warp",
-  "finder"
-];
-
-export const appNameDict: { [key: string]: string } = {
-  "subl": "Sublime Text",
-  "vscode": "Visual Studio Code",
-  "pycharm": "PyCharm Professional Edition",
-  // "terminal": "Terminal",
-  "warp": "Warp",
-  "finder": "Finder"
+export const appsDict: { [key: string]: App } = {
+  "subl": { key: "subl", name: "Sublime Text", title: "Sublime" },
+  "vscode": { key: "vscode", name: "Visual Studio Code", title: "VS Code" },
+  "pycharm": { key: "pycharm", name: "PyCharm Professional Edition", title: "PyCharm" },
+  "warp": { key: "warp", name: "Warp", title: "Warp" },
+  "finder": { key: "finder", name: "Finder", title: "Finder" }
 };
 
-export const toolNameDict: { [key: string]: string } = {
-  "subl": "Sublime",
-  "vscode": "VS Code",
-  "pycharm": "PyCharm",
-  // "terminal": "Terminal",
-  "warp": "Warp",
-  "finder": "Finder"
-};
+const preferences = getPreferenceValues<Preferences>();
+const extraApps = preferences.extraApps?.split(',').map(app => app.trim()) || [];
 
-// todo: add a way to set the default tool via Raycast
-export const defaultTool = "vscode";
+for (const app of extraApps) {
+  const key = app.split(" ")[0].toLowerCase();
+  const name = app;
+  const title = app.split(" ")[0];
+
+  appsDict[key] = { key, title, name } as App;
+}
+
+export function getAppsDict() {
+  return appsDict;
+}
+
+export const getApp = (key: string): App => {
+  const preferences = getPreferenceValues<Preferences>();
+  // If key is empty, return the default app
+  if (!key) {
+    return appsDict[preferences.defaultApp];
+  }
+
+  // If key is not in appsDict, throw an error and show available keys
+  if (!appsDict[key]) {
+    const availableKeys = Object.keys(appsDict).join(", ");
+    throw new Error(`Invalid key. Available keys are: ${availableKeys}`);
+  }
+
+  // Return the app corresponding to the key
+  return appsDict[key];
+};
 
 export const openPathInTool = async (path: string, tool: string) => {
-  
+
   // check if path exists
   if (!checkPathExists(path)) {
     // todo: rewrite all logs to display output in Raycast
     const message = `Path does not exist: ${path}`;
     console.log(message);
     await showToast({
-      title: "Path does not exist",
+      title: "No path selected / Path does not exist",
       message: message,
       style: Toast.Style.Failure
     });
     return;
   }
 
-  let appName = appNameDict[tool];
-  let toolName = toolNameDict[tool];
-  if (!appName) {
-    appName = appNameDict[defaultTool];
-    toolName = toolNameDict[defaultTool];
-    console.log(`Using default tool: ${toolName}`);
-  }
+  const app = getApp(tool);
 
-  await showHUD(`Opening ${path} in ${toolName}`);
-  console.log(`Opening ${path} in ${toolName}`);
-  const command = "open -a \"" + appName + "\" " + path;
+  await showHUD(`Opening ${path} in ${app.title}`);
+  console.log(`Opening ${path} in ${app.title}`);
+  const command = `open -a "${app.name}" ${path}`;
 
   exec(command, (error: ExecException | null, stdout: string, stderr: string) => {
     if (error) {
-      console.error(`Error opening ${path} in ${appName}: ${error.message}`);
+      console.error(`Error opening ${path} in ${app.title}: ${error.message}`);
       return;
     }
     if (stderr) {
-      console.error(`Error opening ${path} in ${appName}: ${stderr}`);
+      console.error(`Error opening ${path} in ${app.title}: ${stderr}`);
       return;
     }
-    console.log(`Opened ${path} in ${appName}`);
+    console.log(`Opened ${path} in ${app.title}`);
   });
 
 };
@@ -97,7 +104,7 @@ export const getPath = async () => {
   if (checkPathExists(path)) {
     return path;
   }
-  
+
   console.log("Path from clipboard does not exist, getting path from Finder");
   // 2. selected items in Finder or Path Finder
   path = await getFinderDir();
@@ -111,8 +118,4 @@ export const getPath = async () => {
   return "";
 
 
-}
-
-    
-dotenv.config({ path: filepath })
-    
+};
