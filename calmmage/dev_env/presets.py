@@ -28,6 +28,7 @@ class PresetJan2024(Preset):
         "code/structured/projects",
         "code/structured/unsorted",
         "code/structured/archive",
+        "code/structured/beta",
         "code/seasonal",
         "code/seasonal/past",
         "workspace/launchd/scripts",
