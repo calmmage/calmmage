@@ -11,9 +11,9 @@ export default function Page() {
             <div className="w-full"
                  style={{border: '2px dotted #101', padding: '10px'}}>
                 <iframe scrolling="no"
-                        src="/showcase/demo1/index.html"
+                        src="/showcase/demo4-tube/index.html"
                         style={{width: '100%', height: '600px', border: 'none'}}
-                        title="Demo 1"
+                        title="Demo 4"
                 ></iframe>
             </div>
         </div>
