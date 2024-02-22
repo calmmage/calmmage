@@ -1,0 +1,12 @@
+- [ ] Implement development best practices from Raycast https://developers.raycast.com/information/best-practices
+  - [ ] add Loading animations where necessary
+  - [ ] Handle errors - show toasts etc..
+- [ ] Use https://developers.raycast.com/api-reference/preferences to set up the extension preferences 
+- [ ] Add 'forceFolder' option to each app
+    - [ ] If forceFolder is set and provided path is a file - opent the parent folder
+    - [ ] if not set - open the file
+  - [ ] add defaultForceFolder option to each app, Warp, Finder - true, other - false
+  - [ ] add forceFolder parameter to each function
+    - [ ] getDirLink
+    - [ ] openDir
+  - [ ] add more functions - open dir? open path? 

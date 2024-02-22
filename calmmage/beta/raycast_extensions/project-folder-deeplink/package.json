@@ -1,0 +1,137 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "project-folder-deeplink",
+  "title": "Project Folder Deeplink",
+  "description": "Open a project folder with a specified app",
+  "icon": "icons8-compass-64-2.png",
+  "author": "petr_lavrov",
+  "owner": "engineering-friends",
+  "categories": [
+    "Developer Tools",
+    "Applications"
+  ],
+  "license": "MIT",
+  "preferences": [
+    {
+      "name": "tinyurlApiToken",
+      "title": "TinyURL API Token",
+      "description": "API token for TinyURL - required to make deepkinks clickable",
+      "type": "password",
+      "required": true
+    },
+    {
+      "name": "defaultApp",
+      "title": "Default App",
+      "description": "Default app to open project folders",
+      "type": "textfield",
+      "default": "auto",
+      "required": false
+    },
+    {
+      "name": "extraApps",
+      "title": "Extra Apps",
+      "description": "comma-separated list of extra apps to open project folders with",
+      "type": "textfield",
+      "required": false,
+      "default": "PyCharm Professional Edition, Sublime Text, WebStorm"
+    },
+    {
+      "name": "extraRules",
+      "title": "Extra regexp rules",
+      "description": "comma-separated list of extra regexp rules to auto-pick the app by path",
+      "type": "textfield",
+      "required": false,
+      "default": "**.ts: vscode, **.py: pycharm"
+    },
+    {
+      "name": "defaultAutoApp",
+      "title": "Default Auto App",
+      "description": "Default app to use if the path is not matched by any regexp rule",
+      "type": "textfield",
+      "default": "sublime",
+      "required": false
+    }
+  ],
+  "commands": [
+    {
+      "name": "open-dir",
+      "title": "Open dir",
+      "subtitle": "Open a project folder in selected app",
+      "description": "Open a provided path with one of the following apps:\n- Pycharm\n- VSCode\n- Sublime Text\n- Finder\n- Warp\n",
+      "mode": "view",
+      "arguments": [
+        {
+          "name": "path",
+          "type": "text",
+          "required": false,
+          "placeholder": "default: clipboard or current Finder dir"
+        }
+      ]
+    },
+    {
+      "name": "get-dir-link",
+      "title": "Get dir link",
+      "subtitle": "Get a https link to open provided path in selected app",
+      "description": "Get a Raycast deep link for the path in the clipboard in the selected app",
+      "mode": "no-view",
+      "arguments": [
+        {
+          "name": "path",
+          "type": "text",
+          "required": false,
+          "placeholder": "default: clipboard or current Finder dir",
+          "description": "If empty - will use the path from the clipboard or the current Finder dir. If not empty - will use the provided path."
+        },
+        {
+          "name": "app",
+          "type": "text",
+          "required": false,
+          "placeholder": "subl, pycharm, vscode, warp, or finder",
+          "description": "If empty - will show the selection menu later. If not empty - will use the provided app. Available apps: subl, pycharm, vscode, warp, or finder."
+        }
+      ]
+    },
+    {
+      "name": "open-dir-manual",
+      "title": "[Dev] Open dir manually",
+      "subtitle": "Open a project folder in selected app",
+      "description": "Open a provided path with the specified app",
+      "mode": "no-view",
+      "arguments": [
+        {
+          "name": "path",
+          "type": "text",
+          "required": false,
+          "placeholder": "default: clipboard or current Finder dir"
+        },
+        {
+          "name": "app",
+          "type": "text",
+          "required": false,
+          "placeholder": "default: Show selection menu"
+        }
+      ]
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.67.1",
+    "@raycast/utils": "^1.12.5",
+    "axios": "^1.6.7",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^1.0.6",
+    "@types/node": "20.8.10",
+    "@types/react": "18.2.27",
+    "eslint": "^8.51.0",
+    "prettier": "^3.0.3",
+    "typescript": "^5.2.2"
+  },
+  "scripts": {
+    "build": "ray build -e dist",
+    "dev": "ray develop",
+    "fix-lint": "ray lint --fix",
+    "lint": "ray lint",
+    "publish": "npx @raycast/api@latest publish"
+  }
+}
