@@ -1,0 +1,4 @@
+- [ ] Implement development best practices from Raycast https://developers.raycast.com/information/best-practices
+  - [ ] add Loading animations where necessary
+  - [ ] Handle errors - show toasts etc..
+- [ ] Use https://developers.raycast.com/api-reference/preferences to set up the extension preferences 

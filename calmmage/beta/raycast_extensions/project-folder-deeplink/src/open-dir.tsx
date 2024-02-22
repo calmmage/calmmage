@@ -1,5 +1,5 @@
 
-import { getPath, tools, toolNameDict, checkPathExists, openPathInTool, getClipboardPath} from './common';
+import { getPath, tools, toolNameDict, checkPathExists, openPathInTool} from './common';
 import { Toast, showToast, ActionPanel, List, Action } from "@raycast/api";
 
 import { LaunchProps } from "@raycast/api";
@@ -26,8 +26,10 @@ const openPathFromUserInTool = async (path: string, tool: string) => {
 // Command:  open the provided dir in the selected tool
 export default function OpenDir(props: LaunchProps<{ arguments?: Arguments.OpenDir }>) {
     const path = props.arguments?.path || "";
+    
     // if (!checkPathExists(path)) {
     // todo: check if path exists and if not - get path from clipboard (sync!!)
+    // try https://developers.raycast.com/utilities/react-hooks/usepromise
     return (
       <List>
         <List.Section title={`Opening ${path || "dir"}`} >

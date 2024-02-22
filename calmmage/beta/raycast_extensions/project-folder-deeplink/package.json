@@ -28,16 +28,9 @@
       ]
     },
     {
-      "name": "open-dir-clipboard",
-      "title": "[Dev] Open dir from clipboard",
-      "subtitle": "Open the path from clipboard in selected app",
-      "description": "Open the path from clipboard with one of the following apps:\n- Pycharm\n- VSCode\n- Sublime Text\n- Finder\n- Warp\n",
-      "mode": "view"
-    },
-    {
       "name": "get-dir-link",
-      "title": "Get dir link from clipboard",
-      "subtitle": "Get a Raycast deep link for the path in the clipboard",
+      "title": "Get dir link",
+      "subtitle": "Get a https link to open provided path in selected app",
       "description": "Get a Raycast deep link for the path in the clipboard in the selected tool",
       "mode": "no-view",
       "arguments": [
@@ -45,29 +38,24 @@
           "name": "path",
           "type": "text",
           "required": false,
-          "placeholder": "default: clipboard or current Finder dir"
+          "placeholder": "default: clipboard or current Finder dir",
+          "description": "If empty - will use the path from the clipboard or the current Finder dir. If not empty - will use the provided path."
         },
         {
           "name": "tool",
           "type": "text",
           "required": false,
-          "placeholder": "default: configured tool"
+          "placeholder": "subl, pycharm, vscode, warp, or finder",
+          "description": "If empty - will show the selection menu later. If not empty - will use the provided tool. Available tools: subl, pycharm, vscode, warp, or finder."
         }
       ]
-    },
-    {
-      "name": "sample-command",
-      "title": "[Dev] Sample Command",
-      "subtitle": "Open hardcoded path in selected app",
-      "description": "Open a hardcoded path with one of the following apps:\n- Pycharm\n- VSCode\n- Sublime Text\n- Finder\n- Warp\n",
-      "mode": "view"
     },
     {
       "name": "open-dir-manual",
       "title": "[Dev] Open dir manually",
       "subtitle": "Open a project folder in selected app",
-      "description": "Open a provided path with one of the following apps:\n- Pycharm\n- VSCode\n- Sublime Text\n- Finder\n- Warp\n",
-      "mode": "view",
+      "description": "Open a provided path with the specified app",
+      "mode": "no-view",
       "arguments": [
         {
           "name": "path",

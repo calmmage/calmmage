@@ -4,6 +4,8 @@ import fs from "fs";
 import { exec, ExecException } from "child_process";
 import { getFinderDir } from "./get-finder-dir";
 import { showHUD } from "@raycast/api";
+import axios from 'axios';
+import dotenv from 'dotenv';
 
 
 export const checkPathExists = (path: string) => {
@@ -172,21 +174,8 @@ const OWNER = "engineering-friends";
 
 const DEEPLINK_TEMPLATE = `raycast://extensions/{owner}/{extension}/{command}?arguments={arguments}`;
 const EXTENSION_NAME = "project-folder-deeplink";
-const COMMAND_NAME = "open-dir-manual";
 
-// export generateDeeplink
-// - raycast://extensions/<author-or-owner―<extension-name↔<command-name>
-//     - "author": "petr_lavrov",
-//     - "owner": "engineering-friends",
-// - raycast://extensions/engineering-friends/project-folder-deeplink/open-dir-manual?arguments=
-//     - arguments = URL-encoded JSON object.
-
-export function generateDeeplink(path: string, tool: string): string {
-  const argumentsObject = {
-    path: path,
-    tool: tool
-  };
-
+export function generateDeeplinkArgs(argumentsObject: object, command: string): string {
   // URL-encode the arguments object
   const argumentsString = encodeURIComponent(JSON.stringify(argumentsObject));
 
@@ -194,7 +183,7 @@ export function generateDeeplink(path: string, tool: string): string {
   return DEEPLINK_TEMPLATE
     .replace("{owner}", OWNER)
     .replace("{extension}", EXTENSION_NAME)
-    .replace("{command}", COMMAND_NAME)
+    .replace("{command}", command)
     .replace("{arguments}", argumentsString);
 }
 
@@ -207,8 +196,30 @@ export async function copyHtmlToClipboard(html: string) {
 }
   
 export async function copyHyperlinkToClipboard(name: string, link: string) {
-    // const hyperlink = `[${name}](${link})`;
-    const hyperlink = `<a href="${link}">${name}</a>`;
-    await copyHtmlToClipboard(hyperlink);
-    // console.log(`Copied to clipboard: ${hyperlink}`);
+  // const hyperlink = `[${name}](${link})`;
+  const hyperlink = `<a href="${link}">${name}</a>`;
+  await copyHtmlToClipboard(hyperlink);
+  // console.log(`Copied to clipboard: ${hyperlink}`);
+}
+
+    
+// dotenv.config(); // Load environment variables from .env file
+const filepath = "/Users/calm/work/code/structured/tools/calmmage/calmmage/beta/raycast_extensions/project-folder-deeplink/src/.env"
+dotenv.config({ path: filepath })
+    
+// todo: set up the extension in the beginning - store token there
+// https://developers.raycast.com/api-reference/user-interface/actions
+export async function createTinyURL(longUrl: string): Promise<string> {
+  // console.log(`found api token: ${process.env.TINYURL_API_TOKEN}`)
+  const response = await axios.post('https://api.tinyurl.com/create', {
+    url: longUrl
+  }, {
+    headers: {
+      'Authorization': `Bearer ${process.env.TINYURL_API_TOKEN}`,
+      'Content-Type': 'application/json'
     }
+  });
+  
+  return response.data.data.tiny_url;
+}
+    

@@ -1,27 +1,6 @@
-import { checkPathExists, copyHyperlinkToClipboard, getClipboardPath } from './common';
-import { generateDeeplink, toolNameDict } from './common';
+import { checkPathExists, copyHyperlinkToClipboard, createTinyURL, generateDeeplinkArgs, getClipboardPath } from './common';
+import { toolNameDict } from './common';
 import { LaunchProps, showHUD, showToast, Toast } from "@raycast/api";
-import axios from 'axios';
-import dotenv from 'dotenv';
-
-// dotenv.config(); // Load environment variables from .env file
-const filepath = "/Users/calm/work/code/structured/tools/calmmage/calmmage/beta/raycast_extensions/project-folder-deeplink/src/.env"
-dotenv.config({ path: filepath })
-
-// todo: set up the extension in the beginning - store token there
-async function createTinyURL(longUrl: string): Promise<string> {
-    console.log(`found api token: ${process.env.TINYURL_API_TOKEN}`)
-    const response = await axios.post('https://api.tinyurl.com/create', {
-        url: longUrl
-    }, {
-        headers: {
-            'Authorization': `Bearer ${process.env.TINYURL_API_TOKEN}`,
-            'Content-Type': 'application/json'
-        }
-    });
-    
-    return response.data.data.tiny_url;
-}
 
 export default async function GetDirLink(props: LaunchProps<{ arguments?: Arguments.GetDirLink }>) {
     let path = props.arguments?.path || "";
@@ -52,11 +31,25 @@ export default async function GetDirLink(props: LaunchProps<{ arguments?: Argume
     }
 
     const tool = props.arguments?.tool || "";
-    console.log(`Getting deeplink for ${path} in ${tool}`);
-    const deeplink = generateDeeplink(path, tool);
-    console.log(`generating TinyURL`);
+    let deeplink = undefined;
+    if (tool) {
+        // deeplink = generateDeeplink(path, tool);
+        if (!(tool in toolNameDict)) {
+            console.log("Invalid tool specified");
+            await showToast({
+                style: Toast.Style.Failure,
+                title: "Invalid tool specified",
+                message: "Please provide a valid tool, values: " + Object.keys(toolNameDict).join(", ") + " or leave empty for default tool."
+            });
+            return;
+        }
+        deeplink = generateDeeplinkArgs({path: path, tool: tool}, "open-dir-manual");
+    } else {
+        deeplink = generateDeeplinkArgs({path: path}, "open-dir");
+    }
+    // console.log(`generating TinyURL`);
     const tinyurl = await createTinyURL(deeplink);
-    console.log(`TinyURL: ${tinyurl}`);
+    // console.log(`TinyURL: ${tinyurl}`);
     let name = `Open ${path}`;
     // let name = `Open ${path}`.replace('/', '\\');
     // let name = path.split('/').pop() || 'dir';
@@ -67,5 +60,5 @@ export default async function GetDirLink(props: LaunchProps<{ arguments?: Argume
     await copyHyperlinkToClipboard(name, tinyurl);
     
     console.log(`Copied to clipboard: ${tinyurl}: ${deeplink}`);
-    showHUD(`Created deeplink to ${path}`);
+    showHUD(`Copied link to ${path}`);
 }
