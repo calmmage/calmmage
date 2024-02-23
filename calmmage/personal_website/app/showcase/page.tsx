@@ -19,7 +19,7 @@ export default function Page() {
                 </div>
                 <div className="w-full"
                      style={{border: '2px dotted #101', padding: '10px'}}>
-                    <iframe scrolling="no"
+                <iframe scrolling="no"
                             src="showcase/demo5-square/index.html"
                             style={{width: '100%', height: '600px', border: 'none'}}
                             title="Demo 5"
@@ -28,7 +28,7 @@ export default function Page() {
                 <div className="w-full"
                      style={{border: '2px dotted #101', padding: '10px'}}>
                     <iframe scrolling="no"
-                            src="showcase/demo1/index.html"
+                            src="showcase/demo1-fast-circle/index.html"
                             style={{width: '100%', height: '600px', border: 'none'}}
                             title="Demo 1"
                     ></iframe>
@@ -36,7 +36,7 @@ export default function Page() {
                 <div className="w-full"
                      style={{border: '2px dotted #011', padding: '10px'}}>
                     <iframe scrolling="no"
-                            src="showcase/demo2/index.html"
+                            src="showcase/demo2-slow-circle/index.html"
                             style={{width: '100%', height: '600px', border: 'none'}}
                             title="Demo 2"
                     ></iframe>
@@ -52,7 +52,7 @@ export default function Page() {
                 <div className="w-full"
                      style={{border: '2px dotted #001', padding: '10px'}}>
                     <iframe scrolling="no"
-                            src="showcase/demo4/index.html"
+                            src="showcase/demo4-tube/index.html"
                             style={{width: '100%', height: '600px', border: 'none'}}
                             title="Demo 4"
                     ></iframe>
