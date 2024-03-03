@@ -14,13 +14,12 @@ const cubes = [];
 const targets = [];
 const trails = [];
 const trailTargets = [];
-const numCubes = 50;
-const numTrails = 5;
-const R = 4;
+const numCubes = 100;
+const numTrails = 20;
+const R = 2;
 const SCALE = 0.05;
 const REACTION_STRENGTH = 0.02;
 const REACT_USE_DISTANCE = true;
-
 
 // funniest to play with
 const REACTION_DISTANCE = 1.3;
@@ -28,8 +27,23 @@ const FOLLOW_SPEED = 0.015;
 let FOLLOW_USE_DISTANCE = true;
 const TRAIL_FOLLOW_SPEED = 0.03;
 const TRAIL_FOLLOW_USE_DISTANCE = true;
-// const TIME_SPEED = 0.0005;
-const TIME_SPEED = 0.003;
+const TIME_SPEED = 0.002;
+
+// Heartbeat
+// const HEARTBEAT_LENGTH = 0.005;
+// const HEARTBEAT_COUNT = 7;
+// const HEARTBEAT_MULT_MAX = 1.5 * 0.02 / HEARTBEAT_LENGTH;
+// const HEARTBEAT_MULT_MIN = 1 / (0.02 / HEARTBEAT_LENGTH);
+// let heart_beat_mult = 1;
+// let heart_step = 0;
+const HEARTBEAT_LENGTH = 0.02;
+const HEARTBEAT_COUNT = 7;
+// const HEARTBEAT_MULT_MAX = 1.5 * 0.02 / HEARTBEAT_LENGTH;
+// const HEARTBEAT_MULT_MIN = 1 / (0.02 / HEARTBEAT_LENGTH);
+const HEARTBEAT_MULT_MAX = 1.5;
+const HEARTBEAT_MULT_MIN = 1;
+let heart_beat_mult = 1;
+let heart_step = 0;
 
 // const POSITION_SCALE = 0.0077;
 // WIDTH_SCALE = 1;
@@ -48,25 +62,60 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
+// Define the color array
+// Define the color array
+const colors = [
+    0x8B0000, // Dark Red
+    0xFF0000, // Red
+    0xFF4747, // Light Red
+    0xFFC0CB, // Pink
+    0xFFB6C1, // Light Pink
+    0xFF69B4, // Hot Pink
+    0xFF1493, // Deep Pink
+    0x800080, // Purple
+    0xFFD700, // Gold
+    0x40E0D0, // Turquoise (Surprise color 1)
+    0x7FFF00  // Chartreuse (Surprise color 2)
+];
+
+// Rest of the code...
+// Function to pick a random color from the array
+function getRandomColor() {
+    return colors[Math.floor(Math.random() * colors.length)];
+}
+
+let color = getRandomColor();
 
 // init
 for (let i = 0; i < numCubes; i++) {
+
     cube = new THREE.Mesh(
         new THREE.BoxGeometry(SCALE, SCALE, SCALE),
-        new THREE.MeshBasicMaterial({color: 0xffffff})
+        new THREE.MeshBasicMaterial({color: color})
     );
     const angle = (i / numCubes) * Math.PI * 2;
-    cube.position.x = Math.sin(angle) * R * WIDTH_SCALE;
-    cube.position.y = Math.cos(angle) * R * WIDTH_SCALE;
+    cube.position.x = Math.sin(angle) * R * WIDTH_SCALE / 10;
+    cube.position.y = Math.cos(angle) * R * WIDTH_SCALE / 10;
+    // cube.position.x = 0;
+    // cube.position.y = 0;
+
+    // Create an edges geometry and pass in the cube geometry
+    let edges = new THREE.EdgesGeometry(cube.geometry);
+    // Create a line segments geometry using the edges geometry and a basic white material
+    let line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({color: 0xffffff}));
+    // Add the line segments to the cube
+    cube.add(line);
+
     cubes.push(cube);
     scene.add(cube);
 
+
     targetCube = new THREE.Mesh(
         new THREE.BoxGeometry(SCALE, SCALE, SCALE),
-        new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: 0})
+        new THREE.MeshBasicMaterial({color: color, transparent: true, opacity: 0})
     );
-    targetCube.position.x = Math.sin(angle) * R* WIDTH_SCALE;
-    targetCube.position.y = Math.cos(angle) * R* WIDTH_SCALE;
+    targetCube.position.x = Math.sin(angle) * R * WIDTH_SCALE;
+    targetCube.position.y = Math.cos(angle) * R * WIDTH_SCALE;
     targetCube.range = R;
     targetCube.offset = angle;
     targets.push(targetCube);
@@ -77,7 +126,7 @@ for (let i = 0; i < numCubes; i++) {
     for (let j = 0; j < numTrails; j++) {
         trail = new THREE.Mesh(
             new THREE.PlaneGeometry(SCALE, SCALE, SCALE),
-            new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: 0.8 * (1.0 - (j / numTrails))})
+            new THREE.MeshBasicMaterial({color: color, transparent: true, opacity: 0.8 * (1.0 - (j / numTrails))})
         );
         trail.position.x = cube.position.x;
         trail.position.y = cube.position.y;
@@ -138,14 +187,29 @@ document.addEventListener('click', (event) => {
 
 let time = 0;
 
+
 function updateCubes() {
     time += TIME_SPEED;
+
+    // add heart beating.
+    heart_step = (time / HEARTBEAT_LENGTH) % HEARTBEAT_COUNT;
+    if ((heart_step > 0) && (heart_step < 1)
+        || (heart_step > 2) && (heart_step < 3))
+    {
+        heart_beat_mult = HEARTBEAT_MULT_MAX;
+    } else {
+        heart_beat_mult = HEARTBEAT_MULT_MIN;
+    }
+
     targets.forEach(cube => {
-        let theta = time * 2 * Math.PI + cube.offset;
-        let radius = cube.range;
-        cube.position.x = WIDTH_SCALE * radius * Math.cos(theta);
-        cube.position.y = WIDTH_SCALE * radius * Math.sin(2 * theta) / 2;
+        let theta = time + cube.offset; // Base angle for heart shape
+        let radius = heart_beat_mult * cube.range * WIDTH_SCALE; // Scale factor applied
+        // Heart shape parametric equations
+        cube.position.x = radius * Math.sin(theta) ** 3;
+        cube.position.y = radius * (0.8125 * Math.cos(theta) - 0.3125 * Math.cos(2 * theta) - 0.125 * Math.cos(3 * theta) - 0.0625 * Math.cos(4 * theta));
     });
+
+
     // all the rest of the cubes just follow their target
     cubes.forEach((cube, i) => {
         distance = Math.sqrt((cube.position.x - targets[i].position.x) ** 2 + (cube.position.y - targets[i].position.y) ** 2);

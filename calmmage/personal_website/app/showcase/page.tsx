@@ -1,3 +1,5 @@
+// import InteractiveButton from "@/components/interactive-button";
+
 export default function Page() {
     return (
         <div className="prose prose-sm prose-invert max-w-none">
@@ -16,10 +18,11 @@ export default function Page() {
                             style={{width: '100%', height: '600px', border: 'none'}}
                             title="Demo 6"
                     ></iframe>
+                    {/*<InteractiveButton/>*/}
                 </div>
                 <div className="w-full"
                      style={{border: '2px dotted #101', padding: '10px'}}>
-                <iframe scrolling="no"
+                    <iframe scrolling="no"
                             src="showcase/demo5-square/index.html"
                             style={{width: '100%', height: '600px', border: 'none'}}
                             title="Demo 5"
@@ -53,6 +56,14 @@ export default function Page() {
                      style={{border: '2px dotted #001', padding: '10px'}}>
                     <iframe scrolling="no"
                             src="showcase/demo4-tube/index.html"
+                            style={{width: '100%', height: '600px', border: 'none'}}
+                            title="Demo 4"
+                    ></iframe>
+                </div>
+                <div className="w-full"
+                     style={{border: '2px dotted #001', padding: '10px'}}>
+                    <iframe scrolling="no"
+                            src="showcase/demo7-beating-heart/index.html"
                             style={{width: '100%', height: '600px', border: 'none'}}
                             title="Demo 4"
                     ></iframe>
