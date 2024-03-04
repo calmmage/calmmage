@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "calmmage"
-version = "0.1.0" # add calmmage dev env
+version = "0.1.1" # add project actions (move to github) and autocompletion
 description = "Personal GitHub repo for tools, projects, and personal website"
 authors = ["Reliable Magician <petrlavrov@calmmage.com>"]
 readme = "README.md"
@@ -17,9 +17,10 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8"
+python = ">=3.8,<4.0.0"
 #pytest = "*"
-typer = "*"
+typer = {version = "==0.7.0", extras = ["all"]}
+typer-cli = {version = "*", extras = ["all"]}
 #toml = "*"
 #pytz = "*"
 tqdm = "*"
