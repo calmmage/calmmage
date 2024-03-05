@@ -338,7 +338,7 @@ class CalmmageDevEnv:
         source_dir = self.resource_dir / (subdir or "")
         source_path = source_dir / resource_name
         target_path = self.app_data_dir / resource_name
-        shutil.copyfile.copyfile(source_path, target_path)
+        shutil.copyfile(source_path, target_path)
 
     def _copy_aliases(self):
         self._copy_resource(".alias", subdir="shell_profiles")
@@ -417,10 +417,12 @@ class CalmmageDevEnv:
 
         # add to the .alias
         lines = [
-            f"alias new_project='python3 {target_path} add'",
-            f"alias np='python3 {target_path} add'",
-            f"alias pm='python3 {target_path}'",
-            f"alias project_manager='python3 {target_path}'\n",
+            f"alias new_project='typer {target_path} run add --template'",
+            f"alias np='typer {target_path} run add --template'",
+            f"alias pm='typer {target_path} run'",
+            f"alias lt='typer {target_path} run lt'",
+            f"alias move2gh='typer {target_path} run move2gh --template'",
+            f"alias project_manager='typer {target_path} run'\n",
         ]
         for line in lines:
             self._source_line(line, targets=[f"{self.app_data_dir}/.alias"])
