@@ -490,14 +490,23 @@ class CalmmageDevEnv:
                 shutil.copy2(src_file_path, dst_file_path)
 
     @staticmethod
-    def _replace_original_project_with_github_clone(
-        original_project_path, clone_project_path
-    ):
-        # Remove the original project directory
-        # shutil.rmtree(original_project_path)
+    def get_backup_path(original_project_path, suffix="_backup"):
         backup_path = original_project_path.parent / (
             original_project_path.name + "_backup"
         )
+        counter = 1
+        while os.path.exists(backup_path):
+            backup_path = original_project_path.parent / (
+                f"{original_project_path.name}{suffix}({counter})"
+            )
+            counter += 1
+        return backup_path
+
+    def _replace_original_project_with_github_clone(
+        self, original_project_path, clone_project_path
+    ):
+        # Remove the original project directory
+        backup_path = self.get_backup_path(original_project_path)
         shutil.move(str(original_project_path), str(backup_path))
         # Move the cloned project directory to the original project location
         shutil.move(str(clone_project_path), original_project_path)
@@ -511,4 +520,4 @@ class CalmmageDevEnv:
         # Commit the changes
         repo.git.commit(m="Initial commit from local project")
         # Push the changes to GitHub
-        repo.git.push()
+        # repo.git.push()
