@@ -44,6 +44,8 @@ jupyter = ">=1.0.0"
 pytest = "*"
 #pytest-mongodb = "*"
 black = ">=24"
+pre-commit = "*"
+jupyter_contrib_nbextensions = "*"
 #easydict = ">=1.10"
 
 #pytest = "*"
