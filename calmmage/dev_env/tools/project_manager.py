@@ -66,6 +66,7 @@ if collisions:
     )
 
 
+# todo: rename and move to calmlib
 def _complete_template_name(incomplete: str, candidates):
     matches = []
     for template, help_text in candidates:
@@ -95,6 +96,7 @@ def complete_github_template_name(incomplete: str):
     return _complete_template_name(incomplete, github_templates)
 
 
+# todo: rename and move to calmlib
 def parse_template_name(template_name: str, candidates=None):
     if not candidates:
         candidates = github_templates + local_templates
@@ -145,6 +147,7 @@ def move_project_to_github(
         project_path, template_name=template, project_name=project_name
     )
     typer.echo(f"Project {project_name} moved to GitHub using template {template}.")
+    typer.echo(f"Project backup is available at {project_path}_backup")
 
 
 # todo: rework this completely - to use the templates vars defined above
@@ -179,9 +182,8 @@ def add_new_project(
     ],
 ):
     template = parse_template_name(template)
-    # todo: local: Annotated[bool, typer.Option(default=True, prompt=True)],
-    # dev_env = CalmmageDevEnv(root_dir, app_data_dir)
     local = any([template == t[0] for t in local_templates])
+    typer.echo(f"Using template {template}, {'GitHub' if not local else 'Local'}.")
     project_dir = dev_env.start_new_project(name, local=local, template_name=template)
 
     # todo: change the dir to new project? or just print the path?
