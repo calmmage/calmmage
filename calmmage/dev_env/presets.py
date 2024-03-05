@@ -33,6 +33,7 @@ class PresetJan2024(Preset):
         "code/seasonal/past",
         "workspace/launchd/scripts",
         "workspace/launchd/logs",
+        "code/structured/dev"
     ]
     # softlinks = {
     #       # "code/seasonal/latest": "code/seasonal/YYYY_MM_MMM",

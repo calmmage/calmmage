@@ -438,6 +438,15 @@ class CalmmageDevEnv:
             self.root_dir / "playground": ["cd2", "cdp", "cd_playground"],
             # structured
             self.root_dir / "code" / "structured": ["cd3", "cds", "cd_structured"],
+            # beta - calmlib dev - /Users/calm/work/code/structured/dev/calmlib-dev/calmlib/beta
+            self.root_dir / "code" / "structured" / "dev" / "calmlib-dev" / "calmlib" / "beta": [
+                "cd5",
+                "cdb",
+                "cd_beta",
+            ],
+            # experiments - calmmage experiments
+            #
+
         }
         for target in aliases:
             for alias in aliases[target]:

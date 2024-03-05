@@ -24,7 +24,6 @@ typer-cli = {version = "*", extras = ["all"]}
 #toml = "*"
 #pytz = "*"
 tqdm = "*"
-#pyperclip = "*"
 #mongoengine = "*"
 loguru = "*"
 calmlib = { git = "https://github.com/calmmage/calmlib.git", branch = "main"}
@@ -39,6 +38,7 @@ gitpython = "*"
 #PyDrive = "*"
 
 [tool.poetry.group.dev.dependencies]
+pyinstaller = "*"
 jupyter = ">=1.0.0"
 #pandas = ">=1.0.0"
 pytest = "*"
@@ -47,7 +47,9 @@ black = ">=24"
 pre-commit = "*"
 jupyter_contrib_nbextensions = "*"
 #easydict = ">=1.10"
-
+fastapi = "*"
+fastui = "*"
+#pyperclip = "*"
 #pytest = "*"
 #tqdm = "*"
 #matplotlib = "*"
