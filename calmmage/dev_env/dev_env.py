@@ -222,7 +222,7 @@ class CalmmageDevEnv:
 
         # self.github_client.get_user().get_repo(name).clone(str(project_dir))
         target_dir = str(project_dir)
-        git.Git(target_dir).clone(url)
+        git.Repo.clone_from(url, target_dir)
         return project_dir
 
     def start_new_project(self, name, local=True, template_name=None):
@@ -480,7 +480,7 @@ class CalmmageDevEnv:
         )
 
         # Push changes to the GitHub repository
-        self._push_local_changes_to_github(temp_project_path)
+        # self._push_local_changes_to_github(temp_project_path)
 
     @staticmethod
     def _copy_project_files_to_github_clone(original_project_path, clone_project_path):

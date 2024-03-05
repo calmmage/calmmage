@@ -83,7 +83,7 @@ def _complete_template_name(incomplete: str, candidates):
         return matches
     # hack: always add the incomplete string to avoid typer error (broken completion)
     # todo: report the issue to typer
-    matches.append(incomplete)
+    matches.append((incomplete, ""))
     return matches
 
 
