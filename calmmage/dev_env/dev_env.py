@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 from pathlib import Path
-from shutil import copyfile
+import shutil
 
 import git
 from dotenv import load_dotenv
@@ -34,6 +34,7 @@ class CalmmageDevEnv:
                     f"root dir exists but has invalid structure: {self.root_dir}. Set overwrite=True to ignore that"
                 )
 
+        self._github_token = None
         self._github_client = None
         # todo: accept logger as kwarg
         # todo: add calmlib.setup_logger to calmlib - find where I have it
@@ -76,11 +77,17 @@ class CalmmageDevEnv:
         if self._github_client is None:
             from github import Github
 
+            self._github_client = Github(self.github_token)
+        return self._github_client
+
+    @property
+    def github_token(self):
+        if self._github_token is None:
             token = os.getenv("GITHUB_API_TOKEN")
             if token is None:
                 raise ValueError("Missing GitHub API token")
-            self._github_client = Github(token)
-        return self._github_client
+            self._github_token = token
+        return self._github_token
 
     @property
     def seasonal_projects_dir(self):
@@ -193,17 +200,25 @@ class CalmmageDevEnv:
                 if not target_path.exists():
                     target_path.symlink_to(project_dir)
 
-    def _create_github_project_from_template(self, name, template_name):
-        # create project dir
-        project_dir = self._setup_new_project_dir(name)
+    BASE_TEMPLATE_NAME = "base-template"
 
+    def _create_github_project_from_template(
+        self, name, template_name=None, local_name=None
+    ):
+        # create project dir
+        if local_name is None:
+            local_name = name
+        project_dir = self._setup_new_project_dir(local_name)
+
+        if template_name is None:
+            template_name = self.BASE_TEMPLATE_NAME
         # create repo
         self._create_repo_from_template(name, template_name)
 
         # git clone
-        token = os.getenv("GITHUB_API_TOKEN")
+        # token = os.getenv("GITHUB_API_TOKEN")
         username = self.github_client.get_user().login
-        url = f"https://{token}@github.com/{username}/{name}.git"
+        url = f"https://{self.github_token}@github.com/{username}/{name}.git"
 
         # self.github_client.get_user().get_repo(name).clone(str(project_dir))
         target_dir = str(project_dir)
@@ -243,7 +258,9 @@ class CalmmageDevEnv:
         templates = self.get_templates(reset_cache=reset_cache)
         return list(templates.keys())
 
-    # def get_repos(self, reset_cache=False):
+    def get_template_description(self, name, reset_cache=False):
+        template = self.get_template(name, reset_cache=reset_cache)
+        return template.description
 
     def _create_repo_from_template(self, name, template_name):
         # create a new repo from template
@@ -321,7 +338,7 @@ class CalmmageDevEnv:
         source_dir = self.resource_dir / (subdir or "")
         source_path = source_dir / resource_name
         target_path = self.app_data_dir / resource_name
-        copyfile(source_path, target_path)
+        shutil.copyfile(source_path, target_path)
 
     def _copy_aliases(self):
         self._copy_resource(".alias", subdir="shell_profiles")
@@ -387,7 +404,7 @@ class CalmmageDevEnv:
     def _copy_script(self, script_name, suffix=".py"):
         source_path = Path(__file__).parent / "tools" / (script_name + suffix)
         target_path = self.scripts_dir / (script_name + suffix)
-        copyfile(source_path, target_path)
+        shutil.copyfile(source_path, target_path)
 
     def _custom_2(self):
         self._copy_script("daily_job")
@@ -396,14 +413,16 @@ class CalmmageDevEnv:
     def _custom_3(self):
         source_path = Path(__file__).parent / "tools" / "project_manager.py"
         target_path = self.app_data_dir / "project_manager.py"
-        copyfile(source_path, target_path)
+        shutil.copyfile(source_path, target_path)
 
         # add to the .alias
         lines = [
-            f"alias new_project='python3 {target_path} add'",
-            f"alias np='python3 {target_path} add'",
-            f"alias pm='python3 {target_path}'",
-            f"alias project_manager='python3 {target_path}'\n",
+            f"alias new_project='typer {target_path} run add --template'",
+            f"alias np='typer {target_path} run add --template'",
+            f"alias pm='typer {target_path} run'",
+            f"alias lt='typer {target_path} run lt'",
+            f"alias move2gh='typer {target_path} run move2gh --template'",
+            f"alias project_manager='typer {target_path} run'\n",
         ]
         for line in lines:
             self._source_line(line, targets=[f"{self.app_data_dir}/.alias"])
@@ -437,3 +456,77 @@ class CalmmageDevEnv:
     def _custom_5(self):
         # improved help string
         pass
+
+    def move_project_to_github(
+        self, project_path, template_name=None, project_name=None
+    ):
+        # Use project directory name if project_name is not provided
+        project_path = Path(project_path).expanduser().absolute()
+        if project_name is None:
+            project_name = project_path.name
+
+        # Create a GitHub project from a template and get the local directory of the cloned repo
+        local_name = project_name + "__github"
+        temp_project_path = self._create_github_project_from_template(
+            name=project_name, template_name=template_name, local_name=local_name
+        )
+
+        # Copy files from the original project directory to the cloned directory
+        self._copy_project_files_to_github_clone(project_path, temp_project_path)
+
+        # Move the cloned directory to replace the original project directory
+        self._replace_original_project_with_github_clone(
+            project_path, temp_project_path
+        )
+
+        # Push changes to the GitHub repository
+        self._push_local_changes_to_github(temp_project_path)
+
+    @staticmethod
+    def _copy_project_files_to_github_clone(original_project_path, clone_project_path):
+        # shutil.copytree cannot be used directly as it doesn't allow overriding existing directories
+        # Use shutil.copy2 and os.walk to manually copy files and directories, allowing override
+        for root, dirs, files in os.walk(original_project_path):
+            # Construct the path structure in the clone directory
+            relative_path = os.path.relpath(root, original_project_path)
+            clone_root_path = os.path.join(clone_project_path, relative_path)
+            if not os.path.exists(clone_root_path):
+                os.makedirs(clone_root_path)
+            for file in files:
+                # Copy each file, allowing for override with shutil.copy2
+                src_file_path = os.path.join(root, file)
+                dst_file_path = os.path.join(clone_root_path, file)
+                shutil.copy2(src_file_path, dst_file_path)
+
+    @staticmethod
+    def get_backup_path(original_project_path, suffix="_backup"):
+        backup_path = original_project_path.parent / (
+            original_project_path.name + "_backup"
+        )
+        counter = 1
+        while os.path.exists(backup_path):
+            backup_path = original_project_path.parent / (
+                f"{original_project_path.name}{suffix}({counter})"
+            )
+            counter += 1
+        return backup_path
+
+    def _replace_original_project_with_github_clone(
+        self, original_project_path, clone_project_path
+    ):
+        # Remove the original project directory
+        backup_path = self.get_backup_path(original_project_path)
+        shutil.move(str(original_project_path), str(backup_path))
+        # Move the cloned project directory to the original project location
+        shutil.move(str(clone_project_path), original_project_path)
+
+    @staticmethod
+    def _push_local_changes_to_github(project_path):
+        # Initialize the repository
+        repo = git.Repo(project_path)
+        # Add all files to the repo
+        repo.git.add(A=True)
+        # Commit the changes
+        repo.git.commit(m="Initial commit from local project")
+        # Push the changes to GitHub
+        # repo.git.push()
