@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 from pathlib import Path
 import shutil
-
+import  time
 import git
 from dotenv import load_dotenv
 
@@ -11,6 +11,22 @@ from calmmage.dev_env.presets import latest_preset
 DEFAULT_ROOT_DIR = "~/work"
 DEFAULT_APP_DATA_DIR = "~/.calmmage"
 
+# todo: move to calmlib
+def copy_tree(source, destination):
+    source_path = Path(source)
+    destination_path = Path(destination)
+
+    if not source_path.is_dir():
+        raise ValueError(f"Source ({source}) is not a directory.")
+
+    if not destination_path.exists():
+        destination_path.mkdir(parents=True)
+
+    for item in source_path.iterdir():
+        if item.is_dir():
+            copy_tree(item, destination_path / item.name)
+        else:
+            shutil.copy2(item, destination_path / item.name)
 
 class CalmmageDevEnv:
     def __init__(
@@ -201,6 +217,8 @@ class CalmmageDevEnv:
                     target_path.symlink_to(project_dir)
 
     BASE_TEMPLATE_NAME = "base-template"
+    GITHUB_RETRY_DELAY = 5
+    GITHUB_NUM_RETRIES = 3
 
     def _create_github_project_from_template(
         self, name, template_name=None, local_name=None
@@ -220,9 +238,31 @@ class CalmmageDevEnv:
         username = self.github_client.get_user().login
         url = f"https://{self.github_token}@github.com/{username}/{name}.git"
 
+        # add a sanity check if the target dir is already existing
+        if project_dir.exists() and list(project_dir.iterdir()):
+            raise ValueError(f"Project dir already exists: {project_dir}")
+
         # self.github_client.get_user().get_repo(name).clone(str(project_dir))
         target_dir = str(project_dir)
         git.Repo.clone_from(url, target_dir)
+
+        # check if the target dir has anything except .git
+        # if not - wait a bit and retry to pull
+        for _ in range(self.GITHUB_NUM_RETRIES) :
+            contents = list(project_dir.iterdir())
+            if '.git' not in contents:
+                time.sleep(self.GITHUB_RETRY_DELAY)
+                git.Repo.clone_from(url, target_dir)
+            elif len(contents) == 1:
+                time.sleep(self.GITHUB_RETRY_DELAY)
+                # pull again
+                repo = git.Repo(target_dir)
+                repo.git.pull()
+            else:
+                break
+        else:
+            raise ValueError(f"Failed to clone the repository from {url} to {target_dir}: no files found")
+
         return project_dir
 
     def start_new_project(self, name, local=True, template_name=None):
@@ -276,8 +316,10 @@ class CalmmageDevEnv:
             raise ValueError(
                 f"Invalid template name: {template_name}. Available templates: {templates}"
             )
+        # check if the repo already exists
+        if name in [repo.name for repo in github_client.get_user().get_repos()]:
+            raise ValueError(f"Repository already exists: https://github.com/{username}/{name}")
 
-        # make the API call to create the repository from the template
         github_client._Github__requester.requestJsonAndCheck(
             "POST",
             f"/repos/{template_owner}/{template_name}/generate",
@@ -320,8 +362,6 @@ class CalmmageDevEnv:
             )
         # copy template to the new project dir
         template_dir = self.get_local_template(template_name)
-        from distutils.dir_util import copy_tree
-
         copy_tree(str(template_dir), str(project_dir))
 
         return project_dir
@@ -484,19 +524,20 @@ class CalmmageDevEnv:
 
     @staticmethod
     def _copy_project_files_to_github_clone(original_project_path, clone_project_path):
-        # shutil.copytree cannot be used directly as it doesn't allow overriding existing directories
-        # Use shutil.copy2 and os.walk to manually copy files and directories, allowing override
-        for root, dirs, files in os.walk(original_project_path):
-            # Construct the path structure in the clone directory
-            relative_path = os.path.relpath(root, original_project_path)
-            clone_root_path = os.path.join(clone_project_path, relative_path)
-            if not os.path.exists(clone_root_path):
-                os.makedirs(clone_root_path)
-            for file in files:
-                # Copy each file, allowing for override with shutil.copy2
-                src_file_path = os.path.join(root, file)
-                dst_file_path = os.path.join(clone_root_path, file)
-                shutil.copy2(src_file_path, dst_file_path)
+        return copy_tree(original_project_path, clone_project_path)
+        # # shutil.copytree cannot be used directly as it doesn't allow overriding existing directories
+        # # Use shutil.copy2 and os.walk to manually copy files and directories, allowing override
+        # for root, dirs, files in os.walk(original_project_path):
+        #     # Construct the path structure in the clone directory
+        #     relative_path = os.path.relpath(root, original_project_path)
+        #     clone_root_path = os.path.join(clone_project_path, relative_path)
+        #     if not os.path.exists(clone_root_path):
+        #         os.makedirs(clone_root_path)
+        #     for file in files:
+        #         # Copy each file, allowing for override with shutil.copy2
+        #         src_file_path = os.path.join(root, file)
+        #         dst_file_path = os.path.join(clone_root_path, file)
+        #         shutil.copy2(src_file_path, dst_file_path)
 
     @staticmethod
     def get_backup_path(original_project_path, suffix="_backup"):
