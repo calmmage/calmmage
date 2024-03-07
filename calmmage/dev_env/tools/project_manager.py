@@ -115,32 +115,38 @@ def parse_template_name(template_name: str, candidates=None):
 def move_project_to_github(
     project_path: Annotated[
         str,
-        typer.Option(
-            prompt="Project path (What project do you want to move to GitHub?)\nPath",
+        typer.Argument(
+            help="Path to the project to move to GitHub.",
+            # prompt="Project path (What project do you want to move to GitHub?)\nPath",
         ),
     ],
     template: Annotated[
         str,
         typer.Option(
-            ...,
+            "python-project-template",
             "--template",
             "-t",
             help="Template name for the GitHub project.",
             autocompletion=complete_github_template_name,
         ),
-    ] = None,
+    ] = "python-project-template",
     project_name: Annotated[
         str,
         typer.Option(
             ...,
-            "--project-name",
-            "-n",
             "--name",
-            help="Name of the project to move to GitHub.",
+            "-n",
+            help="Name for the GitHub project.",
         ),
     ] = None,
 ):
+    """
+    Move project to GitHub using the selected template
+    cli alias: move2gh
+    usage: move2gh <project_path> -t <template> -n <project_name>
+    """
     template = parse_template_name(template, github_templates)
+    project_path = project_path.rstrip("/")
     # Perform the action: Move project to GitHub using the selected template
     # project_name = project_path.split("/")[-1]  # Infer project name from path
     dev_env.move_project_to_github(
@@ -150,9 +156,78 @@ def move_project_to_github(
     typer.echo(f"Project backup is available at {project_path}_backup")
 
 
-# todo: rework this completely - to use the templates vars defined above
-@app.command(name="lt")
+# add a simple 'move2exp' command
+# exp dir path: dev_env.root_dir / "code/structured/dev/calmmage-dev/calmmage/experiments/seasonal/..."
+@app.command(name="move2exp")
+def move_project_to_experiments(
+    project_path: Annotated[
+        str,
+        typer.Argument(
+            help="Path to the project to move to experiments.",
+            # prompt="Project path (What project do you want to move to experiments?)\nPath",
+        ),
+    ],
+    project_name: Annotated[
+        str,
+        typer.Option(
+            ...,
+            "--name",
+            "-n",
+            help="Name for the experiments project.",
+        ),
+    ] = None,
+):
+    """
+    Move project to experiments
+    cli alias: move2exp
+    usage: move2exp <project_path> -n <project_name>
+    """
+    project_path = project_path.rstrip("/")
+    # Perform the action: Move project to experiments
+    # project_name = project_path.split("/")[-1]  # Infer project name from path
+    new_path = dev_env.move_project_to_experiments(
+        project_path, project_name=project_name
+    )
+    typer.echo(f"Project {project_name} moved to {new_path}")
+
+
+# beta dir path: dev_env.root_dir / "code/structured/dev/calmlib-dev/calmlib/beta"
+@app.command(name="move2beta")
+def move_project_to_beta(
+    project_path: Annotated[
+        str,
+        typer.Argument(
+            help="Path to the project to move to beta.",
+            # prompt="Project path (What project do you want to move to beta?)\nPath",
+        ),
+    ],
+    project_name: Annotated[
+        str,
+        typer.Option(
+            ...,
+            "--name",
+            "-n",
+            help="Name for the beta project.",
+        ),
+    ] = None,
+):
+    """
+    Move project to calmilb/beta (assuming / converting to an importable package)
+    cli alias: move2beta, mv2b
+    usage: move2beta <project_path> -n <project_name>
+    """
+    project_path = project_path.rstrip("/")
+    new_path = dev_env.move_project_to_beta(project_path, project_name=project_name)
+    typer.echo(f"{project_name} moved to {new_path}")
+
+
+@app.command(name="lt", help="List available github and local templates")
 def list_templates():
+    """
+    List github and local templates
+    cli alias: lt
+    usage: lt
+    """
     typer.secho("Local templates:", fg=typer.colors.GREEN, bold=True)
     for template, _ in local_templates:
         typer.echo(template)
@@ -165,22 +240,36 @@ def list_templates():
         typer.echo(template)
 
 
-@app.command(name="add")
+@app.command(name="np", help="Add a new project")
 def add_new_project(
     name: Annotated[
         str,
-        typer.Option(
-            prompt="Name (What do you want the project to do?)\nName",
+        typer.Argument(
+            # prompt="Name (What do you want the project to do?)\nName",
         ),
     ],
     template: Annotated[
         str,
         typer.Option(
+            ...,
+            "--template",
+            "-t",
             autocompletion=complete_template_name,
-            # default="default",
         ),
     ],
 ):
+    """
+    Create a new project using the selected template
+    cli alias: np
+    usage: np <name> -t <template>
+    example: np my_project -t pyexp
+
+    Check available templates with 'lt' command
+
+    You can use any subsequence of the template name
+    if it identifies a single template - for example,
+    'pyexp' for python_experiment template
+    """
     template = parse_template_name(template)
     local = any([template == t[0] for t in local_templates])
     typer.echo(f"Using template {template}, {'GitHub' if not local else 'Local'}.")
