@@ -6,7 +6,7 @@ MVP features list:
 - [ ] add ~/.calmlib/config.toml - for current config state, root dir and other
 - [x] Presets, latest = current folder structure (latest added)
 - [ ] Check if folder structure exists, if so, ask to overwrite
-- [ ] add main cli.py using some modern python cli - typer, click, fire
+- [x] add main cli.py using some modern python cli - typer, click, fire
 
 Current folder structure:
 - Discussion with GPT: 
@@ -16,10 +16,10 @@ data/
 tools/
 
 # Extra features:
-- [ ] sync
+- [ ] sync (what?)
 
 # Additional direction - cron job
-Daily / weekly / monthly job to update softlinks / 
+[x] Daily / weekly / monthly job to update softlinks / 
 archive everything.. 
 - 'latest' folder -> chronological / YYMM
 - all new projects -> structured / unordered

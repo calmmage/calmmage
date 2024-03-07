@@ -1,18 +1,15 @@
-# 1) 
-
-# 2) utils
+# 1) utils
 move utils to calmlib
-## 2.1) github
-## 2.2) fuzzy match
+## 1.1) work with github
+## 1.2) fuzzy match
 
-# 3) Project features
-
-# 4) aliases
-
-# 5) 
-
-# 6) Add more templates
-## 6.1) github templates
-## 6.2) local templates
-
-# 7) 
+# 2) Project features
+- [x] new project
+# 3) aliases
+- [x] add aliases 
+# 4) Add more templates
+- [x] github templates
+- [x] local templates
+# 5) Refactor
+- [ ] sort tools dir
+# 6) add tests
