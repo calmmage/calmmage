@@ -494,6 +494,7 @@ class CalmmageDevEnv:
             f"alias move2gh='typer {target_path} run move2gh'",
             f"alias move2exp='typer {target_path} run move2exp'",
             f"alias move2beta='typer {target_path} run move2beta'",
+            f"alias mv2gh='typer {target_path} run move2gh'",
             f"alias mv2e='typer {target_path} run move2exp'",
             f"alias mv2b='typer {target_path} run move2beta'",
             f"alias project_manager='typer {target_path} run'",

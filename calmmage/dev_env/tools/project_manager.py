@@ -241,11 +241,12 @@ def list_templates():
 def add_new_project(
     name: Annotated[
         str,
-        typer.Option(
-            ...,
-            "--name",
-            "-n",
-            prompt="Name (What do you want the project to do?)\nName",
+        typer.Argument(
+            # ...,
+            # "--name",
+            # "-n",
+            # prompt="Name (What do you want the project to do?)\nName",
+            help="Name for the new project.",
         ),
     ],
     template: Annotated[
@@ -254,11 +255,13 @@ def add_new_project(
             "--template",
             "-t",
             autocompletion=complete_template_name,
+            help="Template name for the new project "
+            "- use 'lt' command to list available templates.",
         ),
     ] = "default",
 ):
     """
-    Create a new project using the selected template
+    Create a new project in the seasonal experiments dir using the selected template
     cli alias: np
     usage: np <name> -t <template>
     example: np my_project -t pyexp
