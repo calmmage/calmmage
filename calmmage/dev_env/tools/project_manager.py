@@ -2,12 +2,16 @@ import os
 from pathlib import Path
 
 import typer
+from deprecated import deprecated
 from typing_extensions import Annotated
 
 from calmmage.dev_env import CalmmageDevEnv
 
 
-# todo: move to calmlib
+# todo: replace with calmlib.beta.utils.common.is_subsequence
+@deprecated(
+    version="0.2.1", reason="Use calmlib.beta.utils.common.is_subsequence instead."
+)
 def is_subsequence(sub, main):
     sub_index = 0
     main_index = 0

@@ -1,18 +1,24 @@
 import os
-from datetime import datetime
-from pathlib import Path
 import shutil
 import time
+from datetime import datetime
+from pathlib import Path
+
 import git
+from deprecated import deprecated
 from dotenv import load_dotenv
 
 from calmmage.dev_env.presets import latest_preset
+from calmlib.beta.utils.logging_utils import get_calmmage_logger
+
+logger = get_calmmage_logger(__name__)
 
 DEFAULT_ROOT_DIR = "~/work"
 DEFAULT_APP_DATA_DIR = "~/.calmmage"
 
 
 # todo: move to calmlib
+@deprecated(version="0.1.0", reason="Use calmlib.beta.utils.common.copy_tree instead.")
 def copy_tree(source, destination):
     source_path = Path(source)
     destination_path = Path(destination)
@@ -235,38 +241,43 @@ class CalmmageDevEnv:
         # create repo
         self._create_repo_from_template(name, template_name)
 
-        # git clone
-        # token = os.getenv("GITHUB_API_TOKEN")
+        self._clone_github_repository(name, project_dir)
+
+        return project_dir
+
+    def _clone_github_repository(self, name, project_dir):
+        project_dir = Path(project_dir).expanduser()
         username = self.github_client.get_user().login
         url = f"https://{self.github_token}@github.com/{username}/{name}.git"
 
-        # add a sanity check if the target dir is already existing
         if project_dir.exists() and list(project_dir.iterdir()):
-            raise ValueError(f"Project dir already exists: {project_dir}")
+            raise ValueError(f"Project dir already exists and not empty: {project_dir}")
 
-        # self.github_client.get_user().get_repo(name).clone(str(project_dir))
-        target_dir = str(project_dir)
-        git.Repo.clone_from(url, target_dir)
+        project_dir_str = str(project_dir)
+        logger.debug(f"Cloning the repository from {url} to {project_dir_str}")
+        repo = git.Repo.clone_from(url, project_dir_str)
+        repo.git.pull()
 
-        # check if the target dir has anything except .git
-        # if not - wait a bit and retry to pull
-        for _ in range(self.GITHUB_NUM_RETRIES):
-            contents = list(project_dir.iterdir())
+        for i in range(self.GITHUB_NUM_RETRIES):
+            contents = [p.name for p in project_dir.iterdir()]
             if ".git" not in contents:
                 time.sleep(self.GITHUB_RETRY_DELAY)
-                git.Repo.clone_from(url, target_dir)
+                repo = git.Repo.clone_from(url, project_dir_str)
+                repo.git.pull()
             elif len(contents) == 1:
                 time.sleep(self.GITHUB_RETRY_DELAY)
-                # pull again
-                repo = git.Repo(target_dir)
+                repo = git.Repo(project_dir_str)
                 repo.git.pull()
             else:
                 break
+            logger.warning(
+                f"Missing repo files. Retrying cloning the repository from {url} to {project_dir_str}. Attempt {i + 1} of {self.GITHUB_NUM_RETRIES}"
+            )
         else:
             raise ValueError(
-                f"Failed to clone the repository from {url} to {target_dir}: no files found"
+                f"Failed to clone the repository from {url} to {project_dir_str}: no files found"
             )
-
+        logger.debug(f"Cloned successfully")
         return project_dir
 
     def start_new_project(self, name, local=True, template_name=None):
@@ -307,6 +318,9 @@ class CalmmageDevEnv:
         return template.description
 
     def _create_repo_from_template(self, name, template_name):
+        logger.debug(
+            f"Creating a new repository {name} from the template: {template_name}"
+        )
         # create a new repo from template
         github_client = self.github_client
 
@@ -331,9 +345,10 @@ class CalmmageDevEnv:
             f"/repos/{template_owner}/{template_name}/generate",
             input={"owner": username, "name": name},
         )
-
+        url = f"https://github.com/{username}/{name}"
+        logger.debug(f"Repository created: {url}")
         # return the repo link ?
-        return f"https://github.com/{username}/{name}"
+        return url
 
     # local
     def get_local_template(self, name):
@@ -461,6 +476,9 @@ class CalmmageDevEnv:
         self._copy_script("monthly_job")
 
     def _custom_3(self):
+        """
+        Set up project manager and aliases
+        """
         source_path = Path(__file__).parent / "tools" / "project_manager.py"
         target_path = self.app_data_dir / "project_manager.py"
         shutil.copyfile(source_path, target_path)
@@ -474,13 +492,17 @@ class CalmmageDevEnv:
             f"alias move2gh='typer {target_path} run move2gh'",
             f"alias move2exp='typer {target_path} run move2exp'",
             f"alias move2beta='typer {target_path} run move2beta'",
+            f"alias mv2e='typer {target_path} run move2exp'",
+            f"alias mv2b='typer {target_path} run move2beta'",
             f"alias project_manager='typer {target_path} run'",
         ]
         for line in lines:
             self._source_line(line, targets=[f"{self.app_data_dir}/.alias"])
 
     def _custom_4(self):
-        # add aliases to the main dirs in the repo
+        """
+        add aliases to the main dirs in the repo
+        """
 
         # add to the .alias
         aliases = {
@@ -498,7 +520,12 @@ class CalmmageDevEnv:
                 "cd_beta",
             ],
             # experiments - calmmage experiments
-            #
+            self.root_dir
+            / "code/structured/dev/calmmage-dev/calmmage/experiments": [
+                "cd6",
+                "cde",
+                "cd_experiments",
+            ],
         }
         for target in aliases:
             for alias in aliases[target]:
@@ -624,3 +651,7 @@ class CalmmageDevEnv:
         new_project_path = latest_dir / project_name
         shutil.move(str(project_path), str(new_project_path))
         return new_project_path
+
+
+if __name__ == "__main__":
+    dev_env = CalmmageDevEnv()

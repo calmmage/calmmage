@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "calmmage"
-version = "0.2.1" # merge project actions and project manager
+version = "0.2.2" # update dev_env and project_manager
 description = "Personal GitHub repo for tools, projects, and personal website"
 authors = ["Reliable Magician <petrlavrov@calmmage.com>"]
 readme = "README.md"
