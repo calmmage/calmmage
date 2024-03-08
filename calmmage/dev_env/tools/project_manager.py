@@ -101,7 +101,7 @@ def parse_template_name(template_name: str, candidates=None):
         )
 
 
-@app.command(name="move2gh")
+@app.command(name="move2gh", help="Move project to GitHub using the selected template")
 def move_project_to_github(
     project_path: Annotated[
         Path,
@@ -152,7 +152,7 @@ def move_project_to_github(
 
 
 # exp dir path: dev_env.root_dir / "code/structured/dev/calmmage-dev/calmmage/experiments/seasonal/..."
-@app.command(name="move2exp")
+@app.command(name="move2exp", help="Move project to calmmage/experiments dir")
 def move_project_to_experiments(
     project_path: Annotated[
         Path,
@@ -177,6 +177,7 @@ def move_project_to_experiments(
     Move project to experiments
     cli alias: move2exp
     usage: move2exp <project_path> -n <project_name>
+    example: move2exp /path/to/project -n my_project
     """
     if project_name is None:
         project_name = project_path.name
@@ -188,7 +189,7 @@ def move_project_to_experiments(
 
 
 # beta dir path: dev_env.root_dir / "code/structured/dev/calmlib-dev/calmlib/beta"
-@app.command(name="move2beta")
+@app.command(name="move2beta", help="Move project to calmilb/beta")
 def move_project_to_beta(
     project_path: Annotated[
         Path,
