@@ -29,7 +29,14 @@ else
     echo "Already on main branch"
 fi
 
-git pull
+git fetch origin main
+
+if [ -z "$(git diff origin/main)" ]; then
+    echo "Local repository is up-to-date with remote repository. Proceeding..."
+else
+    echo "Local repository is not up-to-date with remote repository. Please update."
+    git pull
+fi
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
