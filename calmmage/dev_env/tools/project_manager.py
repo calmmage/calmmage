@@ -186,9 +186,9 @@ def move_project_to_experiments(
     cli alias: move2exp
     usage: move2exp <project_path> -n <project_name>
     """
-    project_path = project_path.rstrip("/")
-    # Perform the action: Move project to experiments
-    # project_name = project_path.split("/")[-1]  # Infer project name from path
+    project_path = Path(project_path.rstrip("/"))
+    if project_name is None:
+        project_name = project_path.name
     new_path = dev_env.move_project_to_experiments(
         project_path, project_name=project_name
     )
@@ -220,7 +220,9 @@ def move_project_to_beta(
     cli alias: move2beta, mv2b
     usage: move2beta <project_path> -n <project_name>
     """
-    project_path = project_path.rstrip("/")
+    project_path = Path(project_path.rstrip("/"))
+    if project_name is None:
+        project_name = project_path.name
     new_path = dev_env.move_project_to_beta(project_path, project_name=project_name)
     typer.echo(f"{project_name} moved to {new_path}")
 
