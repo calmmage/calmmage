@@ -1,4 +1,18 @@
 #!/bin/bash
+
+# Required parameters:
+# @raycast.schemaVersion 1
+# @raycast.title Generate Calmmage Dev Env
+# @raycast.mode compact
+
+# Optional parameters:
+# @raycast.icon 🧙🏻‍
+# @raycast.packageName generate-calmmage-dev-env
+
+# Documentation:
+# @raycast.author petr_lavrov
+# @raycast.authorURL https://raycast.com/petr_lavrov
+
 # - 'Regenerate calmmage dev env
 #     - cd ...
 #     - checkout main
