@@ -20,7 +20,7 @@
 #     - run main.py
 
 # todo: move path to env vars?
-cd /Users/calm/work/code/structured/tools/calmmage/
+cd /Users/calm/work/code/structured/tools/calmmage
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 
 if [ "$current_branch" != "main" ]; then
@@ -58,4 +58,3 @@ conda activate calmmage
 export PYTHONPATH="$PYTHONPATH:/Users/calm/work/code/structured/tools/calmmage:/Users/calm/work/code/structured/lib/calmlib"
 
 python calmmage/dev_env/main.py
-```
