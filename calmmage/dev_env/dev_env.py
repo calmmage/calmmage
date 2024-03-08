@@ -572,7 +572,7 @@ class CalmmageDevEnv:
         return copy_tree(original_project_path, clone_project_path, override=True)
 
     @staticmethod
-    def get_backup_path(original_project_path, suffix="_backup", new=True):
+    def get_backup_path(original_project_path, suffix="_backup"):
         backup_path = original_project_path.parent / (
             original_project_path.name + "_backup"
         )
@@ -582,14 +582,22 @@ class CalmmageDevEnv:
                 f"{original_project_path.name}{suffix}({counter})"
             )
             counter += 1
-        if not new:
-            counter -= 1
-            if counter == 0:
-                counter = ""
-            backup_path = original_project_path.parent / (
+        return backup_path
+
+    @staticmethod
+    def get_latest_backup_path(original_project_path, suffix="_backup"):
+        backup_path = original_project_path.parent / (
+            original_project_path.name + suffix
+        )
+        counter = 1
+        while True:
+            next_path = original_project_path.parent / (
                 f"{original_project_path.name}{suffix}({counter})"
             )
-        return backup_path
+            if not next_path.exists():
+                return backup_path
+            backup_path = next_path
+            counter += 1
 
     def _replace_original_project_with_github_clone(
         self, original_project_path, clone_project_path

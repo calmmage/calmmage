@@ -1,11 +1,12 @@
 import os
 from pathlib import Path
+
 import pyperclip
 import typer
 from typing_extensions import Annotated
 
-from calmmage.dev_env import CalmmageDevEnv
 from calmlib.beta.utils.common import is_subsequence
+from calmmage.dev_env import CalmmageDevEnv
 
 # Instantiate the CalmmageDevEnv object
 dev_env = CalmmageDevEnv()
@@ -136,13 +137,13 @@ def move_project_to_github(
     usage: move2gh <project_path> -t <template> -n <project_name>
     """
     template = parse_template_name(template, github_templates)
-    # Perform the action: Move project to GitHub using the selected template
-    # project_name = project_path.split("/")[-1]  # Infer project name from path
+    if project_name is None:
+        project_name = project_path.name
     dev_env.move_project_to_github(
         project_path, template_name=template, project_name=project_name
     )
     typer.echo(f"Project {project_name} moved to GitHub using template {template}.")
-    backup_path = dev_env.get_backup_path(project_path, new=False)
+    backup_path = dev_env.get_latest_backup_path(project_path)
     typer.echo(f"Project backup is available at {backup_path}")
     pyperclip.copy(str(backup_path))
 
@@ -210,7 +211,6 @@ def move_project_to_beta(
     cli alias: move2beta, mv2b
     usage: move2beta <project_path> -n <project_name>
     """
-    project_path = Path(project_path.rstrip("/"))
     if project_name is None:
         project_name = project_path.name
     new_path = dev_env.move_project_to_beta(project_path, project_name=project_name)
