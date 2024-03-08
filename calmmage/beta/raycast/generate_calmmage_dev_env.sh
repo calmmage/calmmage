@@ -19,15 +19,22 @@
 #     - git pull
 #     - run main.py
 
-cd /Users/calm/work/code/structured/dev/calmmage-dev/calmmage/dev_env
+# todo: move path to env vars?
+cd /Users/calm/work/code/structured/tools/calmmage/calmmage/dev_env
+current_branch=$(git rev-parse --abbrev-ref HEAD)
 
-git checkout main
+if [ "$current_branch" != "main" ]; then
+    git checkout main
+else
+    echo "Already on main branch"
+fi
 
 git pull
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/Users/calm/miniforge3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+# todo: move path to env vars?
+__conda_setu p="$('/Users/calm/miniforge3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
