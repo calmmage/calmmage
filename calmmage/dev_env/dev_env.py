@@ -19,7 +19,8 @@ DEFAULT_APP_DATA_DIR = "~/.calmmage"
 
 # todo: move to calmlib
 @deprecated(version="0.1.0", reason="Use calmlib.beta.utils.common.copy_tree instead.")
-def copy_tree(source, destination):
+def copy_tree(source, destination, override=False):
+    # todo: use override
     source_path = Path(source)
     destination_path = Path(destination)
 
@@ -31,7 +32,7 @@ def copy_tree(source, destination):
 
     for item in source_path.iterdir():
         if item.is_dir():
-            copy_tree(item, destination_path / item.name)
+            copy_tree(item, destination_path / item.name, override=override)
         else:
             shutil.copy2(item, destination_path / item.name)
 
@@ -256,6 +257,7 @@ class CalmmageDevEnv:
         project_dir_str = str(project_dir)
         logger.debug(f"Cloning the repository from {url} to {project_dir_str}")
         repo = git.Repo.clone_from(url, project_dir_str)
+        time.sleep(self.GITHUB_RETRY_DELAY)
         repo.git.pull()
 
         for i in range(self.GITHUB_NUM_RETRIES):
@@ -567,23 +569,10 @@ class CalmmageDevEnv:
 
     @staticmethod
     def _copy_project_files_to_github_clone(original_project_path, clone_project_path):
-        return copy_tree(original_project_path, clone_project_path)
-        # # shutil.copytree cannot be used directly as it doesn't allow overriding existing directories
-        # # Use shutil.copy2 and os.walk to manually copy files and directories, allowing override
-        # for root, dirs, files in os.walk(original_project_path):
-        #     # Construct the path structure in the clone directory
-        #     relative_path = os.path.relpath(root, original_project_path)
-        #     clone_root_path = os.path.join(clone_project_path, relative_path)
-        #     if not os.path.exists(clone_root_path):
-        #         os.makedirs(clone_root_path)
-        #     for file in files:
-        #         # Copy each file, allowing for override with shutil.copy2
-        #         src_file_path = os.path.join(root, file)
-        #         dst_file_path = os.path.join(clone_root_path, file)
-        #         shutil.copy2(src_file_path, dst_file_path)
+        return copy_tree(original_project_path, clone_project_path, override=True)
 
     @staticmethod
-    def get_backup_path(original_project_path, suffix="_backup"):
+    def get_backup_path(original_project_path, suffix="_backup", new=True):
         backup_path = original_project_path.parent / (
             original_project_path.name + "_backup"
         )
@@ -593,6 +582,13 @@ class CalmmageDevEnv:
                 f"{original_project_path.name}{suffix}({counter})"
             )
             counter += 1
+        if not new:
+            counter -= 1
+            if counter == 0:
+                counter = ""
+            backup_path = original_project_path.parent / (
+                f"{original_project_path.name}{suffix}({counter})"
+            )
         return backup_path
 
     def _replace_original_project_with_github_clone(

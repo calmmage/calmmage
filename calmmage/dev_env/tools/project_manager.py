@@ -1,26 +1,11 @@
 import os
 from pathlib import Path
-
+import pyperclip
 import typer
-from deprecated import deprecated
 from typing_extensions import Annotated
 
 from calmmage.dev_env import CalmmageDevEnv
-
-
-# todo: replace with calmlib.beta.utils.common.is_subsequence
-@deprecated(
-    version="0.2.1", reason="Use calmlib.beta.utils.common.is_subsequence instead."
-)
-def is_subsequence(sub, main):
-    sub_index = 0
-    main_index = 0
-    while sub_index < len(sub) and main_index < len(main):
-        if sub[sub_index] == main[main_index]:
-            sub_index += 1
-        main_index += 1
-    return sub_index == len(sub)
-
+from calmlib.beta.utils.common import is_subsequence
 
 # Instantiate the CalmmageDevEnv object
 dev_env = CalmmageDevEnv()
@@ -118,8 +103,10 @@ def parse_template_name(template_name: str, candidates=None):
 @app.command(name="move2gh")
 def move_project_to_github(
     project_path: Annotated[
-        str,
+        Path,
         typer.Argument(
+            ...,
+            file_okay=False,
             help="Path to the project to move to GitHub.",
             # prompt="Project path (What project do you want to move to GitHub?)\nPath",
         ),
@@ -127,7 +114,6 @@ def move_project_to_github(
     template: Annotated[
         str,
         typer.Option(
-            "python-project-template",
             "--template",
             "-t",
             help="Template name for the GitHub project.",
@@ -150,23 +136,25 @@ def move_project_to_github(
     usage: move2gh <project_path> -t <template> -n <project_name>
     """
     template = parse_template_name(template, github_templates)
-    project_path = project_path.rstrip("/")
     # Perform the action: Move project to GitHub using the selected template
     # project_name = project_path.split("/")[-1]  # Infer project name from path
     dev_env.move_project_to_github(
         project_path, template_name=template, project_name=project_name
     )
     typer.echo(f"Project {project_name} moved to GitHub using template {template}.")
-    typer.echo(f"Project backup is available at {project_path}_backup")
+    backup_path = dev_env.get_backup_path(project_path, new=False)
+    typer.echo(f"Project backup is available at {backup_path}")
+    pyperclip.copy(str(backup_path))
 
 
-# add a simple 'move2exp' command
 # exp dir path: dev_env.root_dir / "code/structured/dev/calmmage-dev/calmmage/experiments/seasonal/..."
 @app.command(name="move2exp")
 def move_project_to_experiments(
     project_path: Annotated[
-        str,
+        Path,
         typer.Argument(
+            ...,
+            file_okay=False,
             help="Path to the project to move to experiments.",
             # prompt="Project path (What project do you want to move to experiments?)\nPath",
         ),
@@ -186,21 +174,23 @@ def move_project_to_experiments(
     cli alias: move2exp
     usage: move2exp <project_path> -n <project_name>
     """
-    project_path = Path(project_path.rstrip("/"))
     if project_name is None:
         project_name = project_path.name
     new_path = dev_env.move_project_to_experiments(
         project_path, project_name=project_name
     )
     typer.echo(f"Project {project_name} moved to {new_path}")
+    pyperclip.copy(str(new_path))
 
 
 # beta dir path: dev_env.root_dir / "code/structured/dev/calmlib-dev/calmlib/beta"
 @app.command(name="move2beta")
 def move_project_to_beta(
     project_path: Annotated[
-        str,
+        Path,
         typer.Argument(
+            ...,
+            file_okay=False,
             help="Path to the project to move to beta.",
             # prompt="Project path (What project do you want to move to beta?)\nPath",
         ),
@@ -225,6 +215,7 @@ def move_project_to_beta(
         project_name = project_path.name
     new_path = dev_env.move_project_to_beta(project_path, project_name=project_name)
     typer.echo(f"{project_name} moved to {new_path}")
+    pyperclip.copy(str(new_path))
 
 
 @app.command(name="lt", help="List available github and local templates")
@@ -250,19 +241,21 @@ def list_templates():
 def add_new_project(
     name: Annotated[
         str,
-        typer.Argument(
-            # prompt="Name (What do you want the project to do?)\nName",
+        typer.Option(
+            ...,
+            "--name",
+            "-n",
+            prompt="Name (What do you want the project to do?)\nName",
         ),
     ],
     template: Annotated[
         str,
         typer.Option(
-            ...,
             "--template",
             "-t",
             autocompletion=complete_template_name,
         ),
-    ],
+    ] = "default",
 ):
     """
     Create a new project using the selected template
@@ -283,6 +276,7 @@ def add_new_project(
 
     # todo: change the dir to new project? or just print the path?
     typer.echo(project_dir)
+    pyperclip.copy(str(project_dir))
 
 
 if __name__ == "__main__":
