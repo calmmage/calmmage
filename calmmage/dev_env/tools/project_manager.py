@@ -133,6 +133,9 @@ def move_project_to_github(
 ):
     """
     Move project to GitHub using the selected template
+    Pulls the new repo, then copies the project files to the new repo, overwriting any existing files.
+    Saves a backup of the original project in the backups folder.
+
     cli alias: move2gh
     usage: move2gh <project_path> -t <template> -n <project_name>
     """
