@@ -13,5 +13,6 @@
 # @raycast.author petr_lavrov
 # @raycast.authorURL https://raycast.com/petr_lavrov
 
-open -a Visual\ Studio\ Code ~/work/code/structured/tools/calmmage/calmmage/personal_website/pages/calmmage_knowledge_base/
+# todo: move path to an env variable
+open -a Visual\ Studio\ Code ~/work/code/structured/beta/foam/calmmage/personal_website/pages/calmmage_knowledge_base/
 
