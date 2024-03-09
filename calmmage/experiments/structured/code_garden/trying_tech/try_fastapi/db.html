@@ -1,0 +1,65 @@
+<html lang="en">
+<head style="text-align: center">
+    <title>FastAPI Database</title>
+    <script>
+        async function addData() {
+            const addKey = document.getElementById("addKey");
+            const addValue = document.getElementById("addValue");
+            const addButton = document.getElementById("addButton");
+            addButton.style.backgroundColor = "grey";
+            const fontSize = addButton.style.fontSize;
+            addButton.style.fontSize = 6;
+            addButton.disabled = true;
+
+            const key = addKey.value;
+            const value = addValue.value;
+
+            const response = await fetch(`http://localhost:8000/data2/${key}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({value})
+            });
+
+            const data = await response.json();
+            console.log(data);
+            addKey.value = "";
+            addValue.value = "";
+            addButton.style.backgroundColor = "";
+            addButton.style.fontSize = fontSize;
+            addButton.disabled = false;
+        }
+
+        async function getData() {
+            const getKey = document.getElementById("getKey");
+            const getButton = document.getElementById("getButton");
+            getButton.style.backgroundColor = "grey";
+            getButton.disabled = true;
+
+            const key = getKey.value;
+
+            const response = await fetch(`http://localhost:8000/data2/${key}`);
+            const data = await response.json();
+            console.log(data);
+            getKey.value = "";
+            getButton.style.backgroundColor = "";
+            getButton.disabled = false;
+        }
+    </script>
+</head>
+<body>
+<div>
+    <button onclick="addData()">Add Data</button>
+    <label for="addKey">Key:</label>
+    <input id="addKey" placeholder="Key" type="text">
+    <label for="addValue">Value:</label>
+    <input id="addValue" placeholder="Value" type="text">
+</div>
+<div>
+    <button onclick="getData()">Get Data</button>
+    <label for="getKey">Key:</label>
+    <input id="getKey" placeholder="Key" type="text">
+</div>
+</body>
+</html>
