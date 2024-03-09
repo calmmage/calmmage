@@ -16,7 +16,18 @@ const numCubes = 100;
 const numTrails = 20;
 const R = 2;
 const SCALE = 0.1;
-const POSITION_SCALE = 0.5
+let POSITION_SCALE = 0.0077;
+const REACTION_DISTANCE = 0.5;
+const REACTION_STRENGTH = 0.01;
+
+const FOLLOW_SPEED = 0.01;
+const FOLLOW_DISTANCE = false;
+const TRAIL_FOLLOW_SPEED = 0.01;
+const TRAIL_FOLLOW_DISTANCE = true;
+
+
+// funniest to play with
+
 for (let i = 0; i < numCubes; i++) {
     cube = new THREE.Mesh(
         new THREE.BoxGeometry(SCALE, SCALE, SCALE),
@@ -57,50 +68,65 @@ for (let i = 0; i < numCubes; i++) {
             trailTargets.push(trails[trails.length - 2]);
         }
     }
-    }
+}
 
 // Add interactivity
-    document.addEventListener('mousemove', (event) => {
-        mouseX = (event.clientX / window.innerWidth) * 2 - 1; // 1245
-        mouseY = -(event.clientY / window.innerHeight) * 2 + 1;  // 1014
-        // mouseX *= POSITION_SCALE;
-        // mouseY *= POSITION_SCALE;
-        cubes.forEach(cube => {
-            distance = Math.sqrt((cube.position.x - mouseX) ** 2 + (cube.position.y - mouseY) ** 2);
-            if (distance < 2) {
-                cube.position.x += (cube.position.x - mouseX) / distance
-                cube.position.y += (cube.position.y - mouseY) / distance
-            }
-        })
+document.addEventListener('mousemove', (event) => {
+    mouseX = event.clientX - window.innerWidth / 2; // 1245
+    mouseY = window.innerHeight / 2 - event.clientY;  // 1014
+    mouseX *= POSITION_SCALE;
+    mouseY *= POSITION_SCALE;
+    cubes.forEach(cube => {
+        distance = Math.sqrt((cube.position.x - mouseX) ** 2 + (cube.position.y - mouseY) ** 2);
+        if (distance < REACTION_DISTANCE) {
+            cube.position.x += REACTION_STRENGTH * (cube.position.x - mouseX) / distance ;
+            cube.position.y += REACTION_STRENGTH * (cube.position.y - mouseY) / distance ;
+        }
+    })
+});
+
+let time = 0;
+
+function updateCubes() {
+    time += 0.002;
+    targets.forEach(cube => {
+        cube.position.x = Math.sin(time + cube.offset) * cube.range;
+        cube.position.y = Math.cos(time + cube.offset) * cube.range;
+    });
+    // all the rest of the cubes just follow their target
+    cubes.forEach((cube, i) => {
+        distance = Math.sqrt((cube.position.x - targets[i].position.x) ** 2 + (cube.position.y - targets[i].position.y) ** 2);
+        x = (targets[i].position.x - cube.position.x) * FOLLOW_SPEED;
+        y = (targets[i].position.y - cube.position.y) * FOLLOW_SPEED;
+        if (FOLLOW_DISTANCE) {
+            x *= distance;
+            y *= distance;
+        }
+        cube.position.x += x;
+        cube.position.y += y;
+    });
+    trails.forEach((trail, i) => {
+        distance = Math.sqrt((trail.position.x - trailTargets[i].position.x) ** 2 + (trail.position.y - trailTargets[i].position.y) ** 2);
+        x = (trailTargets[i].position.x - trail.position.x) * TRAIL_FOLLOW_SPEED;
+        y = (trailTargets[i].position.y - trail.position.y) * TRAIL_FOLLOW_SPEED;
+        if (TRAIL_FOLLOW_DISTANCE) {
+            x *= distance;
+            y *= distance;
+        }
+        trail.position.x += x;
+        trail.position.y += y;
+
     });
 
-    let time = 0;
+}
 
-    function updateCubes() {
-        time += 0.002;
-        targets.forEach(cube => {
-            cube.position.x = Math.sin(time + cube.offset) * cube.range;
-            cube.position.y = Math.cos(time + cube.offset) * cube.range;
-        });
-        // all the rest of the cubes just follow their target
-        cubes.forEach((cube, i) => {
-            distance = Math.sqrt((cube.position.x - targets[i].position.x) ** 2 + (cube.position.y - targets[i].position.y) ** 2);
-            cube.position.x += (targets[i].position.x - cube.position.x) * 0.01 * distance;
-            cube.position.y += (targets[i].position.y - cube.position.y) * 0.01 * distance;
-        });
-        trails.forEach((trail, i) => {
-            distance = Math.sqrt((trail.position.x - trailTargets[i].position.x) ** 2 + (trail.position.y - trailTargets[i].position.y) ** 2);
-            trail.position.x += (trailTargets[i].position.x - trail.position.x) * 0.01 * distance;
-            trail.position.y += (trailTargets[i].position.y - trail.position.y) * 0.01 * distance;
-        });
 
-    }
 
 // Animate the scene
-    const animate = function () {
-        updateCubes();
-        requestAnimationFrame(animate);
-        renderer.render(scene, camera);
-    };
+const animate = function () {
+    updateCubes();
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+};
 
-    animate();
+animate();
