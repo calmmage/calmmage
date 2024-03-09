@@ -11,5 +11,6 @@ move utils to calmlib
 - [x] github templates
 - [x] local templates
 # 5) Refactor
-- [ ] sort tools dir
+- [x] sort tools dir
+- [ ] consider a 'setup' dir for one-time setup scripts (or all of them one-time?)
 # 6) add tests

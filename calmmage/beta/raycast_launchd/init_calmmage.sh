@@ -1,23 +1,3 @@
-#!/bin/bash
-
-# Required parameters:
-# @raycast.schemaVersion 1
-# @raycast.title Generate Calmmage Dev Env
-# @raycast.mode compact
-
-# Optional parameters:
-# @raycast.icon 🧙🏻‍
-# @raycast.packageName generate-calmmage-dev-env
-
-# Documentation:
-# @raycast.author petr_lavrov
-# @raycast.authorURL https://raycast.com/petr_lavrov
-
-# - 'Regenerate calmmage dev env
-#     - cd ...
-#     - checkout main
-#     - git pull
-#     - run main.py
 
 # todo: move path to env vars?
 cd /Users/calm/work/code/structured/tools/calmmage
@@ -56,5 +36,3 @@ unset __conda_setup
 conda activate calmmage
 
 export PYTHONPATH="$PYTHONPATH:/Users/calm/work/code/structured/tools/calmmage:/Users/calm/work/code/structured/lib/calmlib"
-
-python calmmage/dev_env/main.py
