@@ -2,8 +2,8 @@
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.z = 5;
-const renderer = new THREE.WebGLRenderer( { alpha: true } );
-renderer.setClearColor( 0x000000, 0 );
+const renderer = new THREE.WebGLRenderer({alpha: true});
+renderer.setClearColor(0x000000, 0);
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
@@ -16,12 +16,13 @@ const numCubes = 100;
 const numTrails = 20;
 const R = 2;
 const SCALE = 0.1;
-let POSITION_SCALE = 0.0077;
+const POSITION_SCALE = 0.0077;
 const REACTION_DISTANCE = 0.5;
 const REACTION_STRENGTH = 0.01;
+const REACT_USE_DISTANCE = true;
 
 const FOLLOW_SPEED = 0.01;
-const FOLLOW_DISTANCE = false;
+let FOLLOW_DISTANCE = false;
 const TRAIL_FOLLOW_SPEED = 0.01;
 const TRAIL_FOLLOW_DISTANCE = true;
 
@@ -57,7 +58,11 @@ for (let i = 0; i < numCubes; i++) {
         const opacity = 1.0 - (j / numTrails);
         trail = new THREE.Mesh(
             new THREE.PlaneGeometry(size, size, size),
-            new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: opacity})
+            new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                transparent: true,
+                opacity: opacity
+            })
         );
         trail.position.x = cube.position.x;
         trail.position.y = cube.position.y;
@@ -71,18 +76,51 @@ for (let i = 0; i < numCubes; i++) {
 }
 
 // Add interactivity
-document.addEventListener('mousemove', (event) => {
-    mouseX = event.clientX - window.innerWidth / 2; // 1245
-    mouseY = window.innerHeight / 2 - event.clientY;  // 1014
-    mouseX *= POSITION_SCALE;
-    mouseY *= POSITION_SCALE;
+function scatterCubes(cubes, sourceX, sourceY, reaction_strength, reaction_distance, reaction_use_distance = false) {
     cubes.forEach(cube => {
-        distance = Math.sqrt((cube.position.x - mouseX) ** 2 + (cube.position.y - mouseY) ** 2);
-        if (distance < REACTION_DISTANCE) {
-            cube.position.x += REACTION_STRENGTH * (cube.position.x - mouseX) / distance ;
-            cube.position.y += REACTION_STRENGTH * (cube.position.y - mouseY) / distance ;
+        let distance = Math.sqrt((cube.position.x - sourceX) ** 2 + (cube.position.y - sourceY) ** 2);
+        if ((reaction_distance === 0) || distance < reaction_distance) {
+            x = (sourceX - cube.position.x) * reaction_strength;
+            y = (sourceY - cube.position.y) * reaction_strength;
+            if (reaction_use_distance) {
+                x /= distance;
+                y /= distance;
+            }
+            cube.position.x -= x;
+            cube.position.y -= y;
         }
     })
+}
+
+function getMousePosition(event) {
+    return {
+        x: (event.clientX - window.innerWidth / 2) * POSITION_SCALE,
+        y: (window.innerHeight / 2 - event.clientY) * POSITION_SCALE
+    }
+}
+
+document.addEventListener('mousemove', (event) => {
+    position = getMousePosition(event);
+    scatterCubes(cubes, position.x, position.y, REACTION_STRENGTH, REACTION_DISTANCE, REACT_USE_DISTANCE);
+
+});
+
+const CLICK_REACTION_STRENGTH = 0.1;
+const CLICK_REACTION_DISTANCE = 2;
+const SCATTER_DURATION = 20;
+
+document.addEventListener('click', (event) => {
+    position = getMousePosition(event);
+    FOLLOW_DISTANCE = true;
+    for (let i = 0; i < SCATTER_DURATION; i++) {
+        setTimeout(() => {
+            scatterCubes(cubes, position.x, position.y, CLICK_REACTION_STRENGTH, CLICK_REACTION_DISTANCE, REACT_USE_DISTANCE);
+        }, i * 10);
+    }
+    setTimeout(() => {
+        FOLLOW_DISTANCE = false;
+    }, SCATTER_DURATION * 10 * 2);
+
 });
 
 let time = 0;
@@ -119,7 +157,6 @@ function updateCubes() {
     });
 
 }
-
 
 
 // Animate the scene
