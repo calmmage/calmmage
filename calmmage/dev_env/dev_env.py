@@ -643,7 +643,7 @@ class CalmmageDevEnv:
         project manager 'move2beta' command
         exp dir path: dev_env.root_dir / "code/structured/dev/calmmage-dev/calmmage/experiments/seasonal/..."
         """
-        project_path = Path(project_path.rstrip("/"))
+        project_path = Path(project_path)
         if project_name is None:
             project_name = project_path.name
         target_dir = (
