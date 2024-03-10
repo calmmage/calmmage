@@ -23,6 +23,8 @@ if projects_templates_dir:
     projects_templates_dir = Path(projects_templates_dir)
     templates = projects_templates_dir.iterdir()
     for template_dir in templates:
+        if not template_dir.is_dir() or template_dir.name.startswith("."):
+            continue
         # check if .git folder exists
         if (template_dir / ".git").exists():
             # todo: improve descriptions?
