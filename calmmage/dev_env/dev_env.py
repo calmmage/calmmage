@@ -9,9 +9,9 @@ from deprecated import deprecated
 from dotenv import load_dotenv
 
 from calmmage.dev_env.presets import latest_preset
-from calmlib.beta.utils.logging_utils import get_calmmage_logger
+from calmlib.utils import get_logger
 
-logger = get_calmmage_logger(__name__)
+logger = get_logger(__name__)
 
 DEFAULT_ROOT_DIR = "~/work"
 DEFAULT_APP_DATA_DIR = "~/.calmmage"
