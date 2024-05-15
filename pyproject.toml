@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "calmmage"
-version = "0.2.5" # add 'lsr' and 'cdr' aliases
+version = "0.2.6" # add local python app template
 description = "Personal GitHub repo for tools, projects, and personal website"
 authors = ["Reliable Magician <petrlavrov@calmmage.com>"]
 readme = "README.md"
