@@ -29,7 +29,7 @@ more: knowledge base, similar.
 "
 
 # add alias to add alias to ~/.alias
-aa() {
+add_alias() {
     echo "" >> ~/.alias
     echo "# $3" >> ~/.alias
     echo "alias $1=\"$2\"" >> ~/.alias; source ~/.alias
@@ -47,6 +47,7 @@ find_what_where() {
     grep -rnw "$2" -e "$1"
 }
 
+# todo: replace this with a fancy ai help that queries chatgpt
 help() {
     # HELP=${HELP:-"No help available"}
     if [ -z "$1" ]; then
@@ -119,4 +120,10 @@ change_dir_regexp() {
     # echo $dir_names
     # ls ($dir_regexp)
     eval "cd $dir_regexp 2>/dev/null"
+}
+
+copy_absolute_path() {
+    local abs_path="$(readlink -f "$1")"
+    echo "$abs_path" | pbcopy
+    echo "Copied: $abs_path"
 }
