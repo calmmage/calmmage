@@ -36,7 +36,21 @@ add_alias() {
 }
 
 move_and_link() {
-    mv "$1" "$2" && ln -s "$2/${1##*/}" "$1"
+    # Ensure both arguments are provided
+    if [ $# -ne 2 ]; then
+        echo "Usage: move_and_link <source> <destination>"
+        return 1
+    fi
+
+    # Get the absolute paths
+    source=$(realpath "$1")
+    destination=$(realpath "$2")
+
+    # Move the source to the destination
+    mv "$source" "$destination"
+
+    # Create a symlink at the original source location pointing to the new location
+    ln -s "$destination/$(basename "$source")" "$source"
 }
 
 find_project() {
