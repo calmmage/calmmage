@@ -50,7 +50,7 @@ move_and_link() {
     destination_base=$(basename "$2")
     echo "Moved $source to $destination"
     # Create a symlink at the original source location pointing to the new location
-    if [ destination_base == source_base ]; then
+    if [ "$destination_base" == "$source_base" ]; then
         ln -s "$destination" "$source"
         echo "Linked $source to $destination"
     else
