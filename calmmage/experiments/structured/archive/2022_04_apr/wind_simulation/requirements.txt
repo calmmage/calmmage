@@ -1,4 +1,0 @@
-git+https://github.com/calmquant/calmlib@master#egg=calmlib
-
-pygame
-pyglet
