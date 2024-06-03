@@ -36,6 +36,7 @@ gitpython = "*"
 #assemblyai = "*"
 #whisperx = { git = "https://github.com/m-bain/whisperX.git", branch = "main" }
 #PyDrive = "*"
+pillow = "^10.3.0"
 
 [tool.poetry.group.dev.dependencies]
 pyinstaller = "*"
