@@ -41,16 +41,13 @@ move_and_link() {
         echo "Usage: move_and_link <source> <destination>"
         return 1
     fi
-
     # Get the absolute paths
     source=$(realpath "$1")
-    destination=$(realpath "$2")
-
     # Move the source to the destination
-    mv "$source" "$destination"
-
+    mv "$1" "$2"
+    destination=$(realpath "$2")
     # Create a symlink at the original source location pointing to the new location
-    ln -s "$destination/$(basename "$source")" "$source"
+    ln -s "$destination" "$source"
 }
 
 find_project() {
