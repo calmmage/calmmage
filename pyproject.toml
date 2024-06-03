@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "calmmage"
-version = "0.2.7" # add new aliases and commands to zshrc
+version = "0.2.8" # update project manager to create new projects in projects dir
 description = "Personal GitHub repo for tools, projects, and personal website"
 authors = ["Reliable Magician <petrlavrov@calmmage.com>"]
 readme = "README.md"

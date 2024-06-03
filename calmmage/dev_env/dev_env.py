@@ -129,6 +129,11 @@ class CalmmageDevEnv:
         return self.root_dir / self.preset.project_unsorted_dir
         # return self.root_dir / 'code' / 'structured' / 'unsorted'
 
+    @property
+    def all_projects_dir(self):
+        return self.root_dir / self.preset.all_projects_dir
+        # return self.root_dir / 'code' / 'structured' / 'projects'
+
     def _setup_root_dir(self):
         root_dir = Path(self.root_dir).expanduser()
         root_dir.mkdir(parents=True, exist_ok=True)

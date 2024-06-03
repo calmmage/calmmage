@@ -243,6 +243,17 @@ def list_templates():
         typer.echo(template)
 
 
+def move_and_symlink(source, dest):
+    source = Path(source)
+    dest = Path(dest)
+    if dest.exists():
+        raise FileExistsError(f"Destination already exists: {dest}")
+    import shutil
+
+    shutil.move(source, dest)
+    source.symlink_to(dest)
+
+
 @app.command(name="np", help="Add a new project")
 def add_new_project(
     name: Annotated[
@@ -283,8 +294,17 @@ def add_new_project(
     typer.echo(f"Using template {template}, {'GitHub' if not local else 'Local'}.")
     project_dir = dev_env.start_new_project(name, local=local, template_name=template)
 
+    # new paradygm: move project dir to structured_dir and create a symlink back
+    dest_path = dev_env.all_projects_dir() / name
+    try:
+        move_and_symlink(project_dir, dest_path)
+        typer.echo(project_dir)
+    except Exception as e:
+        typer.echo(f"Failed to move and symlink the project: {e}")
+        typer.echo(f"Project is available at {project_dir}")
+        typer.echo(f"Please move it manually to {dest_path}")
+
     # todo: change the dir to new project? or just print the path?
-    typer.echo(project_dir)
     pyperclip.copy(str(project_dir))
 
 
