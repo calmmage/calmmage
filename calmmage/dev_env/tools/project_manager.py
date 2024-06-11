@@ -295,7 +295,7 @@ def add_new_project(
     project_dir = dev_env.start_new_project(name, local=local, template_name=template)
 
     # new paradygm: move project dir to structured_dir and create a symlink back
-    dest_path = dev_env.all_projects_dir() / name
+    dest_path = dev_env.all_projects_dir / name
     try:
         move_and_symlink(project_dir, dest_path)
         typer.echo(project_dir)
