@@ -1,10 +1,11 @@
-import { getPreferenceValues } from "@raycast/api";
-import { exec, ExecException } from "child_process";
-import { getFinderDir } from "./utils/get-finder-dir";
-import { checkPathExists } from "./utils/path-utils";
-import { getClipboardPath } from "./utils/clipboard-utils";
-import { logWithHUD, logWithToast } from "./utils/raycast-utils";
+import {getPreferenceValues} from "@raycast/api";
+import {exec, ExecException} from "child_process";
+import {getFinderDir} from "./utils/get-finder-dir";
+import {checkPathExists} from "./utils/path-utils";
+import {getClipboardPath} from "./utils/clipboard-utils";
+import {logWithHUD, logWithToast} from "./utils/raycast-utils";
 import fs from "fs";
+
 export interface App {
   key: string; // unique key
   title: string; // title to display
@@ -152,7 +153,7 @@ export const openPathInApp = async (path: string, app: string) => {
     path = path.split('/').slice(0, -1).join('/');
 
   }
-  const command = `open -a "${appObj.name}" ${path}`;
+  const command = `open -a "${appObj.name}" "${path}"`;
 
   exec(command, (error: ExecException | null, stdout: string, stderr: string) => {
     if (error) {

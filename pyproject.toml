@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "calmmage"
-version = "0.2.8" # update project manager to create new projects in projects dir
+version = "0.2.9" # bugfix open-dir
 description = "Personal GitHub repo for tools, projects, and personal website"
 authors = ["Reliable Magician <petrlavrov@calmmage.com>"]
 readme = "README.md"
