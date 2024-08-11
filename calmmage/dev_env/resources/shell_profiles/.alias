@@ -22,3 +22,18 @@ alias fp=find_project
 
 # find text in file
 alias find_=find_what_where
+
+# cdr prj -> cd *p*r*j*; See also: cdf
+alias cdr='nocorrect change_dir_regexp'
+# lsr abc -> ls *a*b*c*
+alias lsr='nocorrect list_dir_regexp'
+# cdf prj -> cd if is_substring(prj, dir). Fails on multi-match; See also: cdf
+alias cdf='nocorrect change_dir_fuzzy'
+# use z to cd (tool from Kostya that remembers dirs)
+alias cdz='z'
+
+# add alias to ~/.alias - aa name "command mommand" "Description and examples"
+alias aa='add_alias'
+
+# copy absolute path of the current dir
+alias cpa="copy_absolute_path"

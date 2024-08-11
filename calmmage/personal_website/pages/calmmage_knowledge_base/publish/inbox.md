@@ -158,3 +158,43 @@ How do I cd into a dir by partial name?
   Doesn't seem to work in subpaths
 - 'cd' should expand paths out of the box
   It doesn't. 
+
+## Case 8
+
+### c8-Problem
+
+Can't search effectively in PyCharm because of .venv files
+
+### c8-Solution
+
+Option 1: .venv -> right click -> Mark Directory as -> Excluded
+Doesn't work - still shows up in search
+
+Option 2: Settings > Editor > File Types > Ignore Files and Folders: add .venv
+Works!
+
+Option 3: Create a custom search space with regexps
+Search -> Spaces -> add a new space -> add a regexp
+Example for multiple folders - very tedious:
+```
+(file[
+abstract-tool-user]:*/||file[
+archivist-bot]:*/||file[
+bot-lib]:*/||file[
+bot-lib-bot-template]:*/||file[
+calmapp]:*/||file[
+calmlib]:*/||file[
+calmmage-feature-bot]:*/||file[
+calmmage-task-tracker]:*/||file[
+electron-app-demo]:*/)&&!file[abstract-tool-user
+]:.venv//*&&!file[archivist-bot
+]:.venv//*&&!file[bot-lib
+]:.venv//*&&!file[bot-lib-bot-template
+]:.venv//*&&!file[calmapp
+]:.venv//*&&!file[calmlib
+]:.venv//*&&!file[calmmage-feature-bot
+]:.venv//*&&!file[calmmage-task-tracker
+]:.venv//*&&!file[electron-app-demo
+]:.venv//*
+```
+

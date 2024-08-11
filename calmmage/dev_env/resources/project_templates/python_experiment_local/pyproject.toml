@@ -1,0 +1,40 @@
+[tool.poetry]
+name = "project-name"
+version = "0.0.1"
+# Template Version: 0.2.2
+# Add scheduled job example
+description = ""
+authors = ["Petr Lavrov <calmmage@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">3.9.7,<3.12" # because of Langchain... and distutils deprecated in 3.12
+# for stability, use frozen-app-name branch
+calmlib = { git = "https://github.com/calmmage/calmlib.git", branch = "main" }
+#calmmage = { git = "https://github.com/calmmage/calmmage.git", branch = "main" }
+pytest = "*"
+# logging
+loguru = "*"
+
+greenlet = "3.0.1"
+openai = "1.23.3"
+langchain = "0.1.16"
+langchain-community = "*"
+python-dotenv = "*"
+langchain_openai = "0.1.3" # _ and - inconsistency is really painful to my eyes
+langsmith = "0.1.50"
+chromadb = "*"
+google-api-python-client = "*"
+google-auth-oauthlib = "*"
+langchain-google-community =  "1.0.2"
+
+[tool.poetry.group.dev.dependencies]
+jupyter = ">=1.0.0"
+tqdm = "*"
+# pandas = "2.1.0"
+black = "*"
+pre-commit = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

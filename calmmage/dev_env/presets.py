@@ -33,7 +33,7 @@ class PresetJan2024(Preset):
         "code/seasonal/past",
         "workspace/launchd/scripts",
         "workspace/launchd/logs",
-        "code/structured/dev"
+        "code/structured/dev",
     ]
     # softlinks = {
     #       # "code/seasonal/latest": "code/seasonal/YYYY_MM_MMM",
@@ -45,6 +45,7 @@ class PresetJan2024(Preset):
     new_projects_dir = "code/seasonal/latest/experiments"
     project_unsorted_dir = "code/structured/unsorted"
     scripts_dir = "workspace/launchd/scripts"
+    all_projects_dir = "code/structured/projects"
 
 
 presets.append(PresetJan2024)

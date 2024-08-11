@@ -7,4 +7,3 @@ There are other, more specialised templates for particular use cases:
 - python project
 - python experiment
 - typescript project
-- feature (branch)

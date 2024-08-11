@@ -1,0 +1,3 @@
+- [ ]  Todo: Re-view zoom recording of a video with aik -> add init commands to setup.sh
+- [x] Find the recording
+  - /Users/calm/Library/Mobile Documents/com~apple~CloudDocs/icloud_macbook/videos/unsotred/Zoom Calls/2023-12-22 -093801_3840x2160.mp4
