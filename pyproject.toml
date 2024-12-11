@@ -15,9 +15,12 @@ classifiers = [
     "Intended Audience :: Developers",
     "Operating System :: OS Independent",
 ]
+packages=[
+    { include = "seasonal", from = "." },
+]
 
 [tool.poetry.dependencies]
-python = ">=3.8.1,<3.12.0"  # no setuptools
+python = ">=3.11,<4"
 #pytest = "*"
 typer = {version = ">=0.9.0", extras = ["all"]}
 #typer-cli = {version = ">=0.0.13", extras = ["all"]}
