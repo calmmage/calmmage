@@ -10,4 +10,4 @@ app = typer.Typer()
 qt = QueueTracker(storage_mode=StorageMode.FILE, storage_path="queue_tracker_state.json")
 
 if __name__ == "__main__":
-    qt.dispacth_items()
+    qt.dispatch_items()

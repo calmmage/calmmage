@@ -24,6 +24,9 @@ class Queue:
             self.cadence = timedelta(seconds=parse(cadence))
         elif isinstance(cadence, timedelta):
             self.cadence = cadence
+        elif isinstance(cadence, dict) and 'total_seconds' in cadence:
+            # Handle deserialized timedelta
+            self.cadence = timedelta(seconds=cadence['total_seconds'])
 
         if callback is None:
             callback = self._default_callback
@@ -76,15 +79,17 @@ class StorageMode(Enum):
 
 class QueueTracker:
     def __init__(self, storage_mode: StorageMode = StorageMode.MEMORY, storage_path: str = None):
+        """
+        WARNING: Current implementation has limitations:
+        1. Only default callback (_default_callback) is supported when loading from storage
+        2. Custom callbacks will be lost after save/load cycle
+        """
         self.queues = {}  # dict name -> Queue
         self.storage_mode = storage_mode
         if self.storage_mode == StorageMode.MEMORY:
-            # todo: integrate storage mode in all places
             pass
         elif self.storage_mode == StorageMode.FILE:
-            # todo: requires a file path
             if storage_path is None:
-                # default storage path is ... the pwd / storage.json
                 storage_path = fix_path("queue_tracker_state.json")
             else:
                 storage_path = fix_path(storage_path)
@@ -93,14 +98,30 @@ class QueueTracker:
             if storage_path.exists():
                 # load the state from the file
                 data = json.loads(storage_path.read_text())
-                # todo: ... - add the data from the state
-                for queue in data["queues"]:
-                    self.queues[queue["name"]] = Queue(**queue)
-                #  to make this work we need to init the queues first, with proper callbacks and stuff
+                for queue_name, queue_data in data["queues"].items():
+                    # Convert last_dispatched back to datetime if it exists
+                    if queue_data["last_dispatched"]:
+                        queue_data["last_dispatched"] = datetime.fromisoformat(queue_data["last_dispatched"])
+                    
+                    # Check callback - warn if non-default was used
+                    saved_callback = queue_data.get("callback", "_default_callback")
+                    if saved_callback != "_default_callback":
+                        logger.warning(
+                            f"Queue '{queue_name}' was saved with a custom callback '{saved_callback}'. "
+                            "Using default callback instead as custom callbacks are not supported in storage."
+                        )
+                    
+                    # Create queue with default callback
+                    queue = Queue(
+                        name=queue_data["name"],
+                        cadence=queue_data["cadence"],
+                        items=queue_data["items"],
+                    )
+                    queue._last_dispatched = queue_data["last_dispatched"]
+                    self.queues[queue_name] = queue
             else:
                 # create an empty file
                 self.export_state()
-            # raise NotImplementedError("File storage is not implemented")
         elif storage_mode == StorageMode.DB:
             # todo: requires a db connection
             raise NotImplementedError("DB storage is not implemented")
@@ -196,22 +217,23 @@ class QueueTracker:
     # region 3 - saving and loading
     def export_state(self):
         if self.storage_mode == StorageMode.MEMORY:
-            # raise NotImplementedError("Memory storage does not need to save state")
             logger.debug("Memory storage does not need to save state")
         elif self.storage_mode == StorageMode.FILE:
             logger.debug(f"Exporting state to {self.storage_path}")
-            # todo: save the state to the file
             res = {"queues": {}}
             for queue_name, queue in self.queues.items():
                 res["queues"][queue_name] = {
+                    "name": queue.name,  # Added name for proper reconstruction
                     "items": queue.items,
-                    "last_dispatched": queue._last_dispatched,
-                    "cadence": queue.cadence,
-                    "callback": queue.callback.__name__,
+                    "last_dispatched": queue._last_dispatched.isoformat() if queue._last_dispatched else None,
+                    "cadence": f"{queue.cadence.total_seconds()}s",  # Serialize timedelta
+                    "callback": "_default_callback",  # Always use default callback for now
                 }
             with open(self.storage_path, "w") as f:
-                json.dump(res, f)
+                json.dump(res, f, indent=2)
 
         elif self.storage_mode == StorageMode.DB:
             # todo: save the state to the db
             raise NotImplementedError("DB storage state saving is not implemented")
+
+    # endregion 3
