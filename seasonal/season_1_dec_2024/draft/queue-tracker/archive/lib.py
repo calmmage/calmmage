@@ -5,11 +5,13 @@ from typing import List, Optional, Callable, Dict
 from pydantic import BaseModel
 from loguru import logger
 
+
 class QueueItem(BaseModel):
     id: str
     content: str
     created_at: datetime = datetime.now()
     processed_at: Optional[datetime] = None
+
 
 class Queue:
     def __init__(
@@ -17,7 +19,7 @@ class Queue:
         name: str,
         storage_path: Optional[Path] = None,
         low_threshold: int = 5,
-        on_low_queue: Optional[Callable] = None
+        on_low_queue: Optional[Callable] = None,
     ):
         self.name = name
         self.storage_path = storage_path or Path(f"queue_{name}.json")
@@ -32,23 +34,20 @@ class Queue:
 
     def _load_items(self) -> List[QueueItem]:
         """Load items from storage"""
-        with open(self.storage_path, 'r') as f:
+        with open(self.storage_path, "r") as f:
             data = json.load(f)
             return [QueueItem.model_validate(item) for item in data]
 
     def _save_items(self, items: List[QueueItem]):
         """Save items to storage"""
-        with open(self.storage_path, 'w') as f:
+        with open(self.storage_path, "w") as f:
             json.dump([item.model_dump() for item in items], f, default=str)
 
     def add_items(self, contents: List[str]) -> List[QueueItem]:
         """Add multiple items to queue"""
         items = self._load_items()
         new_items = [
-            QueueItem(
-                id=f"{self.name}_{datetime.now().timestamp()}_{i}",
-                content=content
-            ) 
+            QueueItem(id=f"{self.name}_{datetime.now().timestamp()}_{i}", content=content)
             for i, content in enumerate(contents)
         ]
         items.extend(new_items)
@@ -61,7 +60,7 @@ class Queue:
         items = self._load_items()
         if not items:
             return None
-            
+
         item = items[0]
         item.processed_at = datetime.now()
         items = items[1:]  # Remove processed item
@@ -83,9 +82,11 @@ class Queue:
         """Get current queue size"""
         return len(self._load_items())
 
+
 class QueueTracker:
     def __init__(self, storage_dir: Optional[Path] = None):
         self.storage_dir = storage_dir or Path.cwd()
         self.queues: Dict[str, Queue] = {}
 
-    def create_queue(
+    def create_queue():
+        pass

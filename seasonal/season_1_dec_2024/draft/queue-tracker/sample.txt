@@ -1,14 +1,14 @@
-# cool things to buy
+# buy
 - psvr
 - apple studio monitor
 - fpv drone
 
-# things to release at work
+# release
 - syntax check
 - message history slider
 - custom prompts + auto-reminder
 
-# games to play
+# games
 - baldurs gate 3
 - minecraft
 - skyrim

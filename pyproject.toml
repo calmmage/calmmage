@@ -40,6 +40,7 @@ gitpython = "*"
 #whisperx = { git = "https://github.com/m-bain/whisperX.git", branch = "main" }
 #PyDrive = "*"
 pillow = "^10.3.0"
+pytimeparse = "^1.1.8"
 
 [tool.poetry.group.dev.dependencies]
 pyinstaller = "*"
@@ -71,6 +72,7 @@ fastui = "*"
 #langchain = "*"
 numpy = "*"
 plotly = "*"
+pandas = "^2.2.3"
 
 [tool.poetry.extras]
 full = ["dropbox", "protobuf", "pandas", "seaborn", "defaultenv", "bmmb",
