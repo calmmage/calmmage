@@ -16,36 +16,36 @@ class Queue:
     def __init__(self, name, cadence, items=None, callback=None):
         """
         :param cadence: how often to dispatch an item from the queue
+        Can be:
+        - timedelta object
+        - string (e.g. "20s", "1h", "2d")
+        - dict with 'total_seconds' key
         """
-
         self.name = name
-        # todo: parse a text-based cadence into a timedelta
+        
+        # Parse cadence
         if isinstance(cadence, str):
             self.cadence = timedelta(seconds=parse(cadence))
         elif isinstance(cadence, timedelta):
             self.cadence = cadence
-        elif isinstance(cadence, dict) and 'total_seconds' in cadence:
-            # Handle deserialized timedelta
-            self.cadence = timedelta(seconds=cadence['total_seconds'])
+        else:
+            raise ValueError(f"Invalid cadence format: {cadence}")
 
         if callback is None:
             callback = self._default_callback
         self.callback = callback
 
-        if items is None:
-            items = []
-        else:
-            # todo: parse items to classes if necessary
-            parsed_items = []
+        # Parse items
+        self.items = []
+        if items:
+            # Parse items to QueueItem if necessary
             for item in items:
                 if isinstance(item, QueueItem):
-                    parsed_items.append(item)
+                    self.items.append(item)
                 elif isinstance(item, dict):
-                    # dict, i guess..
-                    parsed_items.append(QueueItem(**item))
+                    self.items.append(QueueItem(**item))
                 else:
-                    parsed_items.append(QueueItem(item))
-        self.items = []
+                    self.items.append(QueueItem(item))
 
         self._last_dispatched = None
 
@@ -99,9 +99,13 @@ class QueueTracker:
                 # load the state from the file
                 data = json.loads(storage_path.read_text())
                 for queue_name, queue_data in data["queues"].items():
-                    # Convert last_dispatched back to datetime if it exists
-                    if queue_data["last_dispatched"]:
-                        queue_data["last_dispatched"] = datetime.fromisoformat(queue_data["last_dispatched"])
+                    # Only try to parse last_dispatched if it's not None
+                    if queue_data.get("last_dispatched"):
+                        try:
+                            queue_data["last_dispatched"] = datetime.fromisoformat(queue_data["last_dispatched"])
+                        except (ValueError, TypeError) as e:
+                            logger.warning(f"Failed to parse last_dispatched for queue '{queue_name}': {e}")
+                            queue_data["last_dispatched"] = None
                     
                     # Check callback - warn if non-default was used
                     saved_callback = queue_data.get("callback", "_default_callback")
@@ -114,7 +118,7 @@ class QueueTracker:
                     # Create queue with default callback
                     queue = Queue(
                         name=queue_data["name"],
-                        cadence=queue_data["cadence"],
+                        cadence=queue_data["cadence"],  # Now handles string format like "20.0s"
                         items=queue_data["items"],
                     )
                     queue._last_dispatched = queue_data["last_dispatched"]
@@ -223,11 +227,11 @@ class QueueTracker:
             res = {"queues": {}}
             for queue_name, queue in self.queues.items():
                 res["queues"][queue_name] = {
-                    "name": queue.name,  # Added name for proper reconstruction
+                    "name": queue.name,
                     "items": queue.items,
                     "last_dispatched": queue._last_dispatched.isoformat() if queue._last_dispatched else None,
-                    "cadence": f"{queue.cadence.total_seconds()}s",  # Serialize timedelta
-                    "callback": "_default_callback",  # Always use default callback for now
+                    "cadence": str(queue.cadence.total_seconds()) + "s",
+                    "callback": "_default_callback",
                 }
             with open(self.storage_path, "w") as f:
                 json.dump(res, f, indent=2)

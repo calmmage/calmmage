@@ -1,0 +1,39 @@
+{
+  "queues": {
+    "buy": {
+      "name": "buy",
+      "items": [
+        "apple studio monitor",
+        "fpv drone"
+      ],
+      "last_dispatched": "2024-12-11T21:13:57.001316",
+      "cadence": "20.0s",
+      "callback": "_default_callback"
+    },
+    "games": {
+      "name": "games",
+      "items": [
+        "skyrim",
+        "fallout 4",
+        "portal stories mel",
+        "rdr2",
+        "cyberpunk 2077",
+        "death stranding",
+        "enderall"
+      ],
+      "last_dispatched": "2024-12-11T21:14:03.219443",
+      "cadence": "5.0s",
+      "callback": "_default_callback"
+    },
+    "release": {
+      "name": "release",
+      "items": [
+        "message history slider",
+        "custom prompts + auto-reminder"
+      ],
+      "last_dispatched": "2024-12-11T21:13:57.001325",
+      "cadence": "15.0s",
+      "callback": "_default_callback"
+    }
+  }
+}
