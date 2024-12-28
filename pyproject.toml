@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "calmmage"
-version = "0.2.10" # bugfix open-dir
+version = "0.2.11" # bugfix open-dir
 description = "Personal GitHub repo for tools, projects, and personal website"
 authors = ["Reliable Magician <petrlavrov@calmmage.com>"]
 readme = "README.md"
@@ -42,6 +42,7 @@ gitpython = "*"
 #PyDrive = "*"
 pillow = "^10.3.0"
 pytimeparse = "^1.1.8"
+telethon = "^1.38.1"
 
 [tool.poetry.group.dev.dependencies]
 pyinstaller = "*"
