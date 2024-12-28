@@ -1,271 +1,43 @@
-import asyncio
-import logging
-import sys
 from os import getenv
-from pathlib import Path
-from typing import Dict, Optional
 
-from aiogram import Bot, Dispatcher, html
+import asyncio
+from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-from aiogram.filters import CommandStart, Command
-from aiogram.types import Message
 from dotenv import load_dotenv
-from telethon import TelegramClient
-from aiogram.fsm.context import FSMContext
-
-from botspot.components.ask_user_handler import ask_user
-from botspot.components.bot_commands_menu import add_command
-from botspot.core.bot_manager import BotManager
-from botspot.utils.send_safe import send_safe
 from loguru import logger
 
-class TelethonManager:
-    def __init__(self, api_id: int, api_hash: str, sessions_dir: Path):
-        self.api_id = api_id
-        self.api_hash = api_hash
-        self.sessions_dir = sessions_dir
-        self.sessions_dir.mkdir(exist_ok=True)
-        self.clients: Dict[int, TelegramClient] = {}
-        logger.info(f"TelethonManager initialized with sessions dir: {sessions_dir}")
-        
-    async def init_session(self, user_id: int) -> Optional[TelegramClient]:
-        """Initialize and verify a session for user_id"""
-        
-        session_key = SESSIONS_DIR / f"user_{user_id}"
-        session_file = session_key.with_suffix(".session")
-        logger.info(f"Initializing session for user {user_id} from {session_file}")
-        
-        if not session_file.exists():
-            logger.info(f"No session file found for user {user_id}")
-            return None
-            
-        client = TelegramClient(str(session_key), self.api_id, self.api_hash)
-        try:
-            await client.connect()
-            
-            is_authorized = await client.is_user_authorized()
-            logger.info(f"Session authorization check for user {user_id}: {is_authorized}")
-            
-            if is_authorized:
-                self.clients[user_id] = client
-                return client
-                
-            logger.info(f"Session exists but not authorized for user {user_id}")
-            # await client.disconnect()
-            return None
-            
-        except Exception as e:
-            logger.warning(f"Failed to initialize session for user {user_id}: {e}")
-            # await client.disconnect()
-            return None
-    
-    async def init_all_sessions(self):
-        """Initialize all existing sessions from disk"""
-        logger.info("Initializing all sessions...")
-        session_files = list(self.sessions_dir.glob("user_*"))
-        logger.info(f"Found {len(session_files)} session files: {session_files}")
-        
-        for session_file in session_files:
-            try:
-                user_id = int(session_file.stem.split('_')[1])
-                logger.info(f"Found session file for user {user_id}")
-                await self.init_session(user_id)
-            except Exception as e:
-                logger.warning(f"Failed to init session from {session_file}: {e}")
-
-    async def get_client(self, user_id: int) -> Optional[TelegramClient]:
-        """Get or initialize client for user_id"""
-        if user_id in self.clients:
-            return self.clients[user_id]
-        return await self.init_session(user_id)
-    
-    async def disconnect_all(self):
-        """Disconnect all clients"""
-        for client in self.clients.values():
-            await client.disconnect()
-        self.clients.clear()
-
-
+# Load environment variables
 load_dotenv()
+
+from botspot.core.bot_manager import BotManager
+
 # Bot token can be obtained via https://t.me/BotFather
 TOKEN = getenv("TELEGRAM_BOT_TOKEN")
-
-# Add Telethon credentials
-TELEGRAM_API_ID = int(getenv('TELEGRAM_API_ID'))
-TELEGRAM_API_HASH = getenv('TELEGRAM_API_HASH')
-
-# Define sessions directory
-SESSIONS_DIR = Path("sessions")
-SESSIONS_DIR.mkdir(exist_ok=True)
-
-telethon_manager = TelethonManager(TELEGRAM_API_ID, TELEGRAM_API_HASH, SESSIONS_DIR)
-
-dp = Dispatcher()
-
-
-@add_command("start")
-@dp.message(CommandStart())
-async def command_start_handler(message: Message) -> None:
-    """Send a welcome message when the command /start is issued"""
-    await message.answer(f"Hello, {html.bold(message.from_user.full_name)}!")
-
-
-@add_command("error")
-@dp.message(Command("error"))
-async def command_error_handler(message: Message) -> None:
-    """Raise an exception to test error handling"""
-    raise Exception("Something Went Wrong")
-
-
-
-
-@add_command("setup_telethon", "Setup Telethon user client")
-@dp.message(Command("setup_telethon"))
-async def setup_telethon_command(message: Message, state: FSMContext) -> None:
-    await setup_telethon_client(message.from_user.id, state=state)
-
-
-async def setup_telethon_client(user_id: int, state: FSMContext, force: bool = False) -> Optional[TelegramClient]:
-    """
-    Setup Telethon client for a specific user
-    
-    Args:
-        user_id: Telegram user ID (also used as chat_id for messaging)
-        force: If True, will delete existing session and create new one
-    
-    Returns:
-        TelegramClient if setup was successful, None otherwise
-    """
-    # Check if user already has an authenticated session
-    if not force:
-        existing_client = await telethon_manager.get_client(user_id)
-        if existing_client:
-            await send_safe(
-                user_id,
-                "You already have an active Telethon session! "
-                "Use /setup_telethon_force to create a new one."
-            )
-            return existing_client
-
-    # Create new client
-    session_key = SESSIONS_DIR / f"user_{user_id}"
-    session_file = session_key.with_suffix(".session")
-    if session_file.exists():
-        session_file.unlink()
-
-    client = TelegramClient(str(session_key), TELEGRAM_API_ID, TELEGRAM_API_HASH)
-    
-    try:
-        await client.connect()
-        
-        # Ask for phone number
-        phone = await ask_user(
-            user_id,
-            "Please enter your phone number (including country code, e.g., +1234567890):",
-            state,
-            timeout=60.0
-        )
-        
-        if not phone:
-            await send_safe(user_id, "Setup cancelled - no phone number provided.")
-            # await client.disconnect()
-            return None
-
-        # Send code request
-        send_code_result = await client.send_code_request(phone)
-        
-        # Ask for verification code
-        code = await ask_user(
-            user_id,
-            "Please enter the verification code you received. ADD SPACES BETWEEN THE DIGITS OR TELEGRAM WILL NOT BLOCK THE CODE:",
-            state,
-            timeout=300.0,
-            cleanup=True
-        )
-        
-        if not code:
-            await send_safe(user_id, "Setup cancelled - no verification code provided.")
-            # await client.disconnect()
-            return None
-            
-        code = code.replace(" ", "")
-        
-        try:
-            # Try to sign in with the code
-            await client.sign_in(phone, code, phone_code_hash=send_code_result.phone_code_hash)
-        except Exception as e:
-            if "password" in str(e).lower():
-                # 2FA is enabled, ask for password
-                password = await ask_user(
-                    user_id,
-                    "Two-factor authentication is enabled. Please enter your 2FA password:",
-                    state,
-                    timeout=300.0,
-                    cleanup=True
-                )
-                
-                if not password:
-                    await send_safe(user_id, "Setup cancelled - no password provided.")
-                    # await client.disconnect()
-                    return None
-                
-                password = password.replace(" ", "")
-                
-                # Sign in with password
-                await client.sign_in(password=password)
-            else:
-                raise
-        
-        # If we got here, authentication was successful
-        telethon_manager.clients[user_id] = client
-        await send_safe(user_id, "Successfully set up Telethon client! The session is saved and ready to use.")
-        return client
-        
-    except Exception as e:
-        await send_safe(user_id, f"Error during setup: {str(e)}")
-        # await client.disconnect()
-        if session_file.exists():
-            session_file.unlink()
-        return None
-
-
-@add_command("setup_telethon_force", "Force new Telethon client setup")
-@dp.message(Command("setup_telethon_force"))
-async def setup_telethon_force_command(message: Message, state: FSMContext) -> None:
-    await setup_telethon_client(message.from_user.id, state=state, force=True)
-
-
-@add_command("check_telethon", "Check if Telethon client is active")
-@dp.message(Command("check_telethon"))
-async def check_telethon_handler(message: Message) -> None:
-    """Check if user has an active Telethon client"""
-    client = telethon_manager.get_client(message.from_user.id)
-    if client and await client.is_user_authorized():
-        me = await client.get_me()
-        await message.reply(f"Active Telethon session found for {me.first_name}!")
-    else:
-        await message.reply("No active Telethon session found. Use /setup_telethon to create one.")
-
 
 
 async def main() -> None:
     # Initialize Bot instance with default bot properties
     bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-    bm = BotManager(bot=bot)
+    dp = Dispatcher()
+
+    # Initialize BotManager with required components
+    bm = BotManager(
+        bot=bot,
+        # Enable ask_user component as it's required for telethon_manager
+        ask_user={"enabled": True},
+        # Enable bot_commands_menu to register commands
+        bot_commands_menu={"enabled": True},
+    )
+
+    # Setup dispatcher with components
     bm.setup_dispatcher(dp)
-    
-    # Initialize existing sessions
-    await telethon_manager.init_all_sessions()
 
     try:
         await dp.start_polling(bot)
     except Exception as e:
         logger.error(f"Error during polling: {e}")
-    # finally:
-    #     await telethon_manager.disconnect_all()
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     asyncio.run(main())

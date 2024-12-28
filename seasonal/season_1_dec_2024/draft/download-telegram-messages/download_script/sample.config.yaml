@@ -1,0 +1,35 @@
+# Telegram Downloader Configuration
+
+# Time window for downloading messages
+# Format: "1d", "12h", "30m", etc.
+time_window: "1d"
+
+# Whitelist of entities to download from
+chats:
+  personal:
+    # List of usernames or phone numbers
+    - "@example_user"
+    - "+1234567890"
+  
+  groups:
+    # List of group usernames or IDs
+    - "@example_group"
+    - -1001234567890
+  
+  channels:
+    # List of channel usernames or IDs
+    - "@example_channel"
+    - -1001234567891
+
+# Download settings
+settings:
+  # Whether to download media files
+  download_media: false
+  # Directory to save media files
+  media_dir: "downloads/media"
+  # Directory to save message logs
+  logs_dir: "downloads/logs"
+  # Whether to save messages as JSON
+  save_json: true
+  # Whether to save messages as human-readable text
+  save_text: true 
