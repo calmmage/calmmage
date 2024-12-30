@@ -1,7 +1,7 @@
 # Todo
 
 - [x] 1. ~~Add user ID command (/user_id)~~ ✓ 
-- [ ] 2. Add reset chat menu command (/reset_menu)
+- [x] 2. ~~Add reset chat menu command (/reset_menu)~~ ✓
 
 ## Future Enhancements
 - [ ] 3. Enhance /user_id command:

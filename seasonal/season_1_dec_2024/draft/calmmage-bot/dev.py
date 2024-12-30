@@ -152,6 +152,23 @@ async def command_user_id_handler(message: Message, state: FSMContext) -> None:
         )
 
 
+@add_command("reset_menu", "Reset/remove all keyboard menus")
+@dp.message(Command("reset_menu"))
+async def command_reset_menu_handler(message: Message) -> None:
+    """Remove any active keyboard menu"""
+    logger.debug(f"Resetting menu for chat: {message.chat.id}")
+    
+    try:
+        await message.reply(
+            "Menu cleared! ✨",
+            reply_markup=ReplyKeyboardRemove()
+        )
+        logger.debug("Menu reset successful")
+    except Exception as e:
+        logger.error(f"Error while resetting menu: {e}")
+        await message.reply("Sorry, something went wrong while clearing the menu.")
+
+
 async def main() -> None:
     # Configure logging
     logger.remove()  # Remove default handler
