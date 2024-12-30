@@ -43,6 +43,8 @@ gitpython = "*"
 pillow = "^10.3.0"
 pytimeparse = "^1.1.8"
 telethon = "^1.38.1"
+pymongo = "^4.10.1"
+matplotlib = "^3.10.0"
 
 [tool.poetry.group.dev.dependencies]
 pyinstaller = "*"
