@@ -7,8 +7,8 @@ from dotenv import load_dotenv
 from loguru import logger
 import sys
 sys.path.append("./")
-from download_script.downloader import TelegramDownloader
-from download_script.settings import load_config
+from draft_2_download.download_script.downloader import TelegramDownloader
+from draft_2_download.download_script.settings import load_config
 
 # Load environment variables
 load_dotenv()

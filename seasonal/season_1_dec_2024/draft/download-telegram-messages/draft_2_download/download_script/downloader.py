@@ -1,14 +1,13 @@
 """Telegram message downloader using Telethon."""
-import asyncio
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Union, Callable
+from typing import List, Optional, Union, Callable
 
 from loguru import logger
 from telethon import TelegramClient
 from telethon.tl.types import User, Chat, Channel, Message
 
-from download_script.settings import DownloaderConfig
+from draft_2_download.download_script.settings import DownloaderConfig
 
 
 class TelegramDownloader:
