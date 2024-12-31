@@ -1,0 +1,29 @@
+# Other Unsorted
+
+Some text snippets that I want to keep, but I don't know where to put them yet.
+
+## Code Project Management - Mar 2024
+
+### Usage
+
+
+
+### Debugging / troubleshooting
+
+- calmmage / calmlib is enabled by pythonpath in ~/.zshrc
+- 
+```
+export PYTHONPATH="$PYTHONPATH:/Users/calm/work/code/structured/tools/calmmage:/Users/calm/work/code/structured/lib/calmlib"
+```
+
+- the 'latest' and 'seasonal' folders are maintained / updated by the launchd jobs
+- the jobs 
+    - use hardcoded conda environment 'calmmage'
+        - there is a script to create the environment
+    - also use hardcoded miniconda (condaforge) 
+    - also use 
+
+
+### todo, cleanup
+
+- remove unnecessary aliases from `sa`
