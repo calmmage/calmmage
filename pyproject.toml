@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "calmmage"
-version = "2025.01.0" # bugfix open-dir
+version = "2025.1.1" # bugfix open-dir
 description = "Personal GitHub repo for tools, projects, and personal website"
 authors = ["Reliable Magician <petrlavrov@calmmage.com>"]
 readme = "README.md"
