@@ -20,6 +20,7 @@ class ChatCategoryConfig(BaseSettings):
     skip_big: bool = True  # whether to skip large groups/channels
 
 class MessageDownloadConfig(BaseSettings):
+    # todo: unused for now
     size_thresholds: SizeThresholds = Field(default_factory=SizeThresholds)
     owned_groups: ChatCategoryConfig = Field(default_factory=ChatCategoryConfig)
     owned_channels: ChatCategoryConfig = Field(default_factory=ChatCategoryConfig)
@@ -34,28 +35,3 @@ class MessageDownloadConfig(BaseSettings):
             config_dict = yaml.safe_load(f)
         return cls(**config_dict)
 
-
-async def load_messages(config: MessageDownloadConfig):
-    pass
-
-async def main(debug: bool = False):
-    setup_logger(logger, level="DEBUG" if debug else "INFO")
-    logger.debug("Starting script")
-    config = MessageDownloadConfig.from_yaml(Path("config_debug.yaml"))
-    logger.debug(f"Loaded config: {config}")
-    data = await load_messages(config)
-    
-
-
-if __name__ == "__main__":
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--debug", action="store_true", help="Enable debug logging")
-    args = parser.parse_args()
-    
-    # Run the async main function
-    logger.debug("Starting script")
-    # asyncio.run(main(debug=args.debug))
-    # asyncio.run(main_linear(debug=args.debug))
-    asyncio.run(main(debug=args.debug))
-    logger.debug("Script completed")

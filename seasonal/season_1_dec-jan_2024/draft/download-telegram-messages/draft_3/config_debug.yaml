@@ -1,11 +1,11 @@
 size_thresholds:
-  max_members_group: 10000
-  max_members_channel: 50000
+  max_members_group: 1000
+  max_members_channel: 1000
 
 owned_groups:
   enabled: true
-  backdays: 7
-  limit: 10
+  backdays: 365
+  limit: 100
   whitelist: []
   blacklist: []
   download_attachments: false
@@ -13,8 +13,8 @@ owned_groups:
 
 owned_channels:
   enabled: true
-  backdays: 7
-  limit: 10
+  backdays: 365
+  limit: 100
   whitelist: []
   blacklist: []
   download_attachments: false
@@ -22,8 +22,8 @@ owned_channels:
 
 other_groups:
   enabled: true
-  backdays: 7
-  limit: 10
+  backdays: 365
+  limit: 100
   whitelist: []
   blacklist: []
   download_attachments: false
@@ -31,8 +31,8 @@ other_groups:
 
 other_channels:
   enabled: true
-  backdays: 7
-  limit: 10
+  backdays: 365
+  limit: 100
   whitelist: []
   blacklist: []
   download_attachments: false
@@ -40,8 +40,8 @@ other_channels:
 
 private_chats:
   enabled: true
-  backdays: 7
-  limit: 10
+  backdays: 365
+  limit: 100
   whitelist: []
   blacklist: []
   download_attachments: false
@@ -49,8 +49,8 @@ private_chats:
 
 bots:
   enabled: true
-  backdays: 7
-  limit: 10
+  backdays: 365
+  limit: 100
   whitelist: ["test_bot"]
   blacklist: []
   download_attachments: false

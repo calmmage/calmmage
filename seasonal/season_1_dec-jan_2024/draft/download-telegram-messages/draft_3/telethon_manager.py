@@ -24,7 +24,7 @@ class TelethonClientManager:
         logger.debug(f"TelethonManager initialized with storage_mode: {storage_mode}")
         logger.debug(f"TelethonManager initialized with sessions dir: {sessions_dir}")
 
-    async def get_telethon_client(self, user_id: int) -> Optional[TelegramClient]:
+    async def get_telethon_client(self, user_id: int) -> TelegramClient:
         logger.debug(f"Getting telethon client for user {user_id} with storage mode {self.storage_mode}")
         if self.storage_mode == StorageMode.TO_DISK:
             return await self._get_telethon_client_from_disk(user_id)
@@ -32,7 +32,7 @@ class TelethonClientManager:
             return await self._get_telethon_client_from_database(user_id)
 
     # region trajectory 1 save and load conn from disk
-    async def _get_telethon_client_from_disk(self, user_id: int) -> Optional[TelegramClient]:
+    async def _get_telethon_client_from_disk(self, user_id: int) -> TelegramClient:
         logger.debug(f"Attempting to get telethon client from disk for user {user_id}")
         if self._check_if_conn_is_present_on_disk(user_id):
             logger.debug(f"Found existing connection on disk for user {user_id}")
@@ -99,14 +99,14 @@ class TelethonClientManager:
                 return client
             
             logger.debug(f"Failed to authorize client for user {user_id}")
-            return None
+            raise Exception("Failed to authorize client")
             
         except Exception as e:
             logger.warning(f"Failed to create new client for user {user_id}: {e}")
             if session_file.exists():
                 logger.debug(f"Removing failed session file for user {user_id}")
                 session_file.unlink()
-            return None
+            raise e
 
     # 3 - check if conn is present on disk
     def _check_if_conn_is_present_on_disk(self, user_id: int) -> bool:
@@ -116,14 +116,14 @@ class TelethonClientManager:
         return exists
 
     # 4 - load conn from disk
-    async def _load_conn_from_disk(self, user_id: int) -> Optional[TelegramClient]:
+    async def _load_conn_from_disk(self, user_id: int) -> TelegramClient:
         session_key = self.sessions_dir / f"user_{user_id}"
         session_file = session_key.with_suffix(".session")
         logger.debug(f"Loading session for user {user_id} from {session_file}")
         
         if not session_file.exists():
             logger.debug(f"No session file found for user {user_id}")
-            return None
+            raise Exception("No session file found")
             
         client = TelegramClient(str(session_key), self.api_id, self.api_hash)
         try:
@@ -139,11 +139,11 @@ class TelethonClientManager:
                 return client
                 
             logger.debug(f"Session exists but not authorized for user {user_id}")
-            return None
+            raise Exception("Session exists but not authorized")
             
         except Exception as e:
             logger.warning(f"Failed to load session for user {user_id}: {e}")
-            return None
+            raise e
 
     # endregion trajectory 1
 

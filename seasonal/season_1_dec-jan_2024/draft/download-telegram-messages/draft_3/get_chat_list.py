@@ -101,9 +101,10 @@ def _get_chats_from_disk():
     logger.debug(f"Loaded {len(chats)} chats from disk")
     return chats
     
-async def _get_chat_list() -> List[Dialog]:
+async def _get_chat_list(client=None) -> List[Dialog]:
     logger.debug("Getting chat list from Telegram")
-    client = await get_telethon_client()
+    if client is None:
+        client = await get_telethon_client()
     chats = await client.get_dialogs()
     logger.debug(f"Retrieved {len(chats)} dialogs from Telegram")
     return chats
@@ -519,8 +520,8 @@ if __name__ == "__main__":
     
     # Run the async main function
     logger.debug("Starting script")
-    # asyncio.run(main(debug=args.debug))
+    asyncio.run(main(debug=args.debug))
     # asyncio.run(main_linear(debug=args.debug))
-    asyncio.run(main_db(debug=args.debug))
+    # asyncio.run(main_db(debug=args.debug))
     logger.debug("Script completed")
 # endregion main

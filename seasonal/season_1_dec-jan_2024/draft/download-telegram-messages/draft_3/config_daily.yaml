@@ -1,10 +1,10 @@
 size_thresholds:
-  max_members_group: 10000
-  max_members_channel: 50000
+  max_members_group: 1000
+  max_members_channel: 1000
 
 owned_groups:
   enabled: true
-  backdays: null  # no limit
+  backdays: 60  # 2 months
   limit: null
   whitelist: []
   blacklist: []
@@ -13,7 +13,7 @@ owned_groups:
 
 owned_channels:
   enabled: true
-  backdays: null
+  backdays: 60
   limit: null
   whitelist: []
   blacklist: []
@@ -21,17 +21,17 @@ owned_channels:
   skip_big: true
 
 other_groups:
-  enabled: true
+  enabled: false
   backdays: null
   limit: null
   whitelist: []
   blacklist: []
-  download_attachments: true
-  skip_big: true  # only small groups
+  download_attachments: false
+  skip_big: true
 
 other_channels:
   enabled: true
-  backdays: null
+  backdays: 30
   limit: null
   whitelist: []
   blacklist: []
@@ -40,18 +40,18 @@ other_channels:
 
 private_chats:
   enabled: true
-  backdays: null
+  backdays: 60
   limit: null
   whitelist: []
   blacklist: []
   download_attachments: true
-  skip_big: false  # N/A for private chats
+  skip_big: false
 
 bots:
-  enabled: true
+  enabled: false
   backdays: null
   limit: null
-  whitelist: ["useful_bot1", "useful_bot2"]  # explicit whitelist for bots
+  whitelist: []
   blacklist: []
-  download_attachments: true
-  skip_big: false  # N/A for bots 
+  download_attachments: false
+  skip_big: false 
