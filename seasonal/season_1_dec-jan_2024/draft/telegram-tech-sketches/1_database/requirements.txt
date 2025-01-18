@@ -1,5 +1,7 @@
+botspot>=0.2.19
+calmlib>=1.0.11
+
 aiogram>=3.0.0
 pydantic-settings>=2.0.0
 python-dotenv>=1.0.0
-botspot>=0.1.0
 motor>=3.3.0 

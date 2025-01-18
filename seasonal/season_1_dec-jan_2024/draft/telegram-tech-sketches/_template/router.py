@@ -1,9 +1,10 @@
-from _app import App
 from aiogram import Router
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message
 from botspot.components.bot_commands_menu import add_command
 from botspot.utils import send_safe
+
+from _app import App
 
 router = Router()
 app = App()

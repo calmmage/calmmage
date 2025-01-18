@@ -1,0 +1,53 @@
+```mermaid
+
+%% Telegram Tech Projects Roadmap
+%% Author: @calmmage
+
+graph TB
+    %% Legend/Documentation
+    subgraph Legend
+        M[General Milestone] --- B[Bot Implementation]
+        M --- E[Usage Example]
+        M --- C[BotSpot Component]
+        
+        style M fill:#030
+        style B fill:#330
+        style E fill:#303
+        style C fill:#033
+    end
+
+    %% Region: Core Technologies
+    subgraph CoreTech[Core Technologies]
+        LLM[LLM Utils] --- LLM_B[LLM Bot]
+        LLM --- LLM_E[LLM Example]
+        LLM --- LLM_C[LLM Component]
+        
+        style LLM fill:#030
+        style LLM_B fill:#330
+        style LLM_E fill:#303
+        style LLM_C fill:#033
+        
+        CRM[CRM System] --- CRM_B[CRM Bot]
+        CRM --- CRM_E[CRM Example]
+        CRM --- CRM_C[CRM Component]
+        
+        style CRM fill:#030
+        style CRM_B fill:#330
+        style CRM_E fill:#303
+        style CRM_C fill:#033
+    end
+
+    %% Region: Bot Projects
+    subgraph Bots[Bot Projects]
+        WhisperBot[Whisper Bot Rework] 
+        PeopleBot[People Bot] 
+        DynCmd[Dynamic Commands Bot]
+    end
+
+    %% Dependencies
+    WhisperBot --> LLM 
+    PeopleBot --> CRM
+    DynCmd --> LLM
+
+
+```

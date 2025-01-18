@@ -1,11 +1,10 @@
+"""Router module for handling telegram bot commands."""
 from typing import Optional
 
 from _app import App
 from aiogram import Router
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message
-from botspot.utils.deps_getters import get_database
-from motor.motor_asyncio import AsyncIOMotorDatabase
 from botspot.components.bot_commands_menu import add_command
 from botspot.utils import send_safe
 
@@ -52,13 +51,12 @@ async def add_item_handler(message: Message) -> None:
         return
 
     try:
-        db: AsyncIOMotorDatabase = get_database()
-        result = await db.items.insert_one({
-            "user_id": message.from_user.id,
-            "text": text,
-            "created_at": message.date
-        })
-        if result.inserted_id:
+        success = await app.add_item(
+            user_id=message.from_user.id,
+            text=text,
+            created_at=message.date
+        )
+        if success:
             await send_safe(message.chat.id, f"Added new item: {text}")
         else:
             await send_safe(message.chat.id, "Failed to add item. Please try again.")
@@ -72,8 +70,7 @@ async def add_item_handler(message: Message) -> None:
 async def list_items_handler(message: Message) -> None:
     """List all items from the database."""
     try:
-        db: AsyncIOMotorDatabase = get_database()
-        items = await db.items.find({"user_id": message.from_user.id}).to_list(length=None)
+        items = await app.get_items(user_id=message.from_user.id)
         
         if not items:
             await send_safe(message.chat.id, "No items found. Use /add to add some items.")
