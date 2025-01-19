@@ -1,0 +1,4 @@
+- [ ] switch chat model
+- [ ] check token usage per user type
+- [ ] add message history
+- [ ] bugfix html formatting
