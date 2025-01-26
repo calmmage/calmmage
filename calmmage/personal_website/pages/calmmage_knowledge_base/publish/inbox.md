@@ -148,9 +148,24 @@ Disable "Open as Window" - for each app
 
 ### c7-Problem
 
+How do I cd into a dir by partial name?
+
+### s7-Considered-alternatives
+
+- 'cdf' using fzf
+  No easy way to create an alias quickly
+- 'z' using zsh plugin
+  Doesn't seem to work in subpaths
+- 'cd' should expand paths out of the box
+  It doesn't. 
+
+## Case 8
+
+### c8-Problem
+
 Can't search effectively in PyCharm because of .venv files
 
-### c7-Solution
+### c8-Solution
 
 Option 1: .venv -> right click -> Mark Directory as -> Excluded
 Doesn't work - still shows up in search
@@ -182,3 +197,4 @@ electron-app-demo]:*/)&&!file[abstract-tool-user
 ]:.venv//*&&!file[electron-app-demo
 ]:.venv//*
 ```
+
