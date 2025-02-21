@@ -12,12 +12,16 @@ function saveFileToDrive(fileMetadata) {
   const folder = getOrCreateFolder('Zoom Recordings');
   
   try {
-    // Create file in folder directly from blob
-    const file = folder.createFile(fileMetadata.blob);
+    // Download file first since Drive API needs a Blob
+    const response = UrlFetchApp.fetch(fileMetadata.downloadUrl);
+    const blob = response.getBlob();
+    
+    // Create file in folder
+    const file = folder.createFile(blob);
     file.setName(fileMetadata.name);  // Set proper name
     
-    // Add source info as property
-    file.setDescription(`Zoom recording downloaded at: ${new Date().toISOString()}`);
+    // Add source URL as property
+    file.setDescription(`Zoom recording downloaded from: ${fileMetadata.downloadUrl}`);
     
     Logger.log(`Created file: ${file.getName()} (${file.getSize()} bytes)`);
     return file;

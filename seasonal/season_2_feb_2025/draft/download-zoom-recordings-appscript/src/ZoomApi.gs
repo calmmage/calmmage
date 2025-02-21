@@ -92,33 +92,24 @@ function downloadRecording(downloadUrl, fileName) {
   const options = {
     'method': 'get',
     'headers': {
-      'Authorization': `Bearer ${token}`,
-      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-      'Accept-Language': 'en-US,en;q=0.9',
-      'Accept-Encoding': 'gzip, deflate, br',
-      'Connection': 'keep-alive',
-      'Upgrade-Insecure-Requests': '1'
+      'Authorization': `Bearer ${token}`
     },
-    'followRedirects': true,  // Let it follow all redirects
-    'muteHttpExceptions': true
+    'followRedirects': false
   };
   
-  Logger.log(`Starting download of: ${fileName}`);
+  // Get the direct download URL from the redirect
   const response = UrlFetchApp.fetch(downloadUrl, options);
-  
-  if (response.getResponseCode() !== 200) {
-    throw new Error(`Failed to download file: ${response.getResponseCode()}`);
+  if (response.getResponseCode() !== 302) {
+    throw new Error('Expected redirect response from Zoom');
   }
   
-  const blob = response.getBlob();
-  const size = blob.getBytes().length;
-  Logger.log(`Downloaded file size: ${size} bytes (${Math.round(size/1024/1024)} MB)`);
+  const directUrl = response.getHeaders()['Location'];
+  Logger.log(`Got direct download URL: ${directUrl}`);
   
   // Return metadata for Drive import
   return {
     name: fileName,
-    mimeType: blob.getContentType(),
-    blob: blob
+    mimeType: 'video/mp4',
+    downloadUrl: directUrl
   };
 } 
