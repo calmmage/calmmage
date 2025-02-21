@@ -35,11 +35,11 @@ Includes heartbeat monitoring integration with service-registry.calmmage.com.
 3. Choose "Server-to-Server OAuth" app type
 4. Fill in the app information
 5. Configure Required Scopes:
-   - Go to the "Scopes" tab
-   - Search for and add these scopes:
-      - `cloud_recording:read:list_recording_registrants:admin`
-      - `cloud_recording:read:list_user_recordings:admin`
-      - `cloud_recording:read:recording:admin`
+    - Go to the "Scopes" tab
+    - Search for and add these scopes:
+        - `cloud_recording:read:list_recording_registrants:admin`
+        - `cloud_recording:read:list_user_recordings:admin`
+        - `cloud_recording:read:recording:admin`
 6. Note down:
     - Account ID
     - Client ID
@@ -57,9 +57,9 @@ Includes heartbeat monitoring integration with service-registry.calmmage.com.
     - `ZOOM_USER_ID`: Your Zoom user email
 
 4. Optional tracking properties:
-   - `SHEET_TRACKING_ENABLED`: Set to 'true' to enable tracking in Google Sheets
-   - `SHEET_ID`: (Auto-set) ID of the tracking spreadsheet. Only set manually if you
-     want to use an existing sheet
+    - `SHEET_TRACKING_ENABLED`: Set to 'true' to enable tracking in Google Sheets
+    - `SHEET_ID`: (Auto-set) ID of the tracking spreadsheet. Only set manually if you
+      want to use an existing sheet
 
 Note: When you enable tracking using `enableTracking()`, the script will automatically:
 
@@ -85,16 +85,16 @@ function setupCredentials() {
 YouTube upload requires setup in both Apps Script and Google Cloud Console:
 
 1. In Google Apps Script:
-   - Click "+" next to "Services" in the left sidebar
-   - Find and add "YouTube Data API v3"
-   - Click "Add" and authorize when prompted
+    - Click "+" next to "Services" in the left sidebar
+    - Find and add "YouTube Data API v3"
+    - Click "Add" and authorize when prompted
 
 2. In Google Cloud Console:
-   - Visit [Google Cloud Console](https://console.cloud.google.com)
-   - Make sure your Apps Script project is selected (same account)
-   - Search for "YouTube Data API v3"
-   - Click "Enable" and wait a few minutes for activation
-   - If asked, create credentials for "Desktop App" type
+    - Visit [Google Cloud Console](https://console.cloud.google.com)
+    - Make sure your Apps Script project is selected (same account)
+    - Search for "YouTube Data API v3"
+    - Click "Enable" and wait a few minutes for activation
+    - If asked, create credentials for "Desktop App" type
 
 3. Test YouTube access:
    ```javascript
@@ -211,15 +211,15 @@ The script can track all processed recordings in a Google Sheet:
    ```
 
 2. The tracking sheet will include:
-   - Recording date and topic
-   - Drive and YouTube links
-   - Processing timestamp
-   - Unique recording ID
+    - Recording date and topic
+    - Drive and YouTube links
+    - Processing timestamp
+    - Unique recording ID
 
 3. Benefits:
-   - Prevents duplicate processing
-   - Easy access to all video links
-   - Processing history
+    - Prevents duplicate processing
+    - Easy access to all video links
+    - Processing history
 
 4. To disable tracking:
    ```javascript
@@ -333,17 +333,17 @@ To disable automatic pushing, remove or modify `.git/hooks/post-commit`
    ```
 
 2. Google Authentication:
-   - Run `clasp login`
-   - Your default browser will open
-   - Login with your Google account
-   - Grant necessary permissions
-   - Authentication tokens are stored in ~/.clasprc.json
+    - Run `clasp login`
+    - Your default browser will open
+    - Login with your Google account
+    - Grant necessary permissions
+    - Authentication tokens are stored in ~/.clasprc.json
 
 ### Local Development
 
 1. Enable Apps Script API:
-   - Visit https://script.google.com/home/usersettings
-   - Turn on "Google Apps Script API"
+    - Visit https://script.google.com/home/usersettings
+    - Turn on "Google Apps Script API"
 
 2. Configure .claspignore:
    ```
