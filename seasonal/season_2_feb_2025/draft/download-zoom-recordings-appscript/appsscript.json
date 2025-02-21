@@ -1,11 +1,16 @@
 {
-  "timeZone": "America/New_York",
+  "timeZone": "Europe/Moscow",
   "dependencies": {
     "enabledAdvancedServices": [
       {
         "userSymbol": "YouTube",
         "serviceId": "youtube",
         "version": "v3"
+      },
+      {
+        "userSymbol": "Drive",
+        "version": "v3",
+        "serviceId": "drive"
       }
     ]
   },

@@ -34,7 +34,13 @@ Includes heartbeat monitoring integration with service-registry.calmmage.com.
 2. Click "Develop" → "Build App"
 3. Choose "Server-to-Server OAuth" app type
 4. Fill in the app information
-5. Note down:
+5. Configure Required Scopes:
+   - Go to the "Scopes" tab
+   - Search for and add these scopes:
+      - `cloud_recording:read:list_recording_registrants:admin`
+      - `cloud_recording:read:list_user_recordings:admin`
+      - `cloud_recording:read:recording:admin`
+6. Note down:
     - Account ID
     - Client ID
     - Client Secret
@@ -76,11 +82,26 @@ function setupCredentials() {
 
 ### 4. Enable YouTube Upload (Optional)
 
-If you want to use YouTube upload functionality:
+YouTube upload requires setup in both Apps Script and Google Cloud Console:
 
-1. In Google Apps Script, click on "Services" (+ button)
-2. Find and add "YouTube Data API v3"
-3. Save and authorize when prompted
+1. In Google Apps Script:
+   - Click "+" next to "Services" in the left sidebar
+   - Find and add "YouTube Data API v3"
+   - Click "Add" and authorize when prompted
+
+2. In Google Cloud Console:
+   - Visit [Google Cloud Console](https://console.cloud.google.com)
+   - Make sure your Apps Script project is selected (same account)
+   - Search for "YouTube Data API v3"
+   - Click "Enable" and wait a few minutes for activation
+   - If asked, create credentials for "Desktop App" type
+
+3. Test YouTube access:
+   ```javascript
+   function testYouTube() {
+     return enableYouTubeService();  // Should return true if properly set up
+   }
+   ```
 
 ### 5. Set Up Automatic Execution
 
@@ -97,6 +118,25 @@ The script provides several manual execution functions:
 - `manualRunYoutubeOnly()`: Upload recordings to YouTube only
 - `manualRunBoth()`: Download to Drive and upload to YouTube
 - `testHeartbeat()`: Test the heartbeat monitoring connection
+
+### First Run / Historical Import
+
+When running for the first time, specify a start date to avoid processing unnecessary
+history:
+
+1. Test setup with recent recordings:
+   ```javascript
+   // Process last month's recordings
+   const lastMonth = new Date();
+   lastMonth.setMonth(lastMonth.getMonth() - 1);
+   processHistoricalData(lastMonth.toISOString().split('T')[0], null, true, true);
+   ```
+
+2. Process from a specific date:
+   ```javascript
+   // Example: Process all recordings from January 1st, 2024
+   processHistoricalData('2024-01-01', null, true, true);
+   ```
 
 ### Historical Data Processing
 
