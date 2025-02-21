@@ -1,0 +1,8 @@
+**/.git/**
+**/node_modules/**
+README.md
+package.json
+.gitignore
+.env
+todo*.md
+notes.md 
