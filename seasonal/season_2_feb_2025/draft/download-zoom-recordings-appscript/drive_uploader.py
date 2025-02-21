@@ -2,6 +2,7 @@ from config import settings
 from google_auth import get_google_creds
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
+from loguru import logger
 from pathlib import Path
 
 
@@ -16,7 +17,7 @@ def get_or_create_folder(service, folder_name: str) -> str:
 
     if results['files']:
         folder_id = results['files'][0]['id']
-        print(f"Found existing folder: {folder_name}")
+        logger.debug(f"Found existing folder: {folder_name}")
     else:
         folder_metadata = {
             'name': folder_name,
@@ -27,7 +28,7 @@ def get_or_create_folder(service, folder_name: str) -> str:
             fields='id'
         ).execute()
         folder_id = folder['id']
-        print(f"Created new folder: {folder_name}")
+        logger.debug(f"Created new folder: {folder_name}")
 
     return folder_id
 
@@ -59,7 +60,7 @@ def upload_to_drive(file_path: Path, folder_name: str = "Zoom Recordings") -> di
         fields='id, webViewLink'
     ).execute()
 
-    print(f"File uploaded to Drive: {file['webViewLink']}")
+    logger.debug(f"File uploaded to Drive: {file['webViewLink']}")
     return {
         'id': file['id'],
         'url': file['webViewLink']

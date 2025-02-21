@@ -1,5 +1,6 @@
 import requests
 from get_zoom_meeting_list import get_zoom_token
+from loguru import logger
 
 
 def generate_zoom_download_url(download_url: str, file_name: str) -> dict:
@@ -17,7 +18,7 @@ def generate_zoom_download_url(download_url: str, file_name: str) -> dict:
         raise Exception('Expected redirect response from Zoom')
 
     direct_url = response.headers['Location']
-    print(f"Got direct download URL: {direct_url}")
+    logger.debug(f"Got direct download URL: {direct_url}")
 
     # Return metadata for download
     return {

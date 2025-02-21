@@ -2,7 +2,7 @@ import requests
 from config import settings
 from datetime import datetime, timedelta
 
-
+from loguru import logger
 def get_zoom_token():
     """Get OAuth token for Zoom API"""
     credentials = f"{settings.ZOOM_CLIENT_ID}:{settings.ZOOM_CLIENT_SECRET}"
@@ -26,7 +26,7 @@ def get_zoom_meeting_list(from_date: datetime, to_date: datetime = None) -> list
     if to_date is None:
         to_date = datetime.now()
 
-    print(f"Original date range request: {from_date.isoformat()} to {to_date.isoformat()}")
+    logger.debug(f"Original date range request: {from_date.isoformat()} to {to_date.isoformat()}")
 
     # Zoom API has a 30-day limit for listing recordings
     MAX_DAYS = 30
@@ -40,7 +40,7 @@ def get_zoom_meeting_list(from_date: datetime, to_date: datetime = None) -> list
             to_date
         )
 
-        print(f"Fetching chunk: {current_from.isoformat()} to {chunk_end.isoformat()}")
+        logger.debug(f"Fetching chunk: {current_from.isoformat()} to {chunk_end.isoformat()}")
 
         token = get_zoom_token()
         headers = {
@@ -57,7 +57,7 @@ def get_zoom_meeting_list(from_date: datetime, to_date: datetime = None) -> list
         while True:
             page_param = f'&next_page_token={next_page_token}' if next_page_token else ''
             url = f'https://api.zoom.us/v2/users/{settings.ZOOM_USER_ID}/recordings?from={from_str}&to={to_str}&page_size=300{page_param}'
-            print(f"Fetching page {page} from Zoom API: {url}")
+            logger.debug(f"Fetching page {page} from Zoom API: {url}")
 
             response = requests.get(url, headers=headers)
             response.raise_for_status()
@@ -65,7 +65,7 @@ def get_zoom_meeting_list(from_date: datetime, to_date: datetime = None) -> list
 
             if result.get('meetings'):
                 all_meetings.extend(result['meetings'])
-                print(f"Added {len(result['meetings'])} meetings from page {page}")
+                logger.debug(f"Added {len(result['meetings'])} meetings from page {page}")
 
             next_page_token = result.get('next_page_token', '')
             if not next_page_token:
@@ -79,5 +79,5 @@ def get_zoom_meeting_list(from_date: datetime, to_date: datetime = None) -> list
     # Sort meetings by date
     all_meetings.sort(key=lambda m: m['start_time'])
 
-    print(f"Found total {len(all_meetings)} recordings")
+    logger.info(f"Found total {len(all_meetings)} recordings")
     return all_meetings

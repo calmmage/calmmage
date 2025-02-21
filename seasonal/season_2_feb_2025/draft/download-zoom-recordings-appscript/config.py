@@ -1,8 +1,14 @@
+from datetime import datetime, timedelta
 from pathlib import Path
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
+    # Date range settings
+    START_DATE: datetime | None = None  # If None, defaults to 30 days ago
+    END_DATE: datetime | None = None  # If None, defaults to now
+    DEFAULT_DAYS_BACK: int = 30  # Number of days to look back by default
+
     # Zoom API credentials
     ZOOM_CLIENT_ID: str
     ZOOM_CLIENT_SECRET: str

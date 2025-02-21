@@ -2,6 +2,7 @@ from config import settings
 from datetime import datetime
 from google_auth import get_google_creds
 from googleapiclient.discovery import build
+from loguru import logger
 from pathlib import Path
 
 
@@ -19,10 +20,10 @@ def get_or_create_sheet():
             sheet = service.spreadsheets().get(
                 spreadsheetId=settings.SHEET_ID
             ).execute()
-            print(f"Found existing sheet: {sheet['properties']['title']}")
+            logger.debug(f"Found existing sheet: {sheet['properties']['title']}")
             return settings.SHEET_ID
         except Exception as e:
-            print(f"Error opening sheet: {e}")
+            logger.error(f"Error opening sheet: {e}")
 
     # Create new sheet
     sheet = service.spreadsheets().create(body={
@@ -42,7 +43,7 @@ def get_or_create_sheet():
     }).execute()
 
     sheet_id = sheet['spreadsheetId']
-    print(f"Created new tracking sheet: {sheet['properties']['title']}")
+    logger.debug(f"Created new tracking sheet: {sheet['properties']['title']}")
     return sheet_id
 
 
@@ -83,14 +84,23 @@ def track_recording(date: str, topic: str, recording_id: str,
     creds = get_google_creds()
     service = build('sheets', 'v4', credentials=creds)
 
+    # Format date for better readability
+    try:
+        # Try to parse and format the date
+        parsed_date = datetime.fromisoformat(date.replace('Z', '+00:00'))
+        formatted_date = parsed_date.strftime('%Y-%m-%d %H:%M:%S')
+    except:
+        # If parsing fails, use the original date string
+        formatted_date = date
+
     # Append row
     values = [[
-        date,
-        topic,
-        recording_id,
-        drive_link,
-        youtube_link,
-        datetime.now().isoformat()
+        formatted_date,  # Date
+        topic,  # Meeting Topic
+        recording_id,  # Recording ID
+        drive_link,  # Drive Link
+        youtube_link,  # YouTube Link
+        datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Processing Date
     ]]
 
     body = {
@@ -104,4 +114,4 @@ def track_recording(date: str, topic: str, recording_id: str,
         body=body
     ).execute()
 
-    print(f"Tracked recording in sheet: {topic}")
+    logger.debug(f"Tracked recording in sheet: {topic}")

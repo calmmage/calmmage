@@ -3,6 +3,7 @@ import os
 import requests
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
+from loguru import logger
 
 
 def get_zoom_token():
@@ -36,7 +37,7 @@ def get_zoom_recordings(from_date, to_date=None):
     from_str = from_date.strftime('%Y-%m-%d')
     to_str = to_date.strftime('%Y-%m-%d')
 
-    print(f"Getting recordings from {from_str} to {to_str}")
+    logger.debug(f"Getting recordings from {from_str} to {to_str}")
 
     headers = {
         'Authorization': f'Bearer {token}'
@@ -49,7 +50,7 @@ def get_zoom_recordings(from_date, to_date=None):
     while True:
         page_param = f'&next_page_token={next_page_token}' if next_page_token else ''
         url = f'https://api.zoom.us/v2/users/{user_id}/recordings?from={from_str}&to={to_str}&page_size=300{page_param}'
-        print(f"Fetching page {page}")
+        logger.debug(f"Fetching page {page}")
 
         response = requests.get(url, headers=headers)
         response.raise_for_status()
@@ -57,7 +58,7 @@ def get_zoom_recordings(from_date, to_date=None):
 
         if result.get('meetings'):
             all_meetings.extend(result['meetings'])
-            print(f"Added {len(result['meetings'])} meetings from page {page}")
+            logger.debug(f"Added {len(result['meetings'])} meetings from page {page}")
 
         next_page_token = result.get('next_page_token', '')
         if not next_page_token:
@@ -65,7 +66,7 @@ def get_zoom_recordings(from_date, to_date=None):
 
         page += 1
 
-    print(f"Found total {len(all_meetings)} recordings")
+    logger.info(f"Found total {len(all_meetings)} recordings")
     return all_meetings
 
 
@@ -82,7 +83,7 @@ def get_direct_download_url(download_url):
         raise Exception('Expected redirect response from Zoom')
 
     direct_url = response.headers['Location']
-    print(f"Got direct download URL: {direct_url}")
+    logger.debug(f"Got direct download URL: {direct_url}")
     return direct_url
 
 
@@ -94,10 +95,10 @@ if __name__ == "__main__":
     meetings = get_zoom_recordings(from_date)
 
     for meeting in meetings:
-        print(f"\nMeeting: {meeting['topic']} ({meeting['start_time']})")
+        logger.info(f"\nMeeting: {meeting['topic']} ({meeting['start_time']})")
         for recording in meeting.get('recording_files', []):
             if recording['file_type'].lower() == 'mp4':
-                print(f"Found MP4 recording: {recording['recording_type']}")
+                logger.debug(f"Found MP4 recording: {recording['recording_type']}")
                 direct_url = get_direct_download_url(recording['download_url'])
-                print(f"Download URL: {direct_url}")
+                logger.info(f"Download URL: {direct_url}")
                 break  # Just get the first MP4 recording

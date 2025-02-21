@@ -1,5 +1,6 @@
 import subprocess
 from config import settings
+from loguru import logger
 from pathlib import Path
 
 
@@ -11,11 +12,11 @@ def download_file_with_curl(file_metadata: dict) -> Path:
 
     # Check if file already exists
     if output_path.exists():
-        print(f"File already exists: {output_path}")
-        print(f"Size: {output_path.stat().st_size / (1024 * 1024):.2f} MB")
+        logger.debug(f"File already exists: {output_path}")
+        logger.debug(f"Size: {output_path.stat().st_size / (1024 * 1024):.2f} MB")
         return output_path
 
-    print(f"Downloading to {output_path}...")
+    logger.debug(f"Downloading to {output_path}...")
 
     curl_cmd = [
         'curl',
@@ -28,8 +29,8 @@ def download_file_with_curl(file_metadata: dict) -> Path:
     try:
         subprocess.run(curl_cmd, check=True)
         size = output_path.stat().st_size
-        print(f"Download complete! File size: {size / (1024 * 1024):.2f} MB")
+        logger.debug(f"Download complete! File size: {size / (1024 * 1024):.2f} MB")
         return output_path
     except subprocess.CalledProcessError as e:
-        print(f"Download failed with exit code {e.returncode}")
+        logger.error(f"Download failed with exit code {e.returncode}")
         raise

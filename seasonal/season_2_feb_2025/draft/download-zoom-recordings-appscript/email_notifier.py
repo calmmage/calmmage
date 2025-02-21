@@ -4,7 +4,7 @@ from config import settings
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-
+from loguru import logger
 
 def send_video_links(topic: str, date: str, drive_link: str = '', youtube_link: str = ''):
     """Send notification with video links"""
@@ -33,8 +33,8 @@ def send_video_links(topic: str, date: str, drive_link: str = '', youtube_link: 
         with smtplib.SMTP_SSL(settings.SMTP_SERVER, settings.SMTP_PORT) as server:
             server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
             server.send_message(msg)
-        print(f"Sent email notification for: {topic}")
+        logger.debug(f"Sent email notification for: {topic}")
         return True
     except Exception as e:
-        print(f"Error sending notification for {topic}: {e}")
+        logger.error(f"Error sending notification for {topic}: {e}")
         return False
