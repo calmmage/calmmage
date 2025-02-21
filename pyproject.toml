@@ -87,6 +87,9 @@ fastui = "*"
 numpy = "*"
 plotly = "*"
 pandas = "^2.2.3"
+google-auth-oauthlib = "^1.2.1"
+google-api-python-client = "^2.161.0"
+requests = "^2.32.3"
 
 [tool.poetry.extras]
 full = ["dropbox", "protobuf", "pandas", "seaborn", "defaultenv", "bmmb",

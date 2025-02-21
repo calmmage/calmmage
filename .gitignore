@@ -207,3 +207,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+/seasonal/season_2_feb_2025/draft/download-zoom-recordings-appscript/token.pickle
+/seasonal/season_2_feb_2025/draft/download-zoom-recordings-appscript/.clasp.json
+/seasonal/season_2_feb_2025/draft/download-zoom-recordings-appscript/credentials.json
+/seasonal/season_2_feb_2025/draft/download-zoom-recordings-appscript/.specstory/history/video-download-bug-investigation.md
+/seasonal/season_2_feb_2025/draft/download-zoom-recordings-appscript/.specstory/history/youtube-upload-issues-and-solutions.md
