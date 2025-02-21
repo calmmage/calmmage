@@ -1,0 +1,55 @@
+
+01:28:25 | ERROR    | 
+  File "/Users/petrlavrov/work/projects/calmmage/seasonal/season_1_dec-jan_2024/draft/telegram-tech-sketches/4_dynamic_commands/router.py", line 101, in new_command_handler
+  File "/Users/petrlavrov/work/projects/botspot/botspot/components/bot_commands_menu.py", line 110, in set_aiogram_bot_commands
+    await bot.set_my_commands(bot_commands)
+  File "/Users/petrlavrov/work/projects/calmmage/.venv/lib/python3.11/site-packages/aiogram/client/bot.py", line 3727, in set_my_commands
+    return await self(call, request_timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petrlavrov/work/projects/calmmage/.venv/lib/python3.11/site-packages/aiogram/client/bot.py", line 498, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petrlavrov/work/projects/calmmage/.venv/lib/python3.11/site-packages/aiogram/client/session/base.py", line 254, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petrlavrov/work/projects/calmmage/.venv/lib/python3.11/site-packages/aiogram/client/session/aiohttp.py", line 189, in make_request
+    response = self.check_response(
+               ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petrlavrov/work/projects/calmmage/.venv/lib/python3.11/site-packages/aiogram/client/session/base.py", line 120, in check_response
+    raise TelegramBadRequest(method=method, message=description)
+aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: command description must be non-empty
+
+01:28:50 | WARNING  | User-defined command /start overrides default command. Default: 'Start the bot' -> User: 'Start the bot'
+01:28:50 | INFO     | Setting bot command: /start - Start the bot
+01:28:50 | INFO     | Setting bot command: /help - Show this help message
+01:28:50 | INFO     | Setting bot command: /new_command - Create a new command
+01:28:50 | INFO     | Setting bot command: /help_botspot - Show available bot commands
+01:28:50 | INFO     | Setting bot command: /bobo - Here's a bobo command
+01:28:50 | INFO     | Setting bot command: /fitness_blender - 
+01:28:50 | INFO     | Setting bot command: /exit - fitness_blender
+01:28:50 | ERROR    | 
+  File "/Users/petrlavrov/work/projects/calmmage/seasonal/season_1_dec-jan_2024/draft/telegram-tech-sketches/4_dynamic_commands/router.py", line 101, in new_command_handler
+  File "/Users/petrlavrov/work/projects/botspot/botspot/components/bot_commands_menu.py", line 110, in set_aiogram_bot_commands
+    await bot.set_my_commands(bot_commands)
+  File "/Users/petrlavrov/work/projects/calmmage/.venv/lib/python3.11/site-packages/aiogram/client/bot.py", line 3727, in set_my_commands
+    return await self(call, request_timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petrlavrov/work/projects/calmmage/.venv/lib/python3.11/site-packages/aiogram/client/bot.py", line 498, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petrlavrov/work/projects/calmmage/.venv/lib/python3.11/site-packages/aiogram/client/session/base.py", line 254, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petrlavrov/work/projects/calmmage/.venv/lib/python3.11/site-packages/aiogram/client/session/aiohttp.py", line 189, in make_request
+    response = self.check_response(
+               ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/petrlavrov/work/projects/calmmage/.venv/lib/python3.11/site-packages/aiogram/client/session/base.py", line 120, in check_response
+    raise TelegramBadRequest(method=method, message=description)
+aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: command description must be non-empty
+
+Failed to fetch updates - TelegramNetworkError: HTTP Client says - Request timeout error
+Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 6458739376)
+Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [Connect call failed ('149.154.167.220', 443)]
+Sleep for 1.166611 seconds and try again... (tryings = 1, bot id = 6458739376)
+Failed to fetch updates - TelegramNetworkError: HTTP Client says - ClientConnectorError: Cannot connect to host api.telegram.org:443 ssl:default [Connect call failed ('149.154.167.220', 443)]
+Sleep for 1.357416 seconds and try again... (tryings = 2, bot id = 6458739376)
