@@ -44,11 +44,22 @@ Includes heartbeat monitoring integration with service-registry.calmmage.com.
 
 1. In Google Apps Script, click on "Project Settings" (⚙️)
 2. Go to "Script Properties" tab
-3. Add the following properties:
+3. Required properties:
     - `ZOOM_ACCOUNT_ID`: Your Zoom account ID
     - `ZOOM_CLIENT_ID`: Your Zoom client ID
     - `ZOOM_CLIENT_SECRET`: Your Zoom client secret
     - `ZOOM_USER_ID`: Your Zoom user email
+
+4. Optional tracking properties:
+   - `SHEET_TRACKING_ENABLED`: Set to 'true' to enable tracking in Google Sheets
+   - `SHEET_ID`: (Auto-set) ID of the tracking spreadsheet. Only set manually if you
+     want to use an existing sheet
+
+Note: When you enable tracking using `enableTracking()`, the script will automatically:
+
+1. Create a new tracking spreadsheet
+2. Set the `SHEET_ID` property
+3. Set `SHEET_TRACKING_ENABLED` to 'true'
 
 Alternatively, you can run this function in the script editor:
 
@@ -148,6 +159,35 @@ By default, the script:
 The script sends heartbeats to service-registry.calmmage.com every hour. You can monitor
 the service status there.
 
+### Progress Tracking (Optional)
+
+The script can track all processed recordings in a Google Sheet:
+
+1. Enable tracking:
+   ```javascript
+   function setupTracking() {
+     enableTracking();  // This will create a new sheet and enable tracking
+   }
+   ```
+
+2. The tracking sheet will include:
+   - Recording date and topic
+   - Drive and YouTube links
+   - Processing timestamp
+   - Unique recording ID
+
+3. Benefits:
+   - Prevents duplicate processing
+   - Easy access to all video links
+   - Processing history
+
+4. To disable tracking:
+   ```javascript
+   function stopTracking() {
+     disableTracking();
+   }
+   ```
+
 ## Troubleshooting
 
 ### Common Issues
@@ -172,4 +212,126 @@ the service status there.
 
 - Never share your Zoom API credentials
 - Script Properties securely store sensitive information
-- YouTube uploads are set to "unlisted" by default 
+- YouTube uploads are set to "unlisted" by default
+
+## Development
+
+### Quick Setup (Recommended)
+
+1. Clone this repository:
+   ```bash
+   git clone https://your-repository-url.git
+   cd your-repository-name
+   ```
+
+2. Run the setup script:
+   ```bash
+   chmod +x setup.sh
+   ./setup.sh
+   ```
+
+The script will:
+
+- Install clasp if needed
+- Set up the project structure
+- Configure git hooks for automatic pushing
+- Guide you through the remaining setup steps
+
+### Manual Setup with clasp
+
+If you prefer manual setup:
+
+1. Install clasp globally:
+   ```bash
+   npm install -g @google/clasp
+   ```
+
+2. Login to Google:
+   ```bash
+   clasp login
+   ```
+
+3. Clone this repository:
+   ```bash
+   git clone https://your-repository-url.git
+   cd your-repository-name
+   ```
+
+4. Create a new Google Apps Script project:
+   ```bash
+   clasp create --title "Zoom Recording Downloader" --type standalone
+   ```
+
+5. Push code to Google Apps Script:
+   ```bash
+   clasp push
+   ```
+
+6. Open the project in browser:
+   ```bash
+   clasp open
+   ```
+
+### Git Hooks (Automated with setup.sh)
+
+The setup script installs two git hooks:
+
+1. `pre-commit`: Ensures all .gs files are in the src/ directory
+2. `post-commit`: Automatically pushes changes to Google Apps Script
+
+To disable automatic pushing, remove or modify `.git/hooks/post-commit`
+
+### Authentication on macOS
+
+1. First-time setup:
+   ```bash
+   # Install Node.js and npm (if not already installed)
+   brew install node
+
+   # Run setup script
+   ./setup.sh
+   ```
+
+2. Google Authentication:
+   - Run `clasp login`
+   - Your default browser will open
+   - Login with your Google account
+   - Grant necessary permissions
+   - Authentication tokens are stored in ~/.clasprc.json
+
+### Local Development
+
+1. Enable Apps Script API:
+   - Visit https://script.google.com/home/usersettings
+   - Turn on "Google Apps Script API"
+
+2. Configure .claspignore:
+   ```
+   # Ignore files not needed in Apps Script
+   **/.git/**
+   **/node_modules/**
+   README.md
+   package.json
+   ```
+
+3. Watch for changes (auto-push):
+   ```bash
+   clasp push --watch
+   ```
+
+### Repository Structure
+
+```
+.
+├── .clasp.json          # clasp configuration
+├── appsscript.json      # Apps Script manifest
+├── src/
+│   ├── Config.gs
+│   ├── ZoomApi.gs
+│   ├── DriveUtils.gs
+│   ├── YouTubeUploader.gs
+│   ├── HeartbeatService.gs
+│   ├── SheetsTracker.gs
+│   └── Main.gs
+└── README.md
+``` 

@@ -26,20 +26,41 @@ function processZoomRecordings(uploadToDrive = true, uploadToYoutube = false, fr
     
     meeting.recording_files.forEach(recording => {
       if (recording.file_type === 'MP4') {
+        // Skip if already processed (check in sheet if enabled)
+        if (isTrackingEnabled() && isRecordingProcessed(recording.id)) {
+          Logger.log(`Skipping already processed recording: ${meeting.topic}`);
+          return;
+        }
+        
         try {
           const fileName = `${meeting.start_time.split('T')[0]} - ${meeting.topic}.mp4`;
           const blob = downloadRecording(recording.download_url, fileName);
+          let driveLink = '';
+          let youtubeLink = '';
           
           if (uploadToDrive) {
-            saveFileToDrive(blob, 'recordings');
+            const file = saveFileToDrive(blob, 'recordings');
+            driveLink = file.getUrl();
           }
           
           if (uploadToYoutube) {
             if (enableYouTubeService()) {
-              uploadToYouTube(blob, fileName);
+              const videoId = uploadToYouTube(blob, fileName);
+              youtubeLink = `https://youtu.be/${videoId}`;
             } else {
               Logger.log('YouTube upload skipped - API not enabled');
             }
+          }
+          
+          // Track in sheet if enabled
+          if (isTrackingEnabled()) {
+            trackRecording(
+              meeting.start_time,
+              meeting.topic,
+              recording.id,
+              driveLink,
+              youtubeLink
+            );
           }
           
           // Update progress after successful processing
@@ -59,7 +80,8 @@ function processZoomRecordings(uploadToDrive = true, uploadToYoutube = false, fr
     total: totalMeetings,
     processed: processedMeetings,
     fromDate: from.toISOString(),
-    toDate: to.toISOString()
+    toDate: to.toISOString(),
+    sheetUrl: isTrackingEnabled() ? getTrackingSheetUrl() : null
   };
 }
 

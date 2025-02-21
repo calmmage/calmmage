@@ -1,38 +1,23 @@
-# Core Features
+# Completed Features
 
-1. "find emails from zoom about recordings -> extract link and password"
-    - Already implemented in notes.md
-    - Consider adding error handling for expired links
+[x] "Download via zoom api"
+[x] "Upload to google drive/YouTube"
 
-2. "Download via zoom api"
-    - Research Zoom API authentication
-    - Implement recording download endpoint
-    - Compare email-based vs API-based approaches
+[~] "rolling monitoring"
+[x] Add time-based trigger
+[ ] Track processed recordings (currently date-based only)
+[ ] Filter out already processed items (needs improvement)
+[x] Add heartbeat monitoring
 
-3. "Upload to google drive/YouTube"
-    - Implement Google Drive upload first (simpler)
-    - Add YouTube upload as optional enhancement
+# Next Features
 
-4. "rolling monitoring"
-    - Add time-based trigger
-    - Track processed recordings
-    - Filter out already processed items
+Email & Links
 
-# Implementation Notes
+- [ ] Reply/forward original Zoom email with Drive/YouTube links after processing
+- [ ] Add English language support for Gmail filters (currently Russian only)
 
-Email vs API approaches:
+Progress Tracking
 
-- Email: already working, but links may expire
-- Zoom API: more reliable, but requires setup
-- Consider supporting both methods
-
-Deployment options:
-
-- Package as Google Apps Script for easy sharing
-- Store credentials securely
-- Provide simple setup instructions
-
-# Next Steps
-
-Focus on implementing the download functionality first, then proceed with upload
-features. 
+- [x] Save processed videos in Google Sheet
+- [ ] Use sheet for deduplication check before upload
+- [ ] Track both Drive and YouTube links 
