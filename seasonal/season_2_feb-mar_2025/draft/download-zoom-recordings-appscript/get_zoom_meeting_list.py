@@ -21,6 +21,42 @@ def get_zoom_token():
     return response.json()['access_token']
 
 
+def get_meeting_participants(meeting_id: str) -> list:
+    """Get list of participants for a meeting"""
+    token = get_zoom_token()
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+
+    url = f'https://api.zoom.us/v2/past_meetings/{meeting_id}/participants'
+    logger.debug(f"Getting participants for meeting {meeting_id}")
+
+    all_participants = []
+    next_page_token = ''
+    page = 1
+
+    while True:
+        page_param = f'&next_page_token={next_page_token}' if next_page_token else ''
+        response = requests.get(f"{url}?page_size=300{page_param}", headers=headers)
+        response.raise_for_status()
+        result = response.json()
+
+        if result.get('participants'):
+            all_participants.extend(result['participants'])
+            logger.debug(f"Added {len(result['participants'])} participants from page {page}")
+
+        next_page_token = result.get('next_page_token', '')
+        if not next_page_token:
+            break
+
+        page += 1
+
+    # Remove duplicates (same person joining multiple times)
+    unique_participants = {p['user_email']: p for p in all_participants if p.get('user_email')}.values()
+    logger.debug(f"Found {len(unique_participants)} unique participants")
+    return list(unique_participants)
+
+
 def get_zoom_meeting_list(from_date: datetime, to_date: datetime = None) -> list:
     """Get list of Zoom recordings between dates"""
     if to_date is None:

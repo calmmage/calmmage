@@ -5,7 +5,7 @@ from download_file_with_curl import download_file_with_curl
 from drive_uploader import upload_to_drive
 from email_notifier import send_video_links
 from generate_zoom_download_url import generate_zoom_download_url
-from get_zoom_meeting_list import get_zoom_meeting_list
+from get_zoom_meeting_list import get_zoom_meeting_list, get_meeting_participants
 from loguru import logger
 from pathlib import Path
 from sheets_tracker import is_recording_processed, track_recording
@@ -27,6 +27,15 @@ def process_zoom_recordings(from_date=None, to_date=None):
     for meeting in meetings:
         logger.info(f"\nProcessing meeting: {meeting['topic']} ({meeting['start_time']})")
 
+        # Get participants
+        try:
+            participants = get_meeting_participants(meeting['uuid'])
+            participant_count = len(participants)
+            logger.info(f"Found {participant_count} participants")
+        except Exception as e:
+            logger.warning(f"Could not get participants: {e}")
+            participant_count = None
+
         # First process video recordings
         video_recordings = [r for r in meeting['recording_files'] if r['file_type'] == 'MP4']
         logger.debug(f"Found {len(video_recordings)} video recordings")
@@ -36,10 +45,12 @@ def process_zoom_recordings(from_date=None, to_date=None):
                 logger.debug(f"Skipping already processed video: {recording['id']}")
                 continue
 
-            # Generate filename
+            # Generate filename with participant count
             file_name = f"{meeting['start_time'].split('T')[0]} - {meeting['topic']}"
+            if participant_count:
+                file_name += f" ({participant_count} participants)"
             if len(video_recordings) > 1:
-                file_name += f" ({recording['recording_type']})"
+                file_name += f" - {recording['recording_type']}"
             file_name += ".mp4"
 
             # Get direct download URL
@@ -55,10 +66,15 @@ def process_zoom_recordings(from_date=None, to_date=None):
             # Upload to YouTube if enabled
             youtube_info = None
             if is_youtube_enabled():
+                # Add participant info to description
+                description = f"Zoom recording from {meeting['start_time'].split('T')[0]}"
+                if participant_count:
+                    description += f"\nParticipants: {participant_count}"
+                
                 youtube_info = upload_to_youtube(
                     file_path,
                     file_name,
-                    f"Zoom recording from {meeting['start_time'].split('T')[0]}"
+                    description
                 )
                 logger.info(f"Uploaded to YouTube: {youtube_info['url']}")
 
@@ -93,10 +109,12 @@ def process_zoom_recordings(from_date=None, to_date=None):
                 logger.debug(f"Skipping already processed audio: {recording['id']}")
                 continue
 
-            # Generate filename
+            # Generate filename with participant count
             file_name = f"{meeting['start_time'].split('T')[0]} - {meeting['topic']}"
+            if participant_count:
+                file_name += f" ({participant_count} participants)"
             if len(audio_recordings) > 1:
-                file_name += f" ({recording['recording_type']})"
+                file_name += f" - {recording['recording_type']}"
             file_name += ".m4a"
 
             # Get direct download URL

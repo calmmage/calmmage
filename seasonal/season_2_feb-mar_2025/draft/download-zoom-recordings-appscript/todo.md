@@ -12,6 +12,11 @@ Quick
 
 - [ ] QUICK: add heartbeat
 - [ ] Add zoom participants to names of everything - all the files.
+- [ ] bonus: generate name for the video using llm (from first few minutes?)
+
+Extra
+- [ ] Generate transcript from audio using whisper api
+- [ ] Generate action points / artifacts using claude?
 
 llm features
 
