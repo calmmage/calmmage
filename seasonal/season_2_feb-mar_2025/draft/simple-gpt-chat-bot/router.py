@@ -4,7 +4,7 @@ from aiogram.filters import Command, CommandStart
 from aiogram.types import Message
 from botspot import commands_menu
 from botspot.components.new import llm_provider
-from botspot.utils import send_safe
+from botspot.utils import send_safe, send_typing_status
 from loguru import logger
 
 router = Router()
@@ -54,7 +54,7 @@ async def test_handler(message: Message):
     try:
         # 1. Basic query_llm
         test_msg = await send_safe(message.chat.id, "1. Testing basic query_llm...")
-        result = llm_provider.query_llm(prompt=prompt)
+        result = llm_provider.query_llm(prompt=prompt, user=str(message.from_user.id))
         await test_msg.edit_text(f"1. Basic query_llm: ✅\nResult: {result}")
         results.append("query_llm: ✅")
     except Exception as e:
@@ -65,7 +65,11 @@ async def test_handler(message: Message):
     try:
         # 2. Async query with system message
         test_msg = await send_safe(message.chat.id, "2. Testing aquery_llm with system message...")
-        result = await llm_provider.aquery_llm(prompt=prompt, system_message=system_msg)
+        result = await llm_provider.aquery_llm(
+            prompt=prompt,
+            system_message=system_msg,
+            user=str(message.from_user.id)
+        )
         await test_msg.edit_text(f"2. aquery_llm: ✅\nResult: {result}")
         results.append("aquery_llm: ✅")
     except Exception as e:
@@ -77,7 +81,7 @@ async def test_handler(message: Message):
         # 3. Getting provider directly
         test_msg = await send_safe(message.chat.id, "3. Testing direct provider access...")
         provider = llm_provider.get_llm_provider()
-        result = await provider.aquery_llm_text(prompt=prompt)
+        result = await provider.aquery_llm_text(prompt=prompt, user=str(message.from_user.id))
         await test_msg.edit_text(f"3. Direct provider: ✅\nResult: {result}")
         results.append("Direct provider: ✅")
     except Exception as e:
@@ -109,20 +113,14 @@ async def chat_handler(message: Message):
     state = app.get_user_state(user_id)
     
     # Let the user know we're processing
-    await message.chat.action("typing")
-    
-    try:
-        # Simple implementation: just pass the message directly to the LLM
-        response = await llm_provider.aquery_llm(
-            prompt=prompt,
-            system_message=app.config.system_message,
-        )
-        
-        # Send the response
-        await send_safe(message.chat.id, response)
-    except Exception as e:
-        logger.error(f"Error processing chat message: {e}")
-        await send_safe(
-            message.chat.id,
-            "Sorry, I had trouble processing your message. Please try again later."
-        )
+    await send_typing_status(message)
+
+    # Simple implementation: just pass the message directly to the LLM
+    response = await llm_provider.aquery_llm(
+        prompt=prompt,
+        system_message=app.config.system_message,
+        user=str(user_id),  # Convert to string to ensure compatibility
+    )
+
+    # Send the response
+    await send_safe(message.chat.id, response)
