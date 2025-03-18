@@ -4,21 +4,19 @@ This is a Telegram bot that uses Botspot's LLM Provider component to create chat
 
 ## Features
 
-This project demonstrates two ways to use the LLM Provider:
+This project includes two complementary examples of how to use the LLM Provider:
 
-1. **Minimal Showcase Router**: Shows how to create a GPT-powered chat bot in just a few lines of code.
-2. **Advanced Scenarios Router**: Demonstrates more complex features like AI personas and custom system prompts.
+1. **Minimal Showcase**: Shows how to create a simple, but powerful GPT-powered chat bot in just a few lines of code.
+2. **Advanced Scenarios**: Demonstrates more complex features like AI personas, custom system prompts, and comprehensive LLM testing.
+
+Both routers are included in the bot by default, allowing users to explore both simple and advanced functionality.
 
 ## Running the Bot
 
-You can run the bot with either router:
+Simply run the bot with:
 
 ```bash
-# Run with minimal showcase router (default)
 python bot.py
-
-# Run with advanced scenarios router
-python bot.py --router advanced
 ```
 
 ## Minimal Router Example
@@ -57,15 +55,20 @@ The advanced router adds multiple AI personas (scenarios) on top of the base fun
 
 ## Commands
 
-### Minimal Router
+The bot supports a variety of commands from both minimal and advanced routers:
+
+### Minimal Router Commands (Simple but Powerful)
 - `/start` - Start the bot
 - `/help` - Show help message
 
-### Advanced Router
-- `/start` - Start the bot
-- `/help` - Show help message
+### Advanced Router Commands (Feature-Rich)
+- `/test` - Test all LLM provider features (streaming, JSON mode, structured output, etc.)
 - `/scenarios` - View available AI personas
-- `/scenario_[name]` - Select a specific persona
+- `/scenario_default` - Use the default helpful assistant persona
+- `/scenario_creative` - Use the creative writer persona
+- `/scenario_expert` - Use the technical expert persona
+- `/scenario_philosopher` - Use the philosopher persona
+- `/scenario_coach` - Use the life coach persona
 - `/custom [prompt]` - Create a custom AI persona
 
 ## Setup
