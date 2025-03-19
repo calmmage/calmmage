@@ -1,0 +1,1 @@
+Use export.sh to generate merged prompts.md and copy it over to Obsidian note "Prompt Templates"
