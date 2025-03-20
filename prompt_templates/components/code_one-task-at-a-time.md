@@ -1,0 +1,3 @@
+- Always do ONE task at a time.
+- We are tracking our work in todo.md and in workalong.md
+- We only work on ONE FEATURE AT A TIME - e.g. ONE ITEM, ONE TASK from todo.md

@@ -1,6 +1,8 @@
 # Idea - prompt template inbox
 
-Here I want to collect examples of successful conversatinos 
+Exports of conversations
+
+Here I want to collect examples of successful conversations with GPT and other tools
 
 # Todo
 

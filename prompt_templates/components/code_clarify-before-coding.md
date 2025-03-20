@@ -1,0 +1,1 @@
+Explain the full approach you’d take to implement this. Just tell, don’t code.
