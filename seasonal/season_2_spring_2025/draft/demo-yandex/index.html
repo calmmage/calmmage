@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Boid Simulation - Yandex Demo</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background-color: #000;
+      }
+      canvas {
+        display: block;
+      }
+      .controls {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        color: white;
+        background-color: rgba(0, 0, 0, 0.5);
+        padding: 10px;
+        border-radius: 5px;
+        font-family: sans-serif;
+      }
+      .controls h3 {
+        margin-top: 0;
+        margin-bottom: 10px;
+      }
+      .controls div {
+        margin-bottom: 5px;
+      }
+      label {
+        display: inline-block;
+        width: 140px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="controls">
+      <h3>Boid Controls</h3>
+      <div>
+        <label for="separation">Separation:</label>
+        <input type="range" id="separation" min="0" max="3" step="0.1" value="1.5">
+        <span id="separation-value">1.5</span>
+      </div>
+      <div>
+        <label for="alignment">Alignment:</label>
+        <input type="range" id="alignment" min="0" max="3" step="0.1" value="1.0">
+        <span id="alignment-value">1.0</span>
+      </div>
+      <div>
+        <label for="cohesion">Cohesion:</label>
+        <input type="range" id="cohesion" min="0" max="3" step="0.1" value="1.0">
+        <span id="cohesion-value">1.0</span>
+      </div>
+      <div>
+        <label for="speed">Speed:</label>
+        <input type="range" id="speed" min="0.1" max="3" step="0.1" value="1.0">
+        <span id="speed-value">1.0</span>
+      </div>
+      <div>
+        <button id="reset">Reset</button>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
