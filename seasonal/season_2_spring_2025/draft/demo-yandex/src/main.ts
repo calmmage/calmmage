@@ -60,7 +60,7 @@ scene.add(boundingBoxHelper);
 const simulation = new BoidSimulation(scene, bounds);
 
 // Initialize boids
-const numBoids = 200;
+let numBoids = 200;
 simulation.createBoids(numBoids);
 
 // Handle window resize
@@ -75,6 +75,7 @@ const separationSlider = document.getElementById('separation') as HTMLInputEleme
 const alignmentSlider = document.getElementById('alignment') as HTMLInputElement;
 const cohesionSlider = document.getElementById('cohesion') as HTMLInputElement;
 const speedSlider = document.getElementById('speed') as HTMLInputElement;
+const countSlider = document.getElementById('count') as HTMLInputElement;
 const resetButton = document.getElementById('reset') as HTMLButtonElement;
 
 // Value displays
@@ -82,6 +83,7 @@ const separationValue = document.getElementById('separation-value')!;
 const alignmentValue = document.getElementById('alignment-value')!;
 const cohesionValue = document.getElementById('cohesion-value')!;
 const speedValue = document.getElementById('speed-value')!;
+const countValue = document.getElementById('count-value')!;
 
 // Set initial values
 simulation.separationWeight = parseFloat(separationSlider.value);
@@ -112,6 +114,14 @@ speedSlider.addEventListener('input', () => {
   const value = parseFloat(speedSlider.value);
   simulation.speedFactor = value;
   speedValue.textContent = value.toFixed(1);
+});
+
+countSlider.addEventListener('input', () => {
+  const value = parseInt(countSlider.value);
+  numBoids = value;
+  countValue.textContent = value.toString();
+  // Immediately update the simulation with new boid count
+  simulation.reset(numBoids);
 });
 
 // Reset button
