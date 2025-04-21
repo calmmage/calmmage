@@ -22,11 +22,14 @@ Just make a process that runs other process
 	- running jobs
 		- startup
 		- ongoing
+What am I doing? 
 - a
-	- use scheduler to run one job
+	- log the task runs to the database
 - b
-	- 
+	- on startup -> check if all tasks were run recently
 - c
+	- asd
+- d
 	- 
 - tech notes
 	- a
@@ -42,4 +45,15 @@ Just make a process that runs other process
 		- 
 	- f
 		- 
+
+## Attempt 2
+What do I want to achieve next?
+- a
+	- run something on startup
+	- make sure I use the job run logs
+- b
+	- run something on schedule
+- c
+	- log task runs
+
 ## More ideas

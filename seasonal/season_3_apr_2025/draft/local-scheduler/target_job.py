@@ -10,6 +10,8 @@ import datetime
 from pathlib import Path
 import pymongo
 from pymongo import MongoClient
+import time
+import random
 
 def run_hello_world():
     print("Hello world")
@@ -35,13 +37,17 @@ def run_mongodb():
     print(retrieved_document)
 
 def run_env_access():
-
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-
+def main():
+    sleep_time = random.uniform(1, 3)
+    print(f"Starting job, will sleep for {sleep_time:.2f} seconds")
+    time.sleep(sleep_time)
+    print("Job completed")
 
 if __name__ == '__main__':
     # run the test task
     # run_hello_world()
     run_mongodb()
     # print(1)
+    main()
