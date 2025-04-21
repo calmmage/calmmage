@@ -1,0 +1,1 @@
+- [ ] make sure .env file is used to run for the task
