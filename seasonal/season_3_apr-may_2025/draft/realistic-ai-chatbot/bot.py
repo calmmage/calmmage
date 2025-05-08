@@ -12,14 +12,14 @@ dp = Dispatcher()
 dp.include_router(router)
 
 
-
 def main():
     setup_logger(logger)
 
     app = App()
 
     bot = Bot(
-        token=app.config.telegram_bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+        token=app.config.telegram_bot_token,
+        default=DefaultBotProperties(parse_mode=ParseMode.HTML),
     )
 
     # Setup bot manager with basic components

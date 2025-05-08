@@ -1,10 +1,87 @@
+import asyncio
+from enum import Enum
+from textwrap import dedent
+from typing import Union
+
+from aiogram.types import Message
+from botspot.llm_provider import aquery_llm_text
+from botspot.utils import answer_safe, reply_safe
 from pydantic_settings import BaseSettings
+
+
+class SplitterMode(Enum):
+    """Mode for splitting messages"""
+
+    NONE = "none"  # do not split
+    SIMPLE = "simple"  # just split by \n\n
+    SIMPLE_IMPROVED = "simple_improved"  # same as simple, but add heuristics to re-join messages - not too short, not too long.
+    MARKDOWN = "markdown"  # split by markdown headers
+    STRUCTURED = "structured"  # explicitly request
+    MULTI_QUERY = "multi_query"  # do multiple queries to llm - first generate a response, then split it into parts.
+
+
+class DelayMode(Enum):
+    """Mode for delaying messages"""
+
+    NONE = "none"  # do not delay responses
+    SIMPLE = "simple"  # delay by a fixed amount of time
+    # todo: simple_proportional to message length
+    RANDOM = "random"  # delay by a random amount of time
+    # todo: random_proportional to message length
+    STRUCTURED = "structured"  # explicitly request
+
+
+class ReplyMode(Enum):
+    reply = "reply"  # reply to the user's message
+    answer = "answer"  # answer the user's message
+
+
+class ParallelMessageHandlingMode(Enum):
+    ignore = "ignore"  # allow native aiogram approach of handling parallel messages - process each message separately and independently
+    interrupt = (
+        "interrupt"  # interrupt the current message processing if a new one arrives
+    )
+    queue = "queue"  # queue the messages and process them one by one
+
+
+supported_models = [
+    "gpt-4o",
+    "claude-3-5-sonnet",
+    "claude-3-7",
+]
 
 
 class AppConfig(BaseSettings):
     """Basic app configuration"""
 
     telegram_bot_token: str
+    model: str = "claude-3.7"
+    # model = Field(default="gpt-4o", choices=supported_models)
+    # splitter_mode: SplitterMode = SplitterMode.NONE
+    splitter_mode: SplitterMode = SplitterMode.SIMPLE
+
+    # region: delay mode
+    # delay_mode: DelayMode = DelayMode.NONE
+    delay_mode: DelayMode = DelayMode.SIMPLE
+    delay_before_first_message: float = 0.0  # it takes time to start generating, so..
+    delay_simple: float = 5.0  # delay between messages
+    # todo: wire in
+    delay_random_min: float = 0.0  # minimum delay between messages
+    delay_random_max: float = 10.0  # maximum delay between messages
+    # endregion: delay mode
+
+    # region: reply mode
+    reply_mode: ReplyMode = ReplyMode.answer
+    # todo: wire in
+    parallel_message_handling_mode: ParallelMessageHandlingMode = (
+        ParallelMessageHandlingMode.ignore
+    )
+    # todo: wire in
+    auto_switch_to_reply: bool = True  # automatically switch to reply mode when user sends multple parallel messages
+    # endregion: reply mode
+
+    # todo: wire in
+    display_typing_status: bool = True  # display typing status
 
     class Config:
         env_file = ".env"
@@ -12,8 +89,129 @@ class AppConfig(BaseSettings):
         extra = "ignore"
 
 
+# todo: system instructions per splitter mode
+split_instructions = {
+    SplitterMode.NONE: "",  # no extra formatting instructions necessary
+    SplitterMode.SIMPLE: "Use \n\n to separate parts of the response.",
+    SplitterMode.SIMPLE_IMPROVED: "Use \n\n to separate parts of the response.",  #
+    SplitterMode.MARKDOWN: "Use markdown headers to separate parts of the response.",
+    SplitterMode.STRUCTURED: dedent(
+        """
+        We want to split the response to the user into multiple parts grouped by meaning
+        - and send them out one by one with a delay so that user has time to read each part.
+        """
+    ),
+}
+
+
 class App:
     name = "Mini Botspot Template"
 
     def __init__(self, **kwargs):
         self.config = AppConfig(**kwargs)
+
+    @property
+    def model(self):
+        return self.config.model
+
+    @model.setter
+    def model(self, model: str):
+        if model not in supported_models:
+            raise ValueError(
+                f"Model {model} is not supported. Supported models: {supported_models}"
+            )
+        self.config.model = model
+
+    @property
+    def splitter_mode(self) -> SplitterMode:
+        return self.config.splitter_mode
+
+    @splitter_mode.setter
+    def splitter_mode(self, mode: Union[str, SplitterMode]):
+        if isinstance(mode, str):
+            mode = SplitterMode(mode)
+        self.config.splitter_mode = mode
+
+    @property
+    def delay_mode(self) -> DelayMode:
+        return self.config.delay_mode
+
+    @delay_mode.setter
+    def delay_mode(self, mode: Union[str, DelayMode]):
+        if isinstance(mode, str):
+            mode = DelayMode(mode)
+        self.config.delay_mode = mode
+
+    @property
+    def system_message(self) -> str:
+        system_message = "You're a helpful assistant."
+        system_message += "\n\n" + split_instructions[self.splitter_mode]
+        return system_message
+
+    def split_message(self, message: str) -> list[str]:
+        if self.splitter_mode == SplitterMode.NONE:
+            return [message]
+        elif self.splitter_mode == SplitterMode.SIMPLE:
+            return message.split("\n\n")
+        elif self.splitter_mode == SplitterMode.MARKDOWN:
+            raise NotImplementedError("Markdown splitting not implemented")
+        elif self.splitter_mode == SplitterMode.STRUCTURED:
+            raise NotImplementedError("Structured splitting not implemented")
+        else:
+            raise ValueError(f"Invalid splitter mode: {self.splitter_mode}")
+
+    @property
+    def reply_mode(self) -> ReplyMode:
+        return self.config.reply_mode
+
+    @reply_mode.setter
+    def reply_mode(self, mode: Union[str, ReplyMode]):
+        if isinstance(mode, str):
+            mode = ReplyMode(mode)
+        self.config.reply_mode = mode
+
+    @property
+    def delay_between_messages(self) -> float:
+        return self.config.delay_simple
+
+    @delay_between_messages.setter
+    def delay_between_messages(self, delay: float):
+        self.config.delay_simple = delay
+
+    @property
+    def delay_before_first_message(self) -> float:
+        return self.config.delay_before_first_message
+
+    @delay_before_first_message.setter
+    def delay_before_first_message(self, delay: float):
+        self.config.delay_before_first_message = delay
+
+    async def send_messages(self, messages: list[str], user_message: Message):
+        if self.delay_mode == DelayMode.NONE:
+            for message in messages:
+                if self.reply_mode == ReplyMode.reply:
+                    await reply_safe(user_message, message)
+                else:
+                    await answer_safe(user_message, message)
+        elif self.delay_mode == DelayMode.SIMPLE:
+            await asyncio.sleep(self.delay_before_first_message)
+            for message in messages:
+                if self.reply_mode == ReplyMode.reply:
+                    await reply_safe(user_message, message)
+                else:
+                    await answer_safe(user_message, message)
+                await asyncio.sleep(self.delay_between_messages)
+        else:
+            raise NotImplementedError("Delay mode not implemented")
+
+    async def generate_response(self, input_text: str, user_id: int, attachments: list):
+        return await aquery_llm_text(
+            prompt=input_text,
+            user=user_id,
+            attachments=attachments,
+            model=self.model,
+            system_message=self.system_message,
+        )
+
+    # todo: streaming_main_loop
+    # def split_message_streaming
