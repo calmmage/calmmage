@@ -5,23 +5,27 @@ from botspot.core.bot_manager import BotManager
 from calmlib.utils import setup_logger
 from loguru import logger
 from router import router
+from _app import App
 
 # Initialize bot and dispatcher
 dp = Dispatcher()
 dp.include_router(router)
 
-bot = Bot(
-    token=app.config.telegram_bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML)
-)
 
 
 def main():
     setup_logger(logger)
+
+    app = App()
+
+    bot = Bot(
+        token=app.config.telegram_bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+    )
+
     # Setup bot manager with basic components
     bm = BotManager(bot=bot)
     bm.setup_dispatcher(dp)
 
-    app = App()
     dp["app"] = app
 
     # Start polling
