@@ -42,6 +42,7 @@ async def chat_handler(message: Message, app: App):
     response = await aquery_llm_text(
         prompt = input_text,
         user = message.from_user.id,
+        attachments = attachments,
     )
 
     await send_safe(message.chat.id, response)
