@@ -1,2 +1,4 @@
 botspot>=0.4.0
 calmlib>=1.0.11
+# markdown>=3.5.2
+mistune>=3.1.3

@@ -7,6 +7,10 @@ from aiogram.types import Message
 from botspot.llm_provider import aquery_llm_text
 from botspot.utils import answer_safe, reply_safe
 from pydantic_settings import BaseSettings
+import random
+from loguru import logger
+from botspot.utils import typing_status
+from utils import markdown_to_html
 
 
 class SplitterMode(Enum):
@@ -58,11 +62,20 @@ class AppConfig(BaseSettings):
     model: str = "claude-3.7"
     # model = Field(default="gpt-4o", choices=supported_models)
     # splitter_mode: SplitterMode = SplitterMode.NONE
-    splitter_mode: SplitterMode = SplitterMode.SIMPLE
+    # splitter_mode: SplitterMode = SplitterMode.SIMPLE
+    splitter_mode: SplitterMode = SplitterMode.SIMPLE_IMPROVED
+    splitter_min_message_length: int = 200  # minimum message length to split
+
+    # region: markdown settings
+    convert_to_markdown: bool = (
+        False  # whether to convert messages to markdown before sending
+    )
+    # endregion: markdown settings
 
     # region: delay mode
     # delay_mode: DelayMode = DelayMode.NONE
-    delay_mode: DelayMode = DelayMode.SIMPLE
+    # delay_mode: DelayMode = DelayMode.SIMPLE
+    delay_mode: DelayMode = DelayMode.RANDOM
     delay_before_first_message: float = 0.0  # it takes time to start generating, so..
     delay_simple: float = 5.0  # delay between messages
     # todo: wire in
@@ -109,7 +122,11 @@ class App:
 
     def __init__(self, **kwargs):
         self.config = AppConfig(**kwargs)
+        logger.info(
+            f"Initialized {self.name} with model={self.model}, splitter={self.splitter_mode}, delay={self.delay_mode}"
+        )
 
+    # region: properties
     @property
     def model(self):
         return self.config.model
@@ -117,9 +134,11 @@ class App:
     @model.setter
     def model(self, model: str):
         if model not in supported_models:
+            logger.error(f"Attempted to set unsupported model: {model}")
             raise ValueError(
                 f"Model {model} is not supported. Supported models: {supported_models}"
             )
+        logger.info(f"Changing model from {self.config.model} to {model}")
         self.config.model = model
 
     @property
@@ -130,6 +149,9 @@ class App:
     def splitter_mode(self, mode: Union[str, SplitterMode]):
         if isinstance(mode, str):
             mode = SplitterMode(mode)
+        logger.info(
+            f"Changing splitter mode from {self.config.splitter_mode} to {mode}"
+        )
         self.config.splitter_mode = mode
 
     @property
@@ -140,6 +162,7 @@ class App:
     def delay_mode(self, mode: Union[str, DelayMode]):
         if isinstance(mode, str):
             mode = DelayMode(mode)
+        logger.info(f"Changing delay mode from {self.config.delay_mode} to {mode}")
         self.config.delay_mode = mode
 
     @property
@@ -147,18 +170,6 @@ class App:
         system_message = "You're a helpful assistant."
         system_message += "\n\n" + split_instructions[self.splitter_mode]
         return system_message
-
-    def split_message(self, message: str) -> list[str]:
-        if self.splitter_mode == SplitterMode.NONE:
-            return [message]
-        elif self.splitter_mode == SplitterMode.SIMPLE:
-            return message.split("\n\n")
-        elif self.splitter_mode == SplitterMode.MARKDOWN:
-            raise NotImplementedError("Markdown splitting not implemented")
-        elif self.splitter_mode == SplitterMode.STRUCTURED:
-            raise NotImplementedError("Structured splitting not implemented")
-        else:
-            raise ValueError(f"Invalid splitter mode: {self.splitter_mode}")
 
     @property
     def reply_mode(self) -> ReplyMode:
@@ -186,25 +197,138 @@ class App:
     def delay_before_first_message(self, delay: float):
         self.config.delay_before_first_message = delay
 
-    async def send_messages(self, messages: list[str], user_message: Message):
-        if self.delay_mode == DelayMode.NONE:
-            for message in messages:
-                if self.reply_mode == ReplyMode.reply:
-                    await reply_safe(user_message, message)
-                else:
-                    await answer_safe(user_message, message)
-        elif self.delay_mode == DelayMode.SIMPLE:
-            await asyncio.sleep(self.delay_before_first_message)
-            for message in messages:
-                if self.reply_mode == ReplyMode.reply:
-                    await reply_safe(user_message, message)
-                else:
-                    await answer_safe(user_message, message)
-                await asyncio.sleep(self.delay_between_messages)
+    @property
+    def delay_random_min(self) -> float:
+        return self.config.delay_random_min
+
+    @delay_random_min.setter
+    def delay_random_min(self, delay: float):
+        self.config.delay_random_min = delay
+
+    @property
+    def delay_random_max(self) -> float:
+        return self.config.delay_random_max
+
+    @delay_random_max.setter
+    def delay_random_max(self, delay: float):
+        self.config.delay_random_max = delay
+
+    # endregion: properties
+
+    # region: message splitting
+
+    def split_message(self, message: str) -> list[str]:
+        if self.splitter_mode == SplitterMode.NONE:
+            return [message]
+        elif self.splitter_mode == SplitterMode.SIMPLE:
+            return message.split("\n\n")
+        elif self.splitter_mode == SplitterMode.SIMPLE_IMPROVED:
+            return self._split_message_simple_improved(message)
+
+        elif self.splitter_mode == SplitterMode.MARKDOWN:
+            raise NotImplementedError("Markdown splitting not implemented")
+        elif self.splitter_mode == SplitterMode.STRUCTURED:
+            raise NotImplementedError("Structured splitting not implemented")
         else:
+            raise ValueError(f"Invalid splitter mode: {self.splitter_mode}")
+
+    def _split_message_simple_improved(self, message: str) -> list[str]:
+        logger.debug(
+            f"Splitting message of length {len(message)} with min_length={self.config.splitter_min_message_length}"
+        )
+        # First split by double newlines
+        parts = message.split("\n\n")
+        logger.debug(f"Initial split produced {len(parts)} parts")
+
+        # Combine parts that are too short
+        messages = []
+        current_message = ""
+
+        for part in parts:
+            if not current_message:
+                current_message = part
+            elif len(current_message) <= self.config.splitter_min_message_length:
+                # Add the part with double newline separator
+                current_message += "\n\n" + part
+                logger.debug(f"Combined part, new length: {len(current_message)}")
+            else:
+                # Current message is long enough, save it and start new one
+                messages.append(current_message)
+                logger.debug(f"Added message of length {len(current_message)}")
+                current_message = part
+
+        # Don't forget to add the last message if it exists
+        if current_message:
+            messages.append(current_message)
+            logger.debug(f"Added final message of length {len(current_message)}")
+
+        logger.info(f"Final split produced {len(messages)} messages")
+        return messages
+
+    # endregion: message splitting
+
+    async def send_messages(self, messages: list[str], user_message: Message):
+        logger.info(
+            f"Sending {len(messages)} messages with delay_mode={self.delay_mode}"
+        )
+
+        if self.config.convert_to_markdown:
+            messages = [markdown_to_html(msg) for msg in messages]
+
+        if self.delay_mode == DelayMode.NONE:
+            for i, message in enumerate(messages, 1):
+                logger.debug(f"Sending message {i}/{len(messages)}")
+                if self.reply_mode == ReplyMode.reply:
+                    await reply_safe(user_message, message)
+                else:
+                    await answer_safe(user_message, message)
+
+        elif self.delay_mode == DelayMode.SIMPLE:
+            logger.debug(
+                f"Waiting {self.delay_before_first_message}s before first message"
+            )
+            async with typing_status(user_message.chat.id):
+                await asyncio.sleep(self.delay_before_first_message)
+
+            for i, message in enumerate(messages, 1):
+                logger.debug(f"Sending message {i}/{len(messages)}")
+                if self.reply_mode == ReplyMode.reply:
+                    await reply_safe(user_message, message)
+                else:
+                    await answer_safe(user_message, message)
+                logger.debug(
+                    f"Waiting {self.delay_between_messages}s before next message"
+                )
+                async with typing_status(user_message.chat.id):
+                    await asyncio.sleep(self.delay_between_messages)
+
+        elif self.delay_mode == DelayMode.RANDOM:
+            logger.debug(
+                f"Waiting {self.delay_before_first_message}s before first message"
+            )
+            # set status to typing
+            async with typing_status(user_message.chat.id):
+                await asyncio.sleep(self.delay_before_first_message)
+
+            for i, message in enumerate(messages, 1):
+                logger.debug(f"Sending message {i}/{len(messages)}")
+                if self.reply_mode == ReplyMode.reply:
+                    await reply_safe(user_message, message)
+                else:
+                    await answer_safe(user_message, message)
+                delay = random.uniform(self.delay_random_min, self.delay_random_max)
+                logger.debug(f"Waiting {delay:.2f}s before next message")
+                async with typing_status(user_message.chat.id):
+                    await asyncio.sleep(delay)
+        else:
+            logger.error(f"Unsupported delay mode: {self.delay_mode}")
             raise NotImplementedError("Delay mode not implemented")
 
     async def generate_response(self, input_text: str, user_id: int, attachments: list):
+        logger.info(f"Generating response for user {user_id} with model {self.model}")
+        logger.debug(
+            f"Input text length: {len(input_text)}, attachments: {len(attachments)}"
+        )
         return await aquery_llm_text(
             prompt=input_text,
             user=user_id,
