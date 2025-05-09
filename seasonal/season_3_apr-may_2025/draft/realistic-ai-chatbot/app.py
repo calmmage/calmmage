@@ -1,15 +1,15 @@
 import asyncio
+import random
 from enum import Enum
 from textwrap import dedent
 from typing import Union
 
 from aiogram.types import Message
 from botspot.llm_provider import aquery_llm_text
-from botspot.utils import answer_safe, reply_safe
-from pydantic_settings import BaseSettings
-import random
+from botspot.utils import answer_safe, reply_safe, typing_status
 from loguru import logger
-from botspot.utils import typing_status
+from pydantic_settings import BaseSettings
+
 from utils import markdown_to_html
 
 
@@ -78,7 +78,6 @@ class AppConfig(BaseSettings):
     delay_mode: DelayMode = DelayMode.RANDOM
     delay_before_first_message: float = 0.0  # it takes time to start generating, so..
     delay_simple: float = 5.0  # delay between messages
-    # todo: wire in
     delay_random_min: float = 0.0  # minimum delay between messages
     delay_random_max: float = 10.0  # maximum delay between messages
     # endregion: delay mode

@@ -1,8 +1,3 @@
-- [x] basic chat
-- [x] media support
-- [x] add main feature: splitting the ai response into parts
-    - [x] add (randomized?) delay between messages
-    - [x] add custom formatting instructions for system prompt - e.g. split formatting mode
 
 - [x] a - just split in the end 
 - [ ] b - streaming (technical - but still send in the end..)
@@ -26,10 +21,11 @@
   - [x] simple improved
   - [ ] markdown
   - [ ] structured
-- [ ] split messages streaming
-  - [ ] Just wire it - so that it at least works at all.. (None mode
 - [ ] delay messages (e.g. send_out_messages) feature
-  - [x] Just wire it - so that it at least works at all.. (None mode
+  - [x] Just wire it - so that it at least works at all.. (None mode)
+
+- [ ] split messages streaming
+  - [ ] Just wire it - so that it at least works at all.. (None mode)
 
 Next main improvement idea:
 - support the interaction where user writes to the chatbot also in multiple messages - potentially writing in the middle of next message without waiting for response to finish...
@@ -39,7 +35,7 @@ Next main improvement idea:
 
 # more small todos
 - [ ] for 'typing' status also add a delay without 'typing' - somehow... 
-- [ ] add markdown / html formatting to responses
+- [x] add markdown / html formatting to responses
 
 
 ## Settings
@@ -61,3 +57,15 @@ How to implement?
 - [ ] add some way to limit money exposure
   - idea 1: custom anthorpic / openai key with limit on $
   - idea 2: what is my status on 'trial mode limits'? 
+
+
+
+
+
+## Done
+
+- [x] basic chat
+- [x] media support
+- [x] add main feature: splitting the ai response into parts
+    - [x] add (randomized?) delay between messages
+    - [x] add custom formatting instructions for system prompt - e.g. split formatting mode

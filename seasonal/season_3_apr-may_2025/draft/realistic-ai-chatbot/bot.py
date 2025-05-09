@@ -4,8 +4,9 @@ from aiogram.enums import ParseMode
 from botspot.core.bot_manager import BotManager
 from calmlib.utils import setup_logger
 from loguru import logger
+
+from app import App
 from router import router
-from _app import App
 
 # Initialize bot and dispatcher
 dp = Dispatcher()

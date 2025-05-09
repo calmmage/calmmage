@@ -1,6 +1,7 @@
+import re
+
 import mistune
 from mistune.renderers.html import HTMLRenderer
-import re
 
 
 def is_html(text: str) -> bool:

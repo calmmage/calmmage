@@ -1,11 +1,11 @@
-from _app import App
 from aiogram import Router
 from aiogram.filters import Command, CommandStart
-from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
+from aiogram.types import Message
 from botspot import commands_menu
 from botspot.utils import send_safe
-from _app import supported_models
+
+from app import App, supported_models
 
 router = Router()
 
@@ -73,7 +73,8 @@ async def set_splitter_mode_handler(message: Message, app: App, state: FSMContex
     """Basic help command handler"""
 
     from botspot.user_interactions import ask_user_choice
-    from _app import SplitterMode
+
+    from app import SplitterMode
 
     choices = [mode.value for mode in SplitterMode]
     response = await ask_user_choice(
@@ -95,7 +96,8 @@ async def set_delay_mode_handler(message: Message, app: App, state: FSMContext):
     """Basic help command handler"""
 
     from botspot.user_interactions import ask_user_choice
-    from _app import DelayMode
+
+    from app import DelayMode
 
     choices = [mode.value for mode in DelayMode]
     response = await ask_user_choice(
