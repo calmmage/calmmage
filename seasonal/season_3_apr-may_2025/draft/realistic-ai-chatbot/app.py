@@ -11,6 +11,12 @@ from pydantic_settings import BaseSettings
 
 from utils import markdown_to_html
 
+from botspot.components.data.user_data import User
+
+class UserSettings(User):
+    # todo: move from AppSettings and wire in
+    model: str = "claude-3.7"
+
 
 class SplitterMode(Enum):
     """Mode for splitting messages"""
