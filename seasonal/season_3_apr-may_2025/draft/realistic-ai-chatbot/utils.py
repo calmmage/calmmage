@@ -4,9 +4,31 @@ import re
 
 
 def is_html(text: str) -> bool:
-    """Check if text contains HTML tags."""
+    """Check if text contains HTML tags, ignoring tags inside code blocks."""
+    # First split by code blocks
+    parts = []
+    in_code_block = False
+    current_part = []
+
+    for line in text.split("\n"):
+        if line.startswith("```"):
+            if in_code_block:
+                # End of code block
+                parts.append("".join(current_part))
+                current_part = []
+            in_code_block = not in_code_block
+            continue
+
+        if not in_code_block:
+            current_part.append(line + "\n")
+
+    # Add any remaining text
+    if current_part:
+        parts.append("".join(current_part))
+
+    # Check for HTML tags only in non-code parts
     html_pattern = re.compile(r"<[^>]+>")
-    return bool(html_pattern.search(text))
+    return any(bool(html_pattern.search(part)) for part in parts)
 
 
 def markdown_to_html(text: str) -> str:
