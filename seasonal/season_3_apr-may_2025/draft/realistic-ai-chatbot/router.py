@@ -23,29 +23,6 @@ async def help_handler(message: Message, app: App):
     await send_safe(message.chat.id, f"This is {app.name}. Use /start to begin.")
 
 
-# @commands_menu.botspot_command("help", "Show this help message")
-# @router.message(Command("help"))
-@router.message()
-async def chat_handler(message: Message, app: App):
-    """Basic help command handler"""
-    # await send_safe(message.chat.id, f"This is {app.name}. Use /start to begin.")
-
-    input_text = message.text or message.caption
-    assert input_text is not None
-    assert message.from_user is not None
-
-    # todo: support captions and media
-    from botspot.utils.unsorted import get_message_attachments
-
-    attachments = get_message_attachments(message)
-
-    response = await app.generate_response(
-        input_text, message.from_user.id, attachments
-    )
-    messages = app.split_message(response)
-    await app.send_messages(messages, message)
-
-
 @commands_menu.botspot_command("set_model", "Set the model")
 @router.message(Command("set_model"))
 async def set_model_handler(message: Message, app: App, state: FSMContext):
@@ -111,3 +88,32 @@ async def set_delay_mode_handler(message: Message, app: App, state: FSMContext):
         return
     app.delay_mode = response
     await send_safe(message.chat.id, f"Delay mode set to {response}")
+
+
+# @commands_menu.botspot_command("help", "Show this help message")
+# @router.message(Command("help"))
+@router.message()
+async def chat_handler(message: Message, app: App):
+    """Basic help command handler"""
+    # await send_safe(message.chat.id, f"This is {app.name}. Use /start to begin.")
+
+    input_text = message.text or message.caption
+    assert input_text is not None
+    assert message.from_user is not None
+
+    # todo: support captions and media
+    from botspot.utils.unsorted import get_message_attachments
+
+    attachments = get_message_attachments(message)
+
+    response = await app.generate_response(
+        input_text, message.from_user.id, attachments
+    )
+    result = ""
+    async for chunk in response:
+        result += chunk
+        # messages = app.split_message(result)
+        # await app.send_messages(messages, message)
+
+    messages = app.split_message(result)
+    await app.send_messages(messages, message)

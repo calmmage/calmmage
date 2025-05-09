@@ -76,7 +76,7 @@ class TelegramHTMLRenderer(HTMLRenderer):
 
     def paragraph(self, text):
         """Render paragraphs as plain text with newlines."""
-        return f"{text}\n\n"
+        return f"{text}\n"
 
     def linebreak(self):
         """Render line breaks as newlines."""
@@ -84,11 +84,11 @@ class TelegramHTMLRenderer(HTMLRenderer):
 
     def thematic_break(self):
         """Render horizontal rules as newlines."""
-        return "\n\n"
+        return "\n"
 
     def list(self, text, ordered, **attrs):
         """Render lists as plain text with newlines."""
-        return f"{text}\n\n"
+        return f"{text}\n"
 
     def list_item(self, text, **attrs):
         """Render list items as plain text with bullet points."""

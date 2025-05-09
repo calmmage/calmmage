@@ -1,13 +1,10 @@
 # Todos
 
 - [x] a - just split in the end 
-- [ ] b - streaming (technical - but still send in the end..)
+- [x] b - streaming (technical - but still send in the end..)
 - [ ] c - streaming + send as you go
 - [x] d - 'reply safe / answer safe'
 
-- [ ] add model selection command / menu
-  - [x] use model for querying
-  - [ ] add a command - model picker (with ask_user_choice util)
 - [ ] add history - accumulate messages for user
   - [ ] improve - rotate out extra context on timeout
   - [ ] option 1: in-memory
@@ -27,12 +24,16 @@
 - [ ] split messages streaming
   - [ ] Just wire it - so that it at least works at all.. (None mode)
 
-Next main improvement idea:
+---
+
+## Next main improvement idea:
 
 - support the interaction where user writes to the chatbot also in multiple messages - potentially writing in the middle of next message without waiting for response to finish...
 - [ ] idea 1: maintain a shared message -> response (chat) history and use it across processes
 - [ ] idea 2: stop responding to a previous message (interrupt) when new one arrives
 - [ ] automatically activate 'reply' mode when this happens - otherwise, use 'answer' by default
+
+---
 
 ## more small todos
 
@@ -42,10 +43,14 @@ Next main improvement idea:
   - we can try to use multi-message mode for that
   - configure the ... somehow? 
 
+---
+
 ## Settings
 
 - [ ] Implement a web-app settings with slider (e.g. for 'delay between messages' variable
 - [ ] Implement a basic 'settings' component for botspot, that gets a list of variables, setters, and gives user a nice menu / ui for setting them all (e.g. commands, ask_user_choice etc.)
+
+---
 
 ## Next cool feature
 
@@ -57,6 +62,8 @@ How to implement?
 - Idea 2: Ask AI to generate when to try to activate next
   - Still sanity-check
 
+---
+
 ## One more feature
 
 "Think a little more" feature
@@ -66,10 +73,20 @@ How to implement?
 -> evaluate if the new thought is worth sharing
 -> if not, just ignore it
 
+---
+
 ## And one more
 
 - emulate 'being offline' - be online in random time during the day
 - (unique for each user)
+
+---
+
+## Make bot more human
+
+- make responses proportional in length to original request
+
+---
 
 ## Release
 
@@ -78,6 +95,7 @@ How to implement?
   - idea 1: custom anthorpic / openai key with limit on $
   - idea 2: what is my status on 'trial mode limits'? 
 
+---
 
 ## Done
 
@@ -86,3 +104,7 @@ How to implement?
 - [x] add main feature: splitting the ai response into parts
     - [x] add (randomized?) delay between messages
     - [x] add custom formatting instructions for system prompt - e.g. split formatting mode
+
+- [x] add model selection command / menu
+  - [x] use model for querying
+  - [x] add a command - model picker (with ask_user_choice util)

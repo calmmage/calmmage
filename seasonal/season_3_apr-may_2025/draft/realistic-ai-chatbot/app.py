@@ -3,9 +3,8 @@ import random
 from enum import Enum
 from textwrap import dedent
 from typing import Union
-
+from botspot.llm_provider import astream_llm
 from aiogram.types import Message
-from botspot.llm_provider import aquery_llm_text
 from botspot.utils import answer_safe, reply_safe, typing_status
 from loguru import logger
 from pydantic_settings import BaseSettings
@@ -325,7 +324,8 @@ class App:
         logger.debug(
             f"Input text length: {len(input_text)}, attachments: {len(attachments)}"
         )
-        return await aquery_llm_text(
+
+        return astream_llm(
             prompt=input_text,
             user=user_id,
             attachments=attachments,
