@@ -14,7 +14,7 @@ dp.include_router(router)
 
 
 def main():
-    setup_logger(logger)
+    setup_logger(logger, level="DEBUG")
 
     app = App()
 

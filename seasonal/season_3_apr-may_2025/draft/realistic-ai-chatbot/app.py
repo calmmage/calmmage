@@ -66,11 +66,8 @@ class AppConfig(BaseSettings):
     splitter_mode: SplitterMode = SplitterMode.SIMPLE_IMPROVED
     splitter_min_message_length: int = 200  # minimum message length to split
 
-    # region: markdown settings
-    convert_to_markdown: bool = (
-        False  # whether to convert messages to markdown before sending
-    )
-    # endregion: markdown settings
+    # whether to convert messages to markdown before sending
+    convert_to_markdown: bool = True
 
     # region: delay mode
     # delay_mode: DelayMode = DelayMode.NONE
