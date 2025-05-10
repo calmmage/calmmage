@@ -1,38 +1,61 @@
+import asyncio
+from enum import Enum
+from typing import Optional, Dict, Any, Union
 
+from pydantic import BaseModel
+from botspot.utils import get_scheduler
+
+
+class ActivationType(Enum):
+    generate_message = "generate_message"
+    send_message = "send_message"
+
+
+class Activation(BaseModel):
+    timestamp: float
+    activation_type: ActivationType
+    user_id: int
+    data: Optional[Dict[str, Any]] = None
+    job_id: Optional[str] = None
 
 
 class ChatCoordinator:
-    """
-    Chat Coorinator class keeps track of all messages and interactions with the user
-    and ensures that we send messages at appropriate moments and with the understanding of full context
-
-    The main goal is to simulate real human-like behavior of the chat-bot
-
-    Here are desired features:
-    - "accumulation" when user writes a message - when user writes us, wait a little
-    - "offline mode" - have periods of down-time, do not respond, then respond after
-    - "another thought" - after user stopped sending messages, think a little more and write something
-    - random activations
-        - about old conversation topics
-        - just 'how are you doing'
-        - some proacive new ideas
-    - "interruption" - what happens when user interrupts us while we are still responding to a previous message?
-
-    How we are going to implement this:
-    - Incoming queue for incoming messages
-    - Outgoing queue for outgoing messages
-    - Activation queue for activation events
-    - main loop that look at all the queues and fixes the state just in case..
-
-    processing of incoming and outgoing messages only happens in activation events
-
-    Basic example:
-    -> User sends us a message
-    -> we intend to respond at timestamp x. we create an activation event at timestamp x
-    -> scheduler runs the job at timestamp x - activation
-    -> activation looks at the state of the queues, if no new messages arrived - we proceed as planned
-    if new messages - re-evaluate, based on their timestamp and other contextual info
-    """
     def __init__(self):
+        self.scheduler = get_scheduler()
+
+        self.incoming_message_queue = asyncio.Queue()
+        self.outgoing_message_queue = asyncio.Queue()
+
+    def _schedule_activation(
+        self,
+        activation_time: float,
+        activation_type: Union[str, ActivationType],
+        user_id: int,
+        data: Optional[Dict[str, Any]] = None,
+    ):
+        if isinstance(activation_type, str):
+            activation_type = ActivationType(activation_type)
+        activation = Activation(
+            timestamp=activation_time,
+            activation_type=activation_type,
+            user_id=user_id,
+            data=data,
+        )
+        self.scheduler.add_job(
+            self._handle_activation, "date", run_date=activation_time, args=[activation]
+        )
+
+    def _handle_activation(self, activation: Activation):
+        if activation.activation_type == ActivationType.generate_message:
+            self._handle_generate_message(activation)
+        elif activation.activation_type == ActivationType.send_message:
+            self._handle_send_message(activation)
+
+    def _handle_generate_message(self, activation: Activation):
+        # todo: check if there are new messages from the user and there is a future
+        # todo: check if the messages from user are already being processed by another activation
+
         pass
 
+    def _handle_send_message(self, activation: Activation):
+        pass
