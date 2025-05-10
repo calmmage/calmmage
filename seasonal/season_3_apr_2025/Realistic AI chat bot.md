@@ -1,1 +1,0 @@
-Idea - Simple: I want AI chat bot responses to feel like human. How can I achieve that? 
