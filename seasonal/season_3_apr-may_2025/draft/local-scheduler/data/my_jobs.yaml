@@ -1,0 +1,9 @@
+jobs:
+  - name: "Hello World"
+    script_path: "/Users/petrlavrov/work/projects/calmmage/seasonal/season_3_apr-may_2025/draft/local-scheduler/examples/target_job.py"
+    # args:
+    #   - "Hello World"
+    env_file: "/Users/petrlavrov/work/projects/calmmage/seasonal/season_3_apr-may_2025/draft/local-scheduler/examples/.env"
+  - name: "Print env and sys path"
+    script_path: "/Users/petrlavrov/work/projects/calmmage/seasonal/season_3_apr-may_2025/draft/local-scheduler/examples/print_env_and_sys_path.py"
+    env_file: "/Users/petrlavrov/work/projects/calmmage/seasonal/season_3_apr-may_2025/draft/local-scheduler/examples/.env"
