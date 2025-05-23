@@ -1,3 +1,7 @@
+# Todos
+
+## Plan
+
 - a - Download audio
 - b - Cut audio in-place (profile memory?)
 - c - Parse audio with whisper

@@ -19,7 +19,7 @@ def main():
     app = App()
 
     bot = Bot(
-        token=app.config.telegram_bot_token,
+        token=app.config.telegram_bot_token.get_secret_value(),
         default=DefaultBotProperties(parse_mode=ParseMode.HTML),
     )
 
