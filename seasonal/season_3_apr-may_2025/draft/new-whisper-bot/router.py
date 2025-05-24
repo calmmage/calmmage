@@ -3,11 +3,13 @@ from app import App
 from aiogram import Router, F
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message
-from botspot import commands_menu
+from botspot import commands_menu, reply_safe
 from botspot.utils import send_safe
 from loguru import logger
-from botspot.utils.unsorted import get_message_attachments
 from pathlib import Path
+import psutil
+import threading
+import time
 
 router = Router()
 
@@ -51,13 +53,82 @@ def get_file_info(attachment):
     return file_name, mime_type
 
 
+def monitor_process_memory(process, interval=5.0):
+    """Monitor memory usage of a process and its children"""
+    memory_stats = []
+
+    def monitor():
+        try:
+            while process.poll() is None:  # While process is running
+                try:
+                    # Get memory info for main process
+                    memory_info = process.memory_info()
+
+                    # Get memory info for all children
+                    children_memory = 0
+                    try:
+                        psutil_process = psutil.Process(process.pid)
+                        for child in psutil_process.children(recursive=True):
+                            try:
+                                children_memory += child.memory_info().rss
+                            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                                pass
+                    except (psutil.NoSuchProcess, psutil.AccessDenied):
+                        pass
+
+                    total_memory_mb = (memory_info.rss + children_memory) / 1024 / 1024
+                    system_memory = psutil.virtual_memory()
+
+                    stats = {
+                        "timestamp": time.time(),
+                        "process_memory_mb": memory_info.rss / 1024 / 1024,
+                        "children_memory_mb": children_memory / 1024 / 1024,
+                        "total_memory_mb": total_memory_mb,
+                        "system_available_mb": system_memory.available / 1024 / 1024,
+                        "system_used_percent": system_memory.percent,
+                    }
+                    memory_stats.append(stats)
+
+                    logger.info(
+                        f"Memory: Process={stats['process_memory_mb']:.1f}MB, "
+                        f"Children={stats['children_memory_mb']:.1f}MB, "
+                        f"Total={stats['total_memory_mb']:.1f}MB, "
+                        f"System={stats['system_used_percent']:.1f}%"
+                    )
+
+                except Exception as e:
+                    logger.warning(f"Error monitoring memory: {e}")
+
+                time.sleep(interval)
+        except Exception as e:
+            logger.error(f"Memory monitoring thread error: {e}")
+
+    monitor_thread = threading.Thread(target=monitor, daemon=True)
+    monitor_thread.start()
+    return memory_stats
+
+
 def convert_video_to_audio(video_path: Path) -> Path:
-    """Convert video file to mp3 using ffmpeg, in-place, minimal memory usage."""
+    """Convert video file to mp3 using ffmpeg with memory monitoring."""
     import subprocess
 
     audio_path = video_path.with_suffix(".mp3")
+
+    # Log initial system memory state
+    system_memory = psutil.virtual_memory()
+    logger.info(
+        f"Starting conversion. System memory: {system_memory.used / 1024 / 1024:.1f}MB used "
+        f"({system_memory.percent:.1f}%), {system_memory.available / 1024 / 1024:.1f}MB available"
+    )
+
+    # Log file size
+    file_size_mb = video_path.stat().st_size / 1024 / 1024
+    logger.info(f"Input file size: {file_size_mb:.1f}MB")
+
     logger.info(f"Converting {video_path} to {audio_path} using ffmpeg...")
-    result = subprocess.run(
+
+    # Start ffmpeg process
+    process = subprocess.Popen(
         [
             "ffmpeg",
             "-y",
@@ -66,13 +137,70 @@ def convert_video_to_audio(video_path: Path) -> Path:
             "-vn",
             "-acodec",
             "libmp3lame",
+            "-ab",
+            "128k",  # Set bitrate for more predictable output size
             str(audio_path),
         ],
-        capture_output=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
     )
-    if result.returncode != 0:
-        logger.error(f"ffmpeg failed: {result.stderr.decode()}")
-        raise RuntimeError(f"ffmpeg failed: {result.stderr.decode()}")
+
+    # Start memory monitoring
+    memory_stats = monitor_process_memory(process, interval=2.0)
+
+    # Wait for completion
+    start_time = time.time()
+    stdout, stderr = process.communicate()
+    end_time = time.time()
+
+    processing_time = end_time - start_time
+
+    if process.returncode != 0:
+        logger.error(f"ffmpeg failed: {stderr.decode()}")
+        raise RuntimeError(f"ffmpeg failed: {stderr.decode()}")
+
+    # Log final statistics
+    output_size_mb = audio_path.stat().st_size / 1024 / 1024
+    final_system_memory = psutil.virtual_memory()
+
+    if memory_stats:
+        max_memory = max(stat["total_memory_mb"] for stat in memory_stats)
+        avg_memory = sum(stat["total_memory_mb"] for stat in memory_stats) / len(
+            memory_stats
+        )
+
+        logger.info(f"Conversion completed in {processing_time:.1f}s")
+        logger.info(
+            f"Memory usage - Peak: {max_memory:.1f}MB, Average: {avg_memory:.1f}MB"
+        )
+        logger.info(
+            f"File sizes - Input: {file_size_mb:.1f}MB, Output: {output_size_mb:.1f}MB"
+        )
+        logger.info(f"Compression ratio: {output_size_mb/file_size_mb:.2f}")
+
+        # Estimate for 4-hour files
+        if processing_time > 0:
+            time_ratio = processing_time / (file_size_mb / 1024)  # seconds per GB
+            logger.info(
+                f"Performance: {time_ratio:.1f}s processing time per GB of input"
+            )
+
+            # Estimate for 4-hour video (assuming ~1GB per hour for decent quality)
+            estimated_4h_size_gb = 4.0
+            estimated_4h_processing_time = time_ratio * estimated_4h_size_gb
+            estimated_4h_memory_mb = max_memory * (
+                estimated_4h_size_gb / (file_size_mb / 1024)
+            )
+
+            logger.info(
+                f"4-hour file estimates: ~{estimated_4h_processing_time/60:.1f} minutes processing, "
+                f"~{estimated_4h_memory_mb:.0f}MB peak memory"
+            )
+
+    logger.info(
+        f"System memory after conversion: {final_system_memory.used / 1024 / 1024:.1f}MB used "
+        f"({final_system_memory.percent:.1f}%)"
+    )
     logger.info(f"Audio saved to {audio_path}")
     return audio_path
 
@@ -82,73 +210,9 @@ async def media_downloader_handler(message: Message, app: App, state: FSMContext
     logger.info(
         f"media_downloader_handler: received message {message.message_id} from chat {message.chat.id}"
     )
-    attachments = get_message_attachments(message)
-    logger.info(f"Extracted attachments: {attachments}")
-    if not attachments:
-        logger.warning("No attachments found in message!")
-        await send_safe(message.chat.id, "No media found in your message.")
-        return
-    if len(attachments) > 1:
-        logger.warning(f"More than one attachment found: {attachments}")
-    attachment = attachments[0]
-    logger.info(f"Selected attachment: {attachment}")
 
-    # from botspot.utils.deps_getters import get_telethon_client
+    # Use the app's run method to process the media
+    transcription = await app.run(message.message_id, message.from_user.id)
+    # logger.info(f"Transcription completed successfully: {transcription[:100]}...")
 
-    # from telethon import TelegramClient
-    # telethon_bot_client = TelegramClient(
-    #     api_id=,
-    #     api_hash=,
-    #     token=
-    # )
-
-    # it seems... I will have to use pyrogram?! What the fuck...
-
-    # telethon_client = await get_telethon_client(user_id=message.from_user.id, state=state)
-    # telethon_message = await telethon_client.get_messages(message.bot.id, ids=message.message_id)
-    #
-    # logger.info(f"telethon_message: {telethon_message}")
-    #
-    # file_bytes = await download_telegram_file(attachment, message=message, user=message.from_user, state=state)
-    file_name, mime_type = get_file_info(attachment)
-    # logger.info(f"Downloaded file: {file_name}, mime_type: {mime_type}")
-    save_path = SAMPLE_DATA_DIR / file_name
-    # with open(save_path, "wb") as f:
-    #     f.write(file_bytes.read())
-    # logger.info(f"File saved to {save_path}")
-    # # If video, convert to audio
-    # if mime_type and mime_type.startswith("video"):
-    #     try:
-    #         audio_path = convert_video_to_audio(save_path)
-    #         logger.info(f"Video converted to audio: {audio_path}")
-    #     except Exception as e:
-    #         logger.error(f"Failed to convert video to audio: {e}")
-    # await send_safe(message.chat.id, f"Downloaded file: {file_name}, type: {mime_type}, saved to {save_path}")
-
-    # let's do a simple thing
-    import pyrogram
-    from botspot import get_dependency_manager
-
-    deps = get_dependency_manager()
-    pyrogram_client = pyrogram.Client(
-        "telegram_downloader",
-        api_id=deps.botspot_settings.telethon_manager.api_id,
-        api_hash=deps.botspot_settings.telethon_manager.api_hash.get_secret_value(),
-        bot_token=app.config.telegram_bot_token.get_secret_value(),
-    )
-
-    username = message.from_user.username
-    message_id = message.message_id
-
-    async def main(pyrogram_client):
-        async with pyrogram_client:
-            pyrogram_message = await pyrogram_client.get_messages(
-                username, message_ids=message_id
-            )
-            result = await pyrogram_message.download(file_name=save_path)
-        # print(target_path)
-
-    pyrogram_client.run(main(pyrogram_client))
-
-    # logger.info(f"pyrogram_message: {pyrogram_message}")
-    logger.info(f"save_path: {save_path}")
+    await reply_safe(message, transcription)
