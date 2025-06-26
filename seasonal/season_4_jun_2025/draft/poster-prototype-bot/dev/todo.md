@@ -1,25 +1,25 @@
 
-- [ ] Queue component
-  - [ ] enable botspot mongodb
-  - [ ] enable botspot queue
-  - [ ] import botspot queue
-  - [ ] create botspot queue
-  - [ ] add item to botspot queue
-  - [ ] override botspot queue item type - pydantic whatever
-    - [ ] import
-    - [ ] inherit
-    - [ ] pass to constructor
+- [x] Queue component
+  - [x] enable botspot mongodb
+  - [x] enable botspot queue
+  - [x] import botspot queue
+  - [x] create botspot queue
+  - [x] add item to botspot queue
+  - [x] override botspot queue item type - pydantic whatever
+    - [x] import
+    - [x] inherit
+    - [x] pass to constructor
 
 - [ ] receive message from user handler
   - [ ] implementation 1: forward
   - [ ] implementation 2: manual sender - use 
-  - [ ] bonus: use Mark's features
+  - [ ] bonus: use Mark's features - picture and title generation
 
 - [ ] send message to channel handler
 
 - [ ] Add title generation flow and picture generation flow
 - [ ] Add formatting niceities
-  - [ ] @author in the end? 
+  - [ ] @author in the end?
   - [ ] Visual separators / highlights / pleasantries? 
 
 

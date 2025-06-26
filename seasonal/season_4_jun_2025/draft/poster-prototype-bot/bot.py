@@ -13,6 +13,11 @@ dp = Dispatcher()
 dp.include_router(router)
 
 
+def on_startup(dispatcher):
+    app = dispatcher["app"]
+    app.schedule_posts()
+
+
 def main():
     setup_logger(logger)
 
@@ -30,7 +35,7 @@ def main():
     dp["app"] = app
 
     # Start polling
-    dp.run_polling(bot)
+    dp.run_polling(bot, on_startup=on_startup)
 
 
 if __name__ == "__main__":
