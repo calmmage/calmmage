@@ -19,7 +19,7 @@ class AppConfig(BaseSettings):
     telegram_bot_token: str
     post_channel_id: int
     scheduling_mode: SchedulingMode = SchedulingMode.PERIOD
-    scheduling_period_minutes: int = 60
+    scheduling_period_seconds: int = 60
     scheduling_cron_expr: Optional[str] = None
 
     class Config:
@@ -31,12 +31,16 @@ class AppConfig(BaseSettings):
     def check_cron_expr_if_cron(self):
         if self.scheduling_mode == SchedulingMode.CRON:
             if not self.scheduling_cron_expr:
-                raise ValueError("scheduling_cron_expr must be set when scheduling_mode is CRON")
+                raise ValueError(
+                    "scheduling_cron_expr must be set when scheduling_mode is CRON"
+                )
             # Validate cron expression
             try:
                 croniter(self.scheduling_cron_expr)
             except Exception as e:
-                raise ValueError(f"Invalid cron expression: {self.scheduling_cron_expr}. Error: {e}")
+                raise ValueError(
+                    f"Invalid cron expression: {self.scheduling_cron_expr}. Error: {e}"
+                )
         return self
 
 
@@ -99,17 +103,22 @@ class App:
         if records:
             item = records[0]  # Get the oldest item
             from botspot.utils import send_safe
+
             await send_safe(channel_id, item["data"])
             await self.queue.collection.update_one(
                 {"_id": item["_id"]},
-                {"$set": {
-                    "posted": True,
-                    "posted_channel_id": channel_id,
-                    "posted_at": datetime.now()
-                }}
+                {
+                    "$set": {
+                        "posted": True,
+                        "posted_channel_id": channel_id,
+                        "posted_at": datetime.now(),
+                    }
+                },
             )
         else:
+            # send to the user a notification that there are no items in the queue to post
             from botspot.utils import send_safe
+
             await send_safe(channel_id, "No items in queue to post.")
 
     def schedule_posts(self):
@@ -117,16 +126,16 @@ class App:
         if self.config.scheduling_mode == SchedulingMode.PERIOD:
             self.scheduler.add_job(
                 func=self.post_from_queue,
-                trigger='interval',
-                minutes=self.config.scheduling_period_minutes,
+                trigger="interval",
+                seconds=self.config.scheduling_period_seconds,
                 args=[self.config.post_channel_id],
-                id='post_from_queue'
+                id="post_from_queue",
             )
         elif self.config.scheduling_mode == SchedulingMode.CRON:
             self.scheduler.add_job(
                 func=self.post_from_queue,
-                trigger='cron',
+                trigger="cron",
                 args=[self.config.post_channel_id],
-                id='post_from_queue',
-                cron=self.config.scheduling_cron_expr
+                id="post_from_queue",
+                cron=self.config.scheduling_cron_expr,
             )
