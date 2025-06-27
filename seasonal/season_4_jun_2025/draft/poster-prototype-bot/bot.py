@@ -2,11 +2,11 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from botspot.core.bot_manager import BotManager
-from calmlib.utils import setup_logger
+from calmlib.utils.logging_utils import setup_logger, LogMode
 from loguru import logger
 from router import router
 
-from app import App
+from app import App, PosterBotUser
 
 # Initialize bot and dispatcher
 dp = Dispatcher()
@@ -15,11 +15,11 @@ dp.include_router(router)
 
 def on_startup(dispatcher):
     app = dispatcher["app"]
-    app.schedule_posts()
+    app.schedule_posts_on_startup()
 
 
 def main():
-    setup_logger(logger)
+    setup_logger(logger, mode=LogMode.CUSTOM)
 
     app = App()
 
@@ -29,13 +29,14 @@ def main():
     )
 
     # Setup bot manager with basic components
-    bm = BotManager(bot=bot)
+    bm = BotManager(bot=bot, user_class=PosterBotUser)
     bm.setup_dispatcher(dp)
 
     dp["app"] = app
+    dp.startup.register(on_startup)
 
     # Start polling
-    dp.run_polling(bot, on_startup=on_startup)
+    dp.run_polling(bot)
 
 
 if __name__ == "__main__":

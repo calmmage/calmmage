@@ -38,3 +38,30 @@ Test?
 - [ ] ... non-dev - on cron / ... regularly
 
 ## Phase 3 - reminders when queue is close to empty
+
+
+## Misc / extra
+
+- [x] add nice logger config
+  - [x] find it. calmlib? botspot?
+  - [x] setup_logger. init_logger. config_logger
+
+## Dump ideas
+
+- [ ] Notify the user when the post was posted
+  - [x] Save user id to the queue? 
+  - [ ] Save list of users and access it - from bot users (if bot user enabled)
+  - [ ] Tell the user / log how many posts remain in the queue
+
+- [ ] implement smart queue item picker
+
+
+## Move all features to the Queue Manager component
+
+1) Queue with / without repetition
+  - add a switch as a queue config
+  - save queue info to somewhere? (metadata)
+  - get_random_item method (pop?)
+  - with repetition: 
+2) Queue with / without priority
+3) 

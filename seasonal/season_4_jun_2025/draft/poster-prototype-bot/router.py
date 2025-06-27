@@ -40,3 +40,19 @@ async def message_handler(message: Message, app: App):
     await send_safe(
         message.chat.id, f"Saved to queue. Currenlty in queue: {len(total_queue_items)}"
     )
+
+
+@commands_menu.botspot_command("start_autopost", "Enable auto-posting")
+@router.message(Command("start_autopost"))
+async def start_autopost_handler(message: Message, app: App):
+    """Enable auto-posting for the user"""
+    await app.activate_user(message.from_user.id)
+    await message.answer("Auto-posting enabled!")
+
+
+@commands_menu.botspot_command("stop_autopost", "Disable auto-posting")
+@router.message(Command("stop_autopost"))
+async def stop_autopost_handler(message: Message, app: App):
+    """Disable auto-posting for the user"""
+    await app.deactivate_user(message.from_user.id)
+    await message.answer("Auto-posting disabled!")
