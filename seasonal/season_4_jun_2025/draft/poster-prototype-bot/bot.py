@@ -19,9 +19,10 @@ async def on_startup(dispatcher):
 
 
 def main():
-    setup_logger(logger, mode=LogMode.CUSTOM)
-
     app = App()
+    setup_logger(
+        logger, mode=LogMode.CUSTOM, level="DEBUG" if app.config.debug else "INFO"
+    )
 
     bot = Bot(
         token=app.config.telegram_bot_token,
