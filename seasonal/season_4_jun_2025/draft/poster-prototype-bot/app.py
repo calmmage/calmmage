@@ -1,4 +1,6 @@
 from enum import Enum
+from types import NoneType
+from typing import Any
 from pydantic_settings import BaseSettings
 from botspot.components.new.queue_manager import create_queue, QueueItem
 from botspot.components.main.event_scheduler import get_scheduler
@@ -64,7 +66,6 @@ class PosterBotQueueItem(QueueItem):
     posted: bool = False
     posted_channel_id: Optional[int] = None
     posted_at: Optional[datetime] = None
-    # text: str
     # todo: readiness - enum
     # todo: topic(s) - set of enums
 
@@ -102,50 +103,17 @@ class App:
         item = PosterBotQueueItem(data=text)
         await self.queue.add_item(item, user_id=user_id)
 
-    # async def post_from_queue(self, channel_id: int):
-    #     """Post the oldest item from the queue to the specified channel."""
-    #
-    #     # todo:
-    #
-    #     # todo: implement a special method that picks the item to be posted
-    #     #  a) just random
-    #     #  b) make sure post is ready (for this channel - for when we add multiple channels)
-    #     #  c) make sure post is not already posted (to this channel - for when we add multiple channels)
-    #     logger.debug(f"Attempting to post from queue to channel {channel_id}")
-    #     records = await self.queue.get_records()
-    #     logger.debug(f"Queue records fetched: {len(records)} items")
-    #     if records:
-    #         item = records[0]  # Get the oldest item
-    #         logger.info(f"Posting item to channel {channel_id}: {item}")
-    #         from botspot.utils import send_safe
-    #         await send_safe(channel_id, item["data"])
-    #         await self.queue.collection.update_one(
-    #             {"_id": item["_id"]},
-    #             {
-    #                 "$set": {
-    #                     "posted": True,
-    #                     "posted_channel_id": channel_id,
-    #                     "posted_at": datetime.now(),
-    #                 }
-    #             },
-    #         )
-    #         logger.info(f"Marked item as posted in DB: id={item['_id']}")
-    #     else:
-    #         logger.info(f"No items in queue to post for channel {channel_id}")
-    #         from botspot.utils import send_safe
-    #         await send_safe(channel_id, "No items in queue to post.")
-
     async def get_users(self) -> list[PosterBotUser]:
         from botspot.utils import get_user_manager
 
         user_manager = get_user_manager()
         return await user_manager.get_users()
 
-    def schedule_posts_on_startup(self):
+    async def schedule_posts_on_startup(self):
         """Schedule posting from queue at regular intervals or cron."""
 
         # go over all existing users and schedule posting job if they have auto-posting enabled
-        users = self.get_users()
+        users = await self.get_users()
 
         for user in users:
             if user.auto_posting_enabled:
@@ -162,7 +130,12 @@ class App:
         """
         Schedule a posting job for a user based on their settings.
         """
+        assert user.scheduling_mode is not None, "Scheduling mode is not set for user"
+
         if user.scheduling_mode == SchedulingMode.PERIOD:
+            assert user.scheduling_period_seconds is not None, "Scheduling period is not set for user"
+
+            logger.debug(f"Scheduling user {user.user_id} to post every {user.scheduling_period_seconds} seconds")
             self.scheduler.add_job(
                 func=self.post_content_job,
                 trigger="interval",
@@ -171,6 +144,9 @@ class App:
                 id=f"post_content_job_{user.user_id}",
             )
         elif user.scheduling_mode == SchedulingMode.CRON:
+            assert user.scheduling_cron_expr is not None, "Scheduling cron expression is not set for user"
+
+            logger.debug(f"Scheduling user {user.user_id} to post with cron {user.scheduling_cron_expr}")
             self.scheduler.add_job(
                 func=self.post_content_job,
                 trigger="cron",
@@ -178,35 +154,16 @@ class App:
                 id=f"post_content_job_{user.user_id}",
                 cron=user.scheduling_cron_expr,
             )
+        else:
+            raise ValueError(f"Invalid scheduling mode: {user.scheduling_mode}")
 
-    def get_default_user_config(self):
-        return dict(
-            target_channel_id=self.config.post_channel_id,
-            scheduling_mode=self.config.scheduling_mode,
-            scheduling_period_seconds=self.config.scheduling_period_seconds,
-            scheduling_cron_expr=self.config.scheduling_cron_expr,
-        )
-
-    # async def _get_user(self, user_id: int) -> PosterBotUser:
-    #     # TODO: fetch user from user manager
-    #     # If user config is not initialized, call self.initialize_user(user_id)
-    #     # For now, always initialize with defaults
-    #     return await self.initialize_user(user_id)
-    #
-    # async def _initialize_user(self, user_id: int) -> PosterBotUser:
-    #     # TODO: ask user for settings (cron schedule, etc) via bot conversation
-    #     # For now, populate all values with defaults from AppConfig
-    #     defaults = self.get_default_user_config()
-    #     user = PosterBotUser(user_id=user_id, auto_posting_enabled=True, **defaults)
-    #     # TODO: save user to db
-    #     return user
 
     async def post_content_job(self, user_id: int):
         """
         A job that runs on a schedule for a particular user.
         """
 
-        user = await self._get_user(user_id)
+        user = await self.get_user(user_id)
 
         post = await self._pick_post_from_queue(user_id)
         channel_id = user.target_channel_id
@@ -250,20 +207,53 @@ class App:
         """
         Activate a user.
         """
+        logger.info(f"Activating user {user_id}")
         # todo: 0) check if user has all the settings specified. if not - launch the setup flow
+        await self.update_user_field(user_id, "auto_posting_enabled", True)
         user = await self.get_user(user_id)
-        user.auto_posting_enabled = True
-
-        await self.update_user(user)
+        
         self._schedule_user_posting_job(user)
 
     async def deactivate_user(self, user_id: int):
         """
         Deactivate a user.
         """
-        # user = await self._get_user(user_id)
-        # user.auto_posting_enabled = False
-        # await self._save_user(user)
-        # todo: 1) disable the flag
-        # todo: 2) cancel the job
-        raise NotImplementedError
+        logger.info(f"Deactivating user {user_id}")
+        await self.update_user_field(user_id, "auto_posting_enabled", False)
+        # todo: check if user has a job scheduled. if so - cancel it.
+        self._cancel_user_posting_job(user_id)
+        
+    def _cancel_user_posting_job(self, user_id: int):
+        """
+        Cancel the posting job for a user.
+        """
+        self.scheduler.remove_job(f"post_content_job_{user_id}")
+    
+    async def get_user(self, user_id: int) -> PosterBotUser:
+        from botspot.utils import get_user_manager
+        user_manager = get_user_manager()
+        user = await user_manager.get_user(user_id)
+        assert isinstance(user, PosterBotUser), f"User {user_id} is not a PosterBotUser"
+        return user
+
+    async def update_user_field(self, user_id: int, field: str, value: Any):
+        from botspot.utils import get_user_manager
+        user_manager = get_user_manager()
+        await user_manager.update_user(user_id, field, value)
+
+
+    def get_default_user_config(self):
+        return dict(
+            target_channel_id=self.config.post_channel_id,
+            scheduling_mode=self.config.scheduling_mode,
+            scheduling_period_seconds=self.config.scheduling_period_seconds,
+            scheduling_cron_expr=self.config.scheduling_cron_expr,
+        )
+
+    # async def _initialize_user(self, user_id: int) -> PosterBotUser:
+    #     # TODO: ask user for settings (cron schedule, etc) via bot conversation
+    #     # For now, populate all values with defaults from AppConfig
+    #     defaults = self.get_default_user_config()
+    #     user = PosterBotUser(user_id=user_id, auto_posting_enabled=True, **defaults)
+    #     # TODO: save user to db
+    #     return user

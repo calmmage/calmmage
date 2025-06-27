@@ -13,9 +13,9 @@ dp = Dispatcher()
 dp.include_router(router)
 
 
-def on_startup(dispatcher):
+async def on_startup(dispatcher):
     app = dispatcher["app"]
-    app.schedule_posts_on_startup()
+    await app.schedule_posts_on_startup()
 
 
 def main():
