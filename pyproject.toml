@@ -20,8 +20,9 @@ dependencies = [
     "typer[all]>=0.9.0",
     "tqdm",
     "loguru",
-    "calmlib @ git+https://github.com/calmmage/calmlib.git@main",
-    "botspot @ git+https://github.com/calmmage/botspot.git@main",
+    # "calmlib @ git+https://github.com/calmmage/calmlib.git@main",
+    "calmlib @ {root:uri}/calmlib",
+#    "botspot @ git+https://github.com/calmmage/botspot.git@main",
     "PyGithub",
     "python-dotenv",
     "gitpython",
@@ -46,26 +47,26 @@ dependencies = [
     "markdown<4.0,>=3.8",
     "mistune<4.0.0,>=3.1.3",
     "pyrogram<3.0.0,>=2.0.106",
-
-#easydict = ">=1.10"
-#fastapi = "*"
-#fastui = "*"
-#pyperclip = "*"
-#pytest = "*"
-#tqdm = "*"
-#matplotlib = "*"
-#numpy = "*"
-#pandas = "*"
-#seaborn = "*"
-#ipykernel = "*"
-#ipywidgets = "*"
-#joblib = "*"
-#retry = "*"
-#pyperclip = "*"
-#paramiko = "*"
-#scp = "*"
-#pymorphy2 = "*"
-#langchain = "*"
+    #easydict = ">=1.10"
+    #fastapi = "*"
+    #fastui = "*"
+    #pyperclip = "*"
+    #pytest = "*"
+    #tqdm = "*"
+    #matplotlib = "*"
+    #numpy = "*"
+    #pandas = "*"
+    #seaborn = "*"
+    #ipykernel = "*"
+    #ipywidgets = "*"
+    #joblib = "*"
+    #retry = "*"
+    #pyperclip = "*"
+    #paramiko = "*"
+    #scp = "*"
+    #pymorphy2 = "*"
+    #langchain = "*"
+    "croniter>=6.0.0",
 ]
 
 [project.urls]

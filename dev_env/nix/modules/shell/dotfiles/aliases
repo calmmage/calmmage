@@ -1,0 +1,129 @@
+# tools 
+# Alias for repo fixer tool
+# alias fix_repo="$STABLE_DEV_ENV_DIR/.venv/bin/typer $DEV_ENV_PATH/tools/repo_fixer/repo_fixer.py run"
+alias fix_repo="typer $STABLE_DEV_ENV_DIR/dev_env/tools/repo_fixer/repo_fixer.py run"
+
+# Add an alias to update dev-env
+alias update-dev-env='python3 $STABLE_DEV_ENV_DIR/tools/dev_env_updater.py'
+
+# alias help="echo \"$HELP\""
+# open code with sublime
+#alias subl='open -a Sublime\ Text'
+#this is created instead by ln -s "/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl" /usr/local/bin/subl
+# open dir with vscode
+alias code='open -a Visual\ Studio\ Code'
+
+# alias ghc="gh copilot"
+# Explain with github CLI copilot
+alias aie="gh copilot explain"
+# Suggestions with github CLI copilot
+alias ais="gh copilot suggest"
+# alias ai-help="gh copilot explain"
+# Suggest shell command with github CLI copilot
+alias ai="gh copilot suggest -t shell"
+
+# move path and add backlink from old location to new
+alias mva=move_and_link
+
+# find project in the projects dir
+alias fp_=find_project
+alias ff=find_file
+
+# find text in file
+# alias find_=find_what_where
+alias find=rg
+
+# cdr prj -> cd *p*r*j*; See also: cdf
+alias cdr='nocorrect change_dir_regexp'
+# lsr abc -> ls *a*b*c*
+alias lsr='nocorrect list_dir_regexp'
+# cdf prj -> cd if is_substring(prj, dir). Fails on multi-match; See also: cdf
+alias cdf='nocorrect change_dir_fuzzy'
+# use z to cd (tool from Kostya that remembers dirs)
+alias cdz='z'
+
+# add alias to ~/.alias - aa name "command mommand" "Description and examples"
+alias aa='add_alias'
+alias at='add_tool'
+
+# copy absolute path of the current dir
+alias cpa="copy_absolute_path"
+
+# run python script with $DEV_ENV_PATH poetry environment
+alias runp="run_with_poetry"
+
+alias lnsafe="runp $STABLE_DEV_ENV_DIR/dev_env/tools/lnsafe.py"
+# alias lnsafe="python $STABLE_DEV_ENV_DIR/dev_env/tools/lnsafe.py"
+# todo: can I make it so this is unnecessary?
+alias typer=$STABLE_VENV_PATH/bin/typer
+alias ipython=$STABLE_VENV_PATH/bin/ipython
+# todo: need a script that runs and checks in the start of bashrc if $STABLE_DEV_ENV_DIR is set and warn if not
+# typer_path = "$STABLE_DEV_ENV_DIR/bin/typer"
+# new_project_tool_path = "$STABLE_DEV_ENV_DIR/dev/draft/mvp/project_manager.py"
+# # lines_to_add = [
+# #     f"alias typer='{typer_path}'",
+# #     f"alias new_project='typer {new_project_tool_path}'"
+# alias np='typer $DEV_ENV_PATH/dev/draft/mvp/project_manager.py'
+# alias new_project='np'
+alias np="typer $STABLE_DEV_ENV_DIR/dev_env/tools/project_manager/pm_cli.py run new-project"
+alias nmp="typer $STABLE_DEV_ENV_DIR/dev_env/tools/project_manager/pm_cli.py run new-mini-project"
+alias fp="typer $STABLE_DEV_ENV_DIR/dev_env/tools/project_discoverer/pd_cli.py run"
+alias pm="typer $STABLE_DEV_ENV_DIR/dev_env/tools/project_manager/pm_cli.py run"
+
+alias nt="typer $STABLE_DEV_ENV_DIR/dev_env/tools/project_manager/pm_cli.py run new-todo"
+alias nf="typer $STABLE_DEV_ENV_DIR/dev_env/tools/project_manager/pm_cli.py run new-feature"
+
+alias js='typer $ACTIVE_DEV_ENV_DIR/tools/job_scheduler/job_manager_client.py run'
+
+# Connect to the Hetzner instance
+alias hetzner="ssh root@5.75.226.237"
+
+# alias gcu="(gcloud compute ssh --zone "europe-west1-b" "instance-default-mar-2023"  --project "jarvis-mar-2022-pub")"
+# todo: create free tier aws instance
+
+# alias to view / zshrc / aliases
+alias sa="subl ~/.aliases"
+alias sz="subl ~/.zshrc"
+alias ca="cursor ~/.aliases"
+alias cz="cursor ~/.zshrc"
+
+# # aliases for calmmage
+# alias sca="subl ~/.calmmage/.alias"
+# alias scz="subl ~/.calmmage/.zshrc"
+# alias cca="cursor ~/.calmmage/.alias"
+# alias ccz="cursor ~/.calmmage/.zshrc"
+
+# aliases for past projects dir
+# alias cd4="cd ~/work/seasonal/past"
+# alias cdh="cd ~/work/seasonal/past"
+
+# Open foam knowledge management
+# alias foam="code ~/work/code/seasonal/2024_01_jan/calmmage/calmmage/personal_website/pages/calmmage_knowledge_base/"
+
+# 
+# alias pkm="code ~/work/code/structured/tools/calmmage/calmmage/personal_website/pages/calmmage_knowledge_base/"
+
+# Code searcher - open vault with all my code snippets in pycharm
+# alias cs="pycharm ~/work/code/structured/tools/code-searcher"
+
+# export PM=~/work/code/structured/tools/calmmage/calmmage/dev_env/tools/project_manager.py
+# export PM=~/.calmmage/project_manager.py
+
+# export CM=~/work/code/structured/tools/calmmage/
+# alias cm="cd $CM"
+# export CMD=~/work/code/structured/dev/calmmage-dev/
+# alias cmd="cd $CMD"
+# export CL=~/work/code/structured/lib/calmlib
+# alias cl="cd $CL"
+# export CLD=~/work/code/structured/dev/calmlib-dev/
+# alias cld="cd $CLD"
+
+# Connect to the EF Hetzner instance
+alias hetzner-ef="ssh root@37.27.46.129"
+# Connect to the coolify v4 instance
+alias hetzner-2="ssh root@49.13.91.131"
+
+alias ma=myalias
+# sort projects based on config.yaml groups
+alias sort_projects="typer $STABLE_DEV_ENV_DIR/dev_env/tools/project_arranger/cli.py run sort"
+

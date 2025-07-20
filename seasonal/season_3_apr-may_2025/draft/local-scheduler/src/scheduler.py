@@ -28,8 +28,8 @@ class Scheduler:
         self.mongo_conn_str = mongo_conn_str
         self._telegram_bot_token = telegram_bot_token
         self.telegram_chat_id = telegram_chat_id
-
         self.check_local_mongo()
+        self.mongo_client = MongoClient(self.mongo_conn_str)
 
     @property
     def telegram_bot_token(self) -> str:
@@ -74,8 +74,12 @@ class Scheduler:
 
     def run_all_jobs_once(self):
         results = []
+        db = self.mongo_client["scheduler"]
+        collection = db["job_logs"]
         for job in self.jobs_list:
             res = self.run_job(job)
+            # Log to MongoDB
+            collection.insert_one(res.model_dump())
             results.append(res)
         return results
 

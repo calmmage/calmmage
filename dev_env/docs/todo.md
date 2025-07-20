@@ -1,0 +1,1 @@
+- [ ] Document the solutions for the rest of the main scenarios

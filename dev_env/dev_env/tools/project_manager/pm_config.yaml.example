@@ -1,0 +1,16 @@
+# # Project Manager Configuration
+
+# # Project creation settings
+# experiments_destination: "experiments"  # Key in destinations registry
+# mini_projects_destination: "calmmage-private"  # For private mini-projects
+# public_mini_projects_destination: "calmmage"  # For public mini-projects
+
+# # Feature creation settings
+# features_subfolder: "dev/draft"  # relative to project root
+
+# # Todo creation settings
+# todo_subfolder: "dev"  # relative to project root
+# todo_filename_template: "todo_%d_%b.md"  # e.g. todo_17_Nov.md
+
+# # Editor settings
+default_editor: "subl"

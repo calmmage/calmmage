@@ -1,0 +1,14 @@
+{
+  "python_script_plugin": {
+    "title": "Python Script Plugin",
+    "description": "Runs a Python script with custom parameters",
+    "binary": "/Users/petrlavrov/work/projects/calmmage/seasonal/season_4_jun_2025/draft/try-cronicle/cronicle_plugin/run-python-job.py",
+    "params": {
+      "script_path": { "type": "string", "desc": "Path to Python script", "required": 1 },
+      "python_exec": { "type": "string", "desc": "Path to Python executable", "required": 0 },
+      "env_file": { "type": "string", "desc": "Path to .env file", "required": 0 },
+      "cli_args": { "type": "string", "desc": "CLI kwargs/flags", "required": 0 }
+      "user": { "type": "string", "desc": "User to run the job from", "required": 0 }
+    }
+  }
+}

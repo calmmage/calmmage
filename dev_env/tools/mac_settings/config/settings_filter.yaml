@@ -1,0 +1,51 @@
+# Settings that we want to track and understand
+interesting:
+  # Domains to track entirely
+  domains:
+    - com.apple.dock  # Track all dock settings
+    - com.apple.finder  # Track all finder settings
+    
+  # Specific keys to track
+  keys:
+    com.apple.systempreferences:
+      - ShowAllMode
+    
+    com.apple.HIToolbox:
+      - AppleSelectedInputSources
+      - AppleCurrentKeyboardLayoutInputSourceID
+    
+    com.apple.controlcenter:
+      - "NSStatusItem Visible NowPlaying"
+      - "NSStatusItem Visible Battery"
+      - "NSStatusItem Visible WiFi"
+      - "NSStatusItem Visible Sound"
+      - "NSStatusItem Visible Clock"
+    
+    com.apple.WindowManager:
+      - HideDesktop
+      - AutoHide
+      - StageManagerHideWidgets
+      - StandardHideWidgets
+      - AppWindowGroupingBehavior
+
+# Settings we know are unimportant
+boring:
+  # Domains to ignore entirely
+  domains:
+    - com.apple.java.util.prefs
+    - jetbrains.jetprofile.asset
+    - com.apple.CharacterPicker
+  
+  # Specific keys to ignore
+  keys:
+    com.apple.AdLib:
+      - allowIdentifierForAdvertising
+    
+    com.apple.AppleMediaServices:
+      - AMSStorefrontSuffixes
+    
+    com.apple.WindowManager:
+      - HasDisplayedShowDesktopEducation
+    
+    com.apple.systemsettings.extensions:
+      - state-indexing done

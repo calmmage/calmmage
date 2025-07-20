@@ -1,0 +1,168 @@
+[tool.poetry]
+name = "dev-env"
+version = "0.3.7"
+description = ""
+authors = ["Petr Lavrov <calmmage@gmail.com>"]
+readme = "README.md"
+packages=[
+    { include = "dev_env", from = "." },
+]
+
+
+[tool.poetry.dependencies]
+python = ">=3.12,<4.0"
+loguru = ">=0.7"
+# for parsing version
+toml = ">=0.10"
+python-dotenv = "*"
+
+calmlib = { git = "https://github.com/calmmage/calmlib.git", branch = "main" }
+botspot = { git = "https://github.com/calmmage/botspot.git", branch = "main" }
+telegram-downloader = { git = "https://github.com/calmmage/telegram-downloader.git", branch = "main" }
+
+# git ops
+PyGithub = "*"              # GitHub API client
+gitpython = "*"             # Git repository interface
+
+#python-telegram-bot = "^21.4"
+pyrogram = {git = "https://github.com/KurimuzonAkuma/pyrogram", branch = "master"}
+##tgcrypto = "^1.2.5"
+##mtprotocrypt = "*"
+aiogram = "*"
+
+typer-cli = {version =  "0.13.1", extras = ["all"]}
+pyperclip = "^1.9.0"
+nest-asyncio = "^1.6.0"
+fastapi = "^0.115.12"
+uvicorn = "^0.34.1"
+cronitor = "^4.7.1"
+
+[tool.poetry.group.extras.dependencies]
+# dependencies for extra features
+
+# Main
+## Pydantic
+pydantic = ">=2"            # Data validation and settings management
+pydantic-settings = ">=2"   # Pydantic settings management
+
+
+# api
+fastapi = "*"               # High-performance API framework
+##httpx = "*"                 # Async HTTP client
+#
+## cli
+##click = "*"                 # CLI creation toolkit
+##typer = "*"                 # Easy CLI building
+#
+## data, databases
+pymongo = "*"                 # MongoDB client
+motor = "*"                   # MongoDB async client
+##mongoengine = "*"            # MongoDB ORM
+##PyDrive = "*"                # Google Drive API client
+#protobuf = "*"               # Protocol buffers
+##dropbox = "*"                # Dropbox API client
+#
+## utils
+pytz = "*"                  # Timezone definitions
+##retry = "*"                 # Retry decorator
+#nltk = "*"                  # Natural language toolkit
+##easydict = ">=1.10"         # Easy access to dict keys - dotdict
+#pydub = ">=0.25"             # Audio manipulation
+apscheduler = ">=3"         # Scheduling library
+pyperclip = "*"              # Copying to clipboard
+#aiolimiter = ">=1.1"         # Async rate limiting
+deepl = ">=1.18"             # DeepL API client
+#
+## LLM, GPT, AI
+##tiktoken = ">=0.7"            # Tokenization for OpenAI models
+openai = ">=1.45"             # OpenAI API client
+langchain = ">=0.3"            # Language model framework
+langchain-openai = ">=0.2"     # OpenAI integration for LangChain
+langchain-community = "*"      # Community extensions for LangChain
+langchain-anthropic = ">=0.2"  # Anthropic integration for LangChain
+#langfuse = "*"                 # Language model analytics
+##assemblyai = "*"              # Speech-to-text API
+##whisperx = { git = "https://github.com/m-bain/whisperX.git", branch = "main" }  # Advanced Whisper model
+#
+## Misc
+##ipykernel = "*"             # IPython kernel
+##ipywidgets = "*"            # Interactive widgets for Jupyter
+##joblib = "*"                # Lightweight pipelining
+##paramiko = "*"              # SSH2 protocol library
+##scp = "*"                   # Secure copy
+##pymorphy2 = "*"             # Morphological analyzer
+#
+[tool.poetry.group.test.dependencies]
+pytest = ">=6"
+pytest-mongodb = "*"
+pytest-cov = "^6.0.0"
+black = {extras = ["jupyter"], version = "^24.10.0"}
+vulture = "^2.13"
+flake8 = "^7.1.1"
+flake8-docstrings = "^1.7.0"
+flake8-bugbear = "^24.10.31"
+flake8-comprehensions = "^3.16.0"
+flake8-simplify = "^0.21.0"
+isort = "^6"
+pyupgrade = "^3.19.0"
+freezegun = "^1.5.1"
+
+#[tool.poetry.group.docs.dependencies]
+##mkdocs = ">=1.6"
+pytest-asyncio = "^0.26.0"
+pytest-mock = "^3.14.0"
+pyright = "^1.1.400"
+ruff = "^0.11.9"
+
+[tool.poetry.group.dev.dependencies]
+## dev / research utils
+jupyter = ">=1.0.0"          # Interactive notebooks
+##jupyter-nbextensions-configurator = "*"
+##jupyter_contrib_nbextensions = "*"
+black = ">=24.0.0"           # Code formatter
+pre-commit = ">=3.8.0"       # Pre-commit hooks
+tqdm = "*"                   # Progress bars
+poetry-bumpversion = "*"
+#
+### data analysis, research
+pandas = ">=2.0.0"          # Data manipulation and analysis
+#seaborn = "*"               # Statistical data visualization
+##bokeh = "*"                 # Interactive visualizations
+#matplotlib = "*"            # Plotting library
+#numpy = "*"                 # Numerical computing
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[template]
+version = "0.2.4"  # update python version because of langchain
+url = "https://github.com/calmmage/python-project-template.git"
+author = "Petr Lavrov <petrlavrov@calmmage.com>"
+description = "A template for creating a bot using calmapp and bot-lib"
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 100
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+skip = [".git", "venv", ".env", "__pycache__"]
+# known_first_party = ["your_package_name"]  # Replace with your package name
+# known_third_party = [
+#     "aiogram",
+#     "fastapi",
+#     "pydantic",
+#     "pytest",
+#     "tqdm",
+#     "loguru"
+# ]
+# sections = [
+#     "FUTURE",
+#     "STDLIB",
+#     "THIRDPARTY",
+#     "FIRSTPARTY",
+#     "LOCALFOLDER"
+# ]

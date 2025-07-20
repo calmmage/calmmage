@@ -1,0 +1,88 @@
+# Global destinations configuration
+settings:
+  projects_root: "~/work"
+
+destinations:
+  experiments:
+    name: "experiments"
+    path: "experiments"
+    type: "main"
+    description: "New projects and prototypes"
+    features:
+      - "New projects and prototypes"
+      - "Recent experiments (< 30 days old)"
+      - "Small projects under active development"
+
+  projects:
+    name: "projects"
+    path: "projects"
+    type: "main"
+    description: "Main active projects"
+    features:
+      - "Production-ready code"
+      - "Actively maintained repositories"
+      
+  archive:
+    name: "archive"
+    path: "archive"
+    type: "main"
+    description: "Archived projects"
+    features:
+      - "Projects that have been stale for a bit"
+
+  calmmage-private:
+    name: "calmmage-private"
+    path: "projects/calmmage-private"
+    type: "repo"
+    description: "Private mini-projects and quick experiments"
+    features:
+      - "Private experiments"
+      - "Work in progress"
+      - "Sensitive code"
+
+  calmmage:
+    name: "calmmage"
+    path: "projects/calmmage"
+    type: "repo"
+    description: "Public mini-projects and examples"
+    features:
+      - "Public personal projects"
+      - "Cool tech demos"
+
+  examples:
+    name: "examples"
+    path: "projects/examples"
+    type: "repo"
+    description: "Finished tech demos and examples"
+    features:
+      - "Minimal working examples for known libraries"
+      - "My own libraries usage examples"
+
+  botspot:
+    name: "botspot"
+    path: "projects/botspot"
+    type: "library"
+    description: "Telegram bot utilities and components"
+    features:
+      - "Bot-related features"
+      - "Telegram bot components"
+      - "Bot utilities"
+
+  calmlib:
+    name: "calmlib"
+    path: "projects/calmlib"
+    type: "library"
+    description: "Shared utilities and libraries"
+    features:
+      - "Core utility libraries"
+      - "Shared functionality"
+
+  dev-env:
+    name: "dev-env"
+    path: "projects/dev-env"
+    type: "library"
+    description: "Dev env setup and tools"
+    features:
+      - "Nix setup"
+      - "Python tools"
+      - "Shell configs and aliases"

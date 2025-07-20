@@ -1,0 +1,32 @@
+{
+  "publish": {
+    "title": "Wiki"
+  },
+  "inbox": {
+    "title": "Foam Inbox",
+    "display": "hidden"
+  },
+  "todo": {
+    "title": "Foam To Do",
+    "display": "hidden"
+  },
+  "readme": {
+    "title": "Foam Readme",
+    "display": "hidden"
+  },
+  "getting-started": {
+    "title": "Foam Tutorial",
+    "display": "hidden"
+  },
+  "docs": {
+    "title": "Foam Docs"
+  },
+  ".foam": {
+    "title": "Foam Templates",
+    "display": "hidden"
+  },
+  "calmmage_wiki": {
+    "title": "Unsorted",
+    "display": "hidden"
+  }
+}

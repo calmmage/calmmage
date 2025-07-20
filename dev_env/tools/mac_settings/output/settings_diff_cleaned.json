@@ -1,0 +1,768 @@
+{
+  "com.apple.AdLib": {
+    "allowIdentifierForAdvertising": {
+      "old": false,
+      "new": true
+    }
+  },
+  "com.apple.AppleMediaServices": {
+    "AMSStorefrontSuffixes": {
+      "com.apple.Music": {
+        "new": " t:musicstore1"
+      }
+    }
+  },
+  "com.apple.ServicesMenu.Services": {
+    "NSServices": {
+      "CFVendedServices": {
+        "added": [
+          {
+            "NSMenuItem": {
+              "default": "Open in Sourcetree"
+            },
+            "NSRequiredContext": {
+              "NSTextContent": "URL"
+            },
+            "NSSendTypes": [
+              "NSPasteboardTypeFileURL"
+            ],
+            "NSBundlePath": "/Applications/Sourcetree.app",
+            "NSMessage": "openInSourcetree",
+            "NSBundleIdentifier": "com.torusknot.SourceTreeNotMAS"
+          }
+        ]
+      }
+    }
+  },
+  "com.apple.WindowManager": {
+    "HasDisplayedShowDesktopEducation": {
+      "new": true
+    },
+    "EnableTopTilingByEdgeDrag": {
+      "new": false
+    },
+    "EnableTilingByEdgeDrag": {
+      "new": false
+    },
+    "EnableTilingOptionAccelerator": {
+      "new": false
+    }
+  },
+  "com.apple.controlcenter": {
+    "NSStatusItem Visible Item-7": {
+      "new": false
+    },
+    "NSStatusItem Visible FocusModes": {
+      "new": true
+    }
+  },
+  "com.apple.dock": {
+    "tilesize": {
+      "old": 67.0,
+      "new": 36.0
+    },
+    "persistent-apps": {
+      "added": [
+        {
+          "tile-data": {
+            "dock-extra": false,
+            "file-type": 41,
+            "file-data": {
+              "_CFURLStringType": 15,
+              "_CFURLString": "file:///Applications/Raycast.app/"
+            },
+            "file-label": "Raycast",
+            "bundle-identifier": "com.raycast.macos",
+            "is-beta": false
+          },
+          "tile-type": "file-tile"
+        }
+      ]
+    },
+    "magnification": {
+      "old": false,
+      "new": true
+    },
+    "largesize": {
+      "old": 16.0
+    },
+    "expose-group-apps": {
+      "new": true
+    },
+    "mru-spaces": {
+      "new": false
+    },
+    "minimize-to-application": {
+      "new": true
+    }
+  },
+  "com.apple.finder": {
+    "FXPreferredViewStyle": {
+      "new": "Nlsv"
+    },
+    "FK_DefaultIconViewSettings": {
+      "new": {
+        "backgroundColorBlue": 1.0,
+        "iconSize": 64.0,
+        "textSize": 12.0,
+        "backgroundColorRed": 1.0,
+        "backgroundType": 0,
+        "backgroundColorGreen": 1.0,
+        "gridOffsetX": 0.0,
+        "gridOffsetY": 0.0,
+        "showItemInfo": true,
+        "viewOptionsVersion": 1,
+        "arrangeBy": "name",
+        "labelOnBottom": true,
+        "showIconPreview": true,
+        "gridSpacing": 54.0
+      }
+    },
+    "FK_DefaultListViewSettings": {
+      "new": {
+        "viewOptionsVersion": 1,
+        "showIconPreview": true,
+        "columns": [
+          {
+            "visible": true,
+            "identifier": "name",
+            "ascending": true
+          },
+          {
+            "identifier": "dateModified",
+            "ascending": false,
+            "visible": false
+          },
+          {
+            "visible": false,
+            "identifier": "dateCreated",
+            "ascending": false
+          },
+          {
+            "visible": true,
+            "identifier": "size",
+            "width": 97,
+            "ascending": false
+          },
+          {
+            "visible": true,
+            "identifier": "kind",
+            "ascending": true
+          },
+          {
+            "visible": false,
+            "identifier": "label",
+            "width": 100,
+            "ascending": true
+          },
+          {
+            "visible": false,
+            "identifier": "version",
+            "width": 75,
+            "ascending": true
+          },
+          {
+            "visible": false,
+            "identifier": "comments",
+            "ascending": true
+          },
+          {
+            "visible": false,
+            "identifier": "dateLastOpened",
+            "ascending": false
+          },
+          {
+            "visible": false,
+            "identifier": "shareOwner",
+            "ascending": false
+          },
+          {
+            "visible": false,
+            "identifier": "shareLastEditor",
+            "ascending": false
+          },
+          {
+            "identifier": "dateAdded",
+            "ascending": false,
+            "visible": true
+          }
+        ],
+        "calculateAllSizes": false,
+        "textSize": 13,
+        "sortColumn": "dateAdded",
+        "iconSize": 16
+      }
+    }
+  },
+  "com.apple.java.util.prefs": {
+    "/": {
+      "jetbrains/": {
+        "marketplacedownloads_device_id": {
+          "new": "0811242f9af8e9a-63ae-46ef-bb0c-bb43aef9f69a"
+        },
+        "packagechecker_device_id": {
+          "new": "08112428558afe7-b2b5-49d5-8df8-cbb9072fabc0"
+        }
+      }
+    }
+  },
+  "com.apple.madrid": {
+    "IMCloudKitSyncJobStateKey": {
+      "old": 0,
+      "new": 1
+    },
+    "IMCloudKitSyncTypeKey": {
+      "old": 2,
+      "new": 7
+    },
+    "IMCloudKitSyncStatusKey": {
+      "old": 0,
+      "new": 1
+    }
+  },
+  "com.apple.ncprefs": {
+    "apps": {
+      "added": [
+        {
+          "grouping": 0,
+          "src": [
+            {
+              "path": "/Applications/GitHub Desktop.app",
+              "flags": 0,
+              "uuid": "F80979B5-C5BC-4A97-BC15-547967E0860D"
+            }
+          ],
+          "bundle-id": "com.github.GitHubClient",
+          "content_visibility": 0,
+          "path": "/Applications/GitHub Desktop.app",
+          "auth": 0
+        }
+      ],
+      "changed": [
+        {
+          "src": {
+            "changed": [
+              {
+                "path": {
+                  "old": "/private/var/folders/16/grmq774d2bv8w3d93rvrwfc00000gn/T/AppTranslocation/9A227F6B-7B8B-41E3-BE2C-0D80C30C8D47/d/GitHub Desktop.app",
+                  "new": "/Applications/Shottr.app"
+                },
+                "uuid": {
+                  "old": "B23833EE-9547-4E28-AB3C-26BDA20925DE",
+                  "new": "D57C26D9-D5A9-4F04-ADC1-5316F997A1EE"
+                }
+              }
+            ]
+          },
+          "bundle-id": {
+            "old": "com.github.GitHubClient",
+            "new": "cc.ffitch.shottr"
+          },
+          "path": {
+            "old": "/Applications/GitHub Desktop.app",
+            "new": "/Applications/Shottr.app"
+          }
+        }
+      ]
+    }
+  },
+  "com.apple.rapport": {
+    "familySyncedName": {
+      "old": "Petr\u2019s MacBook Pro",
+      "new": "Petr's MacBook Pro"
+    }
+  },
+  "com.apple.spaces": {
+    "SpacesDisplayConfiguration": {
+      "Management Data": {
+        "Monitors": {
+          "changed": [
+            {
+              "Current Space": {
+                "id64": {
+                  "new": 1
+                },
+                "ManagedSpaceID": {
+                  "new": 1
+                },
+                "uuid": {
+                  "old": "F3145B3D-05F7-4677-8DB2-89A61E5A46CD"
+                }
+              },
+              "Spaces": {
+                "added": [
+                  {
+                    "type": 0,
+                    "uuid": "676A4734-54A4-48DB-B134-E19F6E2ED4C2"
+                  },
+                  {
+                    "type": 0,
+                    "uuid": "952AD0E7-A5DD-4850-9773-4D0828D0373A"
+                  },
+                  {
+                    "type": 0,
+                    "uuid": "4F1CD3EB-F4BE-463A-ACA2-E31543D554C4"
+                  },
+                  {
+                    "type": 0,
+                    "uuid": "718ED48E-A363-4B1B-802D-3069400DC893"
+                  },
+                  {
+                    "type": 0,
+                    "uuid": "D82344E6-8D4B-40AD-8EFB-A77EE304B9B0"
+                  },
+                  {
+                    "type": 0,
+                    "uuid": "B194FFA2-4187-4E91-BEFE-25A386785C49"
+                  },
+                  {
+                    "type": 0,
+                    "uuid": "107DCD86-ABF7-4915-85D4-CD8050A4CFDC"
+                  },
+                  {
+                    "type": 0,
+                    "uuid": "06468150-25D9-4111-8E07-6F0A52F2F562"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "Space Properties": {
+        "added": [
+          {
+            "name": "676A4734-54A4-48DB-B134-E19F6E2ED4C2"
+          },
+          {
+            "name": "952AD0E7-A5DD-4850-9773-4D0828D0373A"
+          },
+          {
+            "name": "4F1CD3EB-F4BE-463A-ACA2-E31543D554C4"
+          },
+          {
+            "name": "718ED48E-A363-4B1B-802D-3069400DC893"
+          },
+          {
+            "name": "D82344E6-8D4B-40AD-8EFB-A77EE304B9B0"
+          },
+          {
+            "name": "B194FFA2-4187-4E91-BEFE-25A386785C49"
+          },
+          {
+            "name": "107DCD86-ABF7-4915-85D4-CD8050A4CFDC"
+          },
+          {
+            "name": "06468150-25D9-4111-8E07-6F0A52F2F562"
+          }
+        ]
+      }
+    },
+    "app-bindings": {
+      "new": {
+        "com.apple.systempreferences": "AllSpaces"
+      }
+    }
+  },
+  "com.apple.spotlightknowledge": {
+    "SpotlightKnowledgeV2": {
+      "stats": {
+        "added": [
+          "08.11.2024:text updating all done:24",
+          "08.11.2024:text processing all done:23",
+          "08.11.2024:didScoreGraph:21",
+          "08.11.2024:currentPid:8",
+          "08.11.2024:completed graph analysis:26"
+        ],
+        "removed": [
+          "08.11.2024:currentPid:2"
+        ]
+      }
+    }
+  },
+  "com.apple.symbolichotkeys": {
+    "AppleSymbolicHotKeys": {
+      "60": {
+        "enabled": {
+          "old": true,
+          "new": false
+        }
+      },
+      "61": {
+        "enabled": {
+          "old": true,
+          "new": false
+        }
+      },
+      "28": {
+        "new": {
+          "enabled": false,
+          "value": {
+            "type": "standard",
+            "parameters": [
+              51,
+              20
+            ]
+          }
+        }
+      },
+      "29": {
+        "new": {
+          "enabled": false,
+          "value": {
+            "type": "standard",
+            "parameters": [
+              51,
+              20
+            ]
+          }
+        }
+      },
+      "30": {
+        "new": {
+          "enabled": false,
+          "value": {
+            "type": "standard",
+            "parameters": [
+              52,
+              21
+            ]
+          }
+        }
+      },
+      "31": {
+        "new": {
+          "enabled": false,
+          "value": {
+            "type": "standard",
+            "parameters": [
+              52,
+              21
+            ]
+          }
+        }
+      }
+    }
+  },
+  "com.apple.systemsettings.extensions": {
+    "state-indexing done": {
+      "new": true
+    }
+  },
+  "com.apple.universalaccessAuthWarning": {
+    "3::/Applications/Shottr.app/Contents/MacOS/Shottr": {
+      "new": true
+    },
+    "3::/Applications/Shottr.app": {
+      "new": true
+    },
+    "3::cc.ffitch.shottr": {
+      "new": true
+    }
+  },
+  "com.apple.wallpaper": {
+    "SystemWallpaperURL": {
+      "old": "file:///System/Library/Desktop%20Pictures/.wallpapers/Sequoia%20Sunrise/Sequoia%20Sunrise.mov",
+      "new": "file:///Library/Application%20Support/com.apple.idleassetsd/Customer/4KSDR240FPS/6D6834A4-2F0F-479A-B053-7D4DC5CB8EB7.mov"
+    }
+  },
+  "com.raycast.macos": {
+    "store_everInstalled": {
+      "added": [
+        "6090553e-ee96-4c89-af5c-e6c60fa551ba",
+        "254a620a-7fba-450b-bc17-c2e1ce6809d8",
+        "bf72f769-a5aa-4e6f-968a-714c9dc61daf",
+        "25ea8ce6-1d26-48e2-866b-2ca1af025a74",
+        "5f2e08d5-fdf1-4171-b252-aa53065621b4",
+        "a88f2216-b02b-41bc-823b-2d5847df569a",
+        "da2ac998-edd2-49a4-8614-06b57f30f619",
+        "30370bf8-bb2c-41ad-844b-ff661ae4337a",
+        "606e26d8-b3c5-4760-8001-dccce1b872c4",
+        "cd1bf1c8-96f3-4490-bf00-2530bb47306b",
+        "2c5e16da-6d7e-4b83-8949-aba0efc9bb75",
+        "8eea1fd5-f12b-424d-bf7e-03aed827876d",
+        "a02e27d2-e48e-4960-81a6-f78b3e921ac7",
+        "e1220602-a471-440f-a89f-235b40ca10a4",
+        "b3f8cbba-a0f8-4f17-a711-0194a6f2ff4d",
+        "95d34846-4c7f-4688-abf1-a3a2e7e8f7d5",
+        "7ea70450-5cb7-42cd-8559-502727e79641",
+        "d3e7311b-4072-498b-aeb6-4da257176d80",
+        "2158713f-4712-4862-ba9a-3bce3cd07e3a",
+        "320f40ef-a633-415a-ab0e-1e99515478f7",
+        "f644e18a-985f-43ab-81e1-38beac0a76c1",
+        "eea00fc3-b147-40f7-812c-499a096c539b",
+        "88224f81-2df0-4bf1-aa09-8857d5ba06bb",
+        "32eed09d-aeed-4369-ba6a-4cac9ef2a66f",
+        "e37ade8d-84d5-4262-9cbc-376e32f55ad4",
+        "82c92be8-822f-4923-a5bc-573830b674fb",
+        "95e41a2e-a943-4d49-b0df-152c3db2f7e0",
+        "14db1a1e-3b60-415f-8e13-78b3dabde311",
+        "6d35b3a5-ae12-48b1-b5de-616a22387eae",
+        "7fc4d09a-29ee-49b2-85f4-952972f3db26",
+        "4edaed1c-db97-4891-a43e-ffd451e3eb54",
+        "7eb51bd8-9197-472f-9f06-30ccc042163e",
+        "3fe267ca-df8a-4b6d-adf6-ee6c4aa9dd1a",
+        "a5183261-1462-4200-991a-2054436f746e",
+        "2bfe94cd-50ab-4e48-a6cd-f1ff47a72706",
+        "c0adce9e-aca2-47b9-8cdc-140003e8b276",
+        "6a921dd0-e3da-4c31-81dc-437d0eaac5e0",
+        "1b1ffd81-218f-4ca0-ae2a-1c7889043e35",
+        "c59ff19f-0f2b-4241-8f3c-34903d454f40",
+        "0ad217cb-0811-4047-a586-dcd345128e83",
+        "4d1a2bc7-9a6c-4e7c-be66-5b54b3787e61",
+        "e00a9804-c047-414a-bf61-4d6701429328",
+        "b8425c46-9ad0-47ba-bc1d-f66bbf82998a",
+        "9349c6b9-c442-4895-98e3-b3a926e74ed7",
+        "4988e73c-bd17-4916-8d54-cd8d98454486",
+        "8c7fc31e-ff31-4074-ba10-4f9f9a935ff5",
+        "c9a35421-7a51-42ee-8166-4c8affec2cf4",
+        "a9696c4c-a4e8-4ff1-bf49-c9015f796200",
+        "6caa8a8c-97f5-4538-ad53-f8da9d21775c",
+        "242af3a2-77ba-402a-aca7-b7e8e791125b",
+        "d32fdb99-aab3-4059-b7b3-72454e9327cc",
+        "c460fc92-202d-49bf-b9c4-e486b58a0189",
+        "3805aee5-0254-46e8-8e76-0db24cb50b54",
+        "3467356e-f607-4589-acb4-98bb6151aebf",
+        "aed07bad-1c18-413b-852b-031d7b8dc91b",
+        "0a3cf1ce-7de6-415c-9e37-91a892d1747e"
+      ]
+    }
+  },
+  "com.segment.storage.oai": {
+    "segment.events": {
+      "old": 30,
+      "new": 31
+    }
+  },
+  "dev.warp.Warp-Stable": {
+    "AliasExpansionBannerSeen": {
+      "new": "true"
+    },
+    "ChangelogVersions": {
+      "new": "{\"v0.2024.10.29.08.02.stable_02\":true}"
+    }
+  },
+  "jetbrains.jetprofile.asset": {
+    "/jetbrains/jetprofile/asset/": {
+      "pc/": {
+        "stamp": {
+          "old": "1731060751492",
+          "new": "1731092323938"
+        },
+        "period": {
+          "old": "11369201",
+          "new": "16434468"
+        }
+      },
+      "pcwmp/": {
+        "stamp": {
+          "old": "1731063950959",
+          "new": "1731092324135"
+        },
+        "period": {
+          "new": "14620024"
+        }
+      }
+    }
+  },
+  "me.damir.dropover-mac": {
+    "NumberOfDrops": {
+      "old": 2,
+      "new": 4
+    }
+  },
+  "ru.keepcoder.Telegram": {
+    "NSNavPanelExpandedSizeForOpenMode": {
+      "new": "{800, 448}"
+    }
+  },
+  "cc.ffitch.shottr": {
+    "new": {
+      "downscaleOnSave": false,
+      "afterGrabShow": true,
+      "defaultFolder": "/Users/petr/Desktop/screenshots",
+      "NSNavPanelExpandedSizeForOpenMode": "{800, 448}",
+      "realPixels": false,
+      "captureCursor": "auto",
+      "colorFormat": "HEX",
+      "LaunchAtLogin__hasMigrated": true,
+      "thumbnailClosing": "manual",
+      "altZoomDirection": false,
+      "scrollingReverseAutoscroll": false,
+      "notificationType": "custom",
+      "afterGrabSave": false,
+      "primaryOCRLang": "en-US",
+      "saveOnEsc": true,
+      "GATelemetry": [
+        {
+          "tz": 60,
+          "dpr": 2.0,
+          "cpu": "arm64",
+          "appv": "1.8.0",
+          "dev": false,
+          "screens": 1,
+          "ageft": 0.0,
+          "type": "launch",
+          "os": "15.0.1",
+          "sid": "1ioss3wejr",
+          "build": "103",
+          "uid": "1yvkb2x9-nbci",
+          "lec": 0,
+          "zoom": 0.5,
+          "ln": "en_US@rg=chzzzz",
+          "loc": "Europe/Zurich",
+          "tier": "0"
+        },
+        {
+          "dpr": 2.0,
+          "lec": 1,
+          "uid": "1yvkb2x9-nbci",
+          "tier": "0",
+          "type": "active",
+          "dev": false,
+          "sid": "1ioss3wejr",
+          "ageft": 0.0,
+          "zoom": 0.5
+        },
+        {
+          "zoom": 0.5,
+          "uid": "1yvkb2x9-nbci",
+          "lec": 2,
+          "dpr": 2.0,
+          "tier": "0",
+          "setting": true,
+          "type": "setting-autostart",
+          "dev": false,
+          "sid": "1ioss3wejr",
+          "ageft": 0.0,
+          "method": "welcome:button"
+        },
+        {
+          "dpr": 2.0,
+          "uid": "1yvkb2x9-nbci",
+          "lec": 3,
+          "tier": "0",
+          "type": "inactive",
+          "dev": false,
+          "sid": "1ioss3wejr",
+          "ageft": 0.0,
+          "zoom": 0.5
+        },
+        {
+          "lec": 4,
+          "uid": "1yvkb2x9-nbci",
+          "dpr": 2.0,
+          "tier": "0",
+          "type": "active",
+          "dev": false,
+          "sid": "1ioss3wejr",
+          "ageft": 0.0,
+          "zoom": 0.5
+        },
+        {
+          "uid": "1yvkb2x9-nbci",
+          "lec": 5,
+          "dpr": 2.0,
+          "tier": "0",
+          "type": "inactive",
+          "dev": false,
+          "sid": "1ioss3wejr",
+          "ageft": 0.0,
+          "zoom": 0.5
+        },
+        {
+          "dpr": 2.0,
+          "lec": 6,
+          "uid": "1yvkb2x9-nbci",
+          "tier": "0",
+          "type": "quit",
+          "dev": false,
+          "sid": "1ioss3wejr",
+          "ageft": 0.0,
+          "zoom": 0.5
+        }
+      ],
+      "latestVersionURL": "https://shottr.cc/newversion.html?utm_source=update_notification",
+      "scrollingSpeed": 2,
+      "KeyboardShortcuts_reopen": "{\"carbonKeyCode\":18,\"carbonModifiers\":768}",
+      "KeyboardShortcuts_area": "{\"carbonModifiers\":768,\"carbonKeyCode\":21}",
+      "preferLargeWindow": false,
+      "NSToolbar Configuration com.apple.NSColorPanel": {
+        "TB Is Shown": 1
+      },
+      "KeyboardShortcuts_ocr": "{\"carbonKeyCode\":31,\"carbonModifiers\":6400}",
+      "areaCaptureMode": "none",
+      "copyOnEsc": false,
+      "windowSolidColor": "#404448",
+      "customBackdropColor": "#6080A0",
+      "allowTelemetry": true,
+      "customGradTo": "#919BD2",
+      "expandableCanvas": true,
+      "allowDeeplinks": true,
+      "alwaysOnTop": false,
+      "everVisitedHotkeys": true,
+      "KeyboardShortcuts_fullscreen": "{\"carbonKeyCode\":20,\"carbonModifiers\":768}",
+      "afterGrabCopy": false,
+      "ocrRemoveBreaks": false,
+      "uid": "1yvkb2x9-nbci",
+      "customGradFrom": "#221448",
+      "scrollingManualEnabled": false,
+      "latestVersionPackageUrl": "https://shottr.cc/dl/Shottr-1.8.0.pkg",
+      "everHidMainWindow": true,
+      "kc-vault": "PCgSODsjKVE1LGVffmdCBys+IiRlXnkABg4BRSA3DAEUFDQ+MzALfCAOeXpiHzg2ACoQXlNhfiYVHAVUMQU5FxYoTFY=",
+      "saveFormat": "Auto",
+      "windowShadow": "wallpaper",
+      "KeyboardShortcuts_scrolling": "{\"carbonKeyCode\":19,\"carbonModifiers\":768}"
+    }
+  },
+  "com.apple.CharacterPicker": {
+    "new": {
+      "version": 1
+    }
+  },
+  "com.apple.Preview": {
+    "new": {
+      "com.apple.AnnotationKit.userDefaultsVersion": 1,
+      "com.apple.AnnotationKit.arrowHeadStyle": 2,
+      "NSToolbar Configuration CommonToolbar_v5.1": {
+        "TB Is Shown": true,
+        "TB Icon Size Mode": 1,
+        "TB Size Mode": 1,
+        "TB Display Mode": 2
+      },
+      "com.apple.AnnotationKit.strokeIsDashed": false,
+      "com.apple.AnnotationKit.hasShadow": false,
+      "com.apple.AnnotationKit.strokeWidth": 5.0,
+      "com.apple.AnnotationKit.brushStyle": 0
+    }
+  },
+  "com.apple.Wallpaper-Settings.extension": {
+    "new": {
+      "LegacyYourPhotosMigrated": true
+    }
+  },
+  "com.knollsoft.Rectangle": {
+    "new": {
+      "toggleTodo": {
+        "keyCode": 11
+      },
+      "maximize": {
+        "keyCode": 36
+      },
+      "SUHasLaunchedBefore": true,
+      "internalTilingNotified": true,
+      "allowAnyShortcut": true,
+      "launchOnLogin": true,
+      "SUEnableAutomaticChecks": true,
+      "alternateDefaultShortcuts": true,
+      "reflowTodo": {
+        "keyCode": 45
+      },
+      "almostMaximize": {
+        "keyCode": 36
+      },
+      "subsequentExecutionMode": 1,
+      "gapSize": 10.0
+    }
+  }
+}

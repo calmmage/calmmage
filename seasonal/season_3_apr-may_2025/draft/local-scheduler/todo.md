@@ -1,0 +1,1 @@
+- Add a feature to log the job run result to mongodb 

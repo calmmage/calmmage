@@ -1,5 +1,0 @@
-## Case
-
-### Problem
-
-### Solution

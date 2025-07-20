@@ -1,0 +1,646 @@
+[
+  {
+    "name": "ef-matchmaking-bot",
+    "path": "/Users/petrlavrov/work/projects/ef-matchmaking-bot",
+    "source": "local",
+    "last_modified": "2024-11-05T01:05:36.012314",
+    "is_git_repo": true
+  },
+  {
+    "name": "gpt-bot",
+    "path": "/Users/petrlavrov/work/archive/gpt-bot",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:00.800243",
+    "is_git_repo": true
+  },
+  {
+    "name": "langfuse-kludge",
+    "path": "/Users/petrlavrov/work/archive/langfuse-kludge",
+    "source": "local",
+    "last_modified": "2024-10-15T04:51:58.632066",
+    "is_git_repo": true
+  },
+  {
+    "name": "ai-mono",
+    "path": "/Users/petrlavrov/work/archive/ai-mono",
+    "source": "local",
+    "last_modified": "2024-09-26T22:11:10.947258",
+    "is_git_repo": true
+  },
+  {
+    "name": "try-foam",
+    "path": "/Users/petrlavrov/work/archive/try-foam",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:25.535900",
+    "is_git_repo": true
+  },
+  {
+    "name": "lablabai-hackaton",
+    "path": "/Users/petrlavrov/work/archive/lablabai-hackaton",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:38.000981",
+    "is_git_repo": true
+  },
+  {
+    "name": "resu_me_hh_app",
+    "path": "/Users/petrlavrov/work/archive/resu_me_hh_app",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:46.914135",
+    "is_git_repo": true
+  },
+  {
+    "name": "generate-session-idea-dev",
+    "path": "/Users/petrlavrov/work/archive/generate-session-idea-dev",
+    "source": "local",
+    "last_modified": "2024-08-25T05:10:31.432604",
+    "is_git_repo": false
+  },
+  {
+    "name": "career_wizard",
+    "path": "/Users/petrlavrov/work/archive/career_wizard",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:42.559327",
+    "is_git_repo": true
+  },
+  {
+    "name": "simple-proto-db",
+    "path": "/Users/petrlavrov/work/archive/simple-proto-db",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:21.499498",
+    "is_git_repo": true
+  },
+  {
+    "name": "Robert-GPT-Assistant",
+    "path": "/Users/petrlavrov/work/archive/Robert-GPT-Assistant",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:20.532474",
+    "is_git_repo": true
+  },
+  {
+    "name": "something-fun",
+    "path": "/Users/petrlavrov/work/archive/something-fun",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:23.442823",
+    "is_git_repo": true
+  },
+  {
+    "name": "defaultenv",
+    "path": "/Users/petrlavrov/work/archive/defaultenv",
+    "source": "local",
+    "last_modified": "2024-10-15T04:49:14.305177",
+    "is_git_repo": true
+  },
+  {
+    "name": "siri-ask-gpt",
+    "path": "/Users/petrlavrov/work/archive/siri-ask-gpt",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:22.969224",
+    "is_git_repo": true
+  },
+  {
+    "name": "python-o365",
+    "path": "/Users/petrlavrov/work/archive/python-o365",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:19.566649",
+    "is_git_repo": true
+  },
+  {
+    "name": "google_stock_bot",
+    "path": "/Users/petrlavrov/work/archive/google_stock_bot",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:43.086071",
+    "is_git_repo": true
+  },
+  {
+    "name": "foam-template",
+    "path": "/Users/petrlavrov/work/experiments/foam-template",
+    "source": "local",
+    "last_modified": "2024-10-22T13:10:27.413437",
+    "is_git_repo": true
+  },
+  {
+    "name": "codechat",
+    "path": "/Users/petrlavrov/work/projects/codechat",
+    "source": "local",
+    "last_modified": "2024-10-12T01:52:46.758600",
+    "is_git_repo": true
+  },
+  {
+    "name": "electron-app-demo",
+    "path": "/Users/petrlavrov/work/archive/electron-app-demo",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:57.397507",
+    "is_git_repo": true
+  },
+  {
+    "name": "python-app-template",
+    "path": "/Users/petrlavrov/work/archive/python-app-template",
+    "source": "local",
+    "last_modified": "2024-08-31T01:42:47.931519",
+    "is_git_repo": true
+  },
+  {
+    "name": "forwarder-bot",
+    "path": "/Users/petrlavrov/work/archive/forwarder-bot",
+    "source": "local",
+    "last_modified": "2024-09-14T02:36:58.275419",
+    "is_git_repo": true
+  },
+  {
+    "name": "ef-chat-bot",
+    "path": "/Users/petrlavrov/work/archive/ef-chat-bot",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:56.860271",
+    "is_git_repo": true
+  },
+  {
+    "name": "bot-base",
+    "path": "/Users/petrlavrov/work/archive/bot-base",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:48.968730",
+    "is_git_repo": true
+  },
+  {
+    "name": "generate-dir-link",
+    "path": "/Users/petrlavrov/work/archive/generate-dir-link",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:35.587948",
+    "is_git_repo": true
+  },
+  {
+    "name": "new-bot-lib",
+    "path": "/Users/petrlavrov/work/projects/new-bot-lib",
+    "source": "local",
+    "last_modified": "2024-10-24T01:46:53.469705",
+    "is_git_repo": true
+  },
+  {
+    "name": "first_website",
+    "path": "/Users/petrlavrov/work/archive/first_website",
+    "source": "local",
+    "last_modified": "2024-08-18T06:07:38.115921",
+    "is_git_repo": true
+  },
+  {
+    "name": "bot_me_maybe",
+    "path": "/Users/petrlavrov/work/archive/bot_me_maybe",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:49.973552",
+    "is_git_repo": true
+  },
+  {
+    "name": "calmmage_services_registry",
+    "path": "/Users/petrlavrov/work/archive/calmmage_services_registry",
+    "source": "local",
+    "last_modified": "2024-10-12T01:54:12.188849",
+    "is_git_repo": true
+  },
+  {
+    "name": "simple-queue-dispatcher",
+    "path": "/Users/petrlavrov/work/archive/simple-queue-dispatcher",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:22.000561",
+    "is_git_repo": true
+  },
+  {
+    "name": "dev-env",
+    "path": "/Users/petrlavrov/work/projects/dev-env",
+    "source": "local",
+    "last_modified": "2024-11-10T05:08:34.653373",
+    "is_git_repo": true
+  },
+  {
+    "name": "fedor-bot-idea",
+    "path": "/Users/petrlavrov/work/archive/fedor-bot-idea",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:58.443429",
+    "is_git_repo": true
+  },
+  {
+    "name": "llm-experiments",
+    "path": "/Users/petrlavrov/work/archive/llm-experiments",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:16.371475",
+    "is_git_repo": true
+  },
+  {
+    "name": "calmmage-showcase-bot",
+    "path": "/Users/petrlavrov/work/archive/calmmage-showcase-bot",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:52.519234",
+    "is_git_repo": true
+  },
+  {
+    "name": "typescript-project-template",
+    "path": "/Users/petrlavrov/work/archive/typescript-project-template",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:26.039466",
+    "is_git_repo": true
+  },
+  {
+    "name": "ChatGPTEnhancerBot",
+    "path": "/Users/petrlavrov/work/archive/ChatGPTEnhancerBot",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:53.626556",
+    "is_git_repo": true
+  },
+  {
+    "name": "sample-pyrogram-bot",
+    "path": "/Users/petrlavrov/work/archive/sample-pyrogram-bot",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:21.031868",
+    "is_git_repo": true
+  },
+  {
+    "name": "whisper-bot",
+    "path": "/Users/petrlavrov/work/archive/whisper-bot",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:27.084553",
+    "is_git_repo": true
+  },
+  {
+    "name": "simple-task-repeater",
+    "path": "/Users/petrlavrov/work/archive/simple-task-repeater",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:22.470636",
+    "is_git_repo": true
+  },
+  {
+    "name": "langchain",
+    "path": "/Users/petrlavrov/work/archive/langchain",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:15.574453",
+    "is_git_repo": true
+  },
+  {
+    "name": "gpt-assistant",
+    "path": "/Users/petrlavrov/work/archive/gpt-assistant",
+    "source": "local",
+    "last_modified": "2024-09-25T16:16:58.694313",
+    "is_git_repo": true
+  },
+  {
+    "name": "calmmage-knowledge-database",
+    "path": "/Users/petrlavrov/work/archive/calmmage-knowledge-database",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:52.021536",
+    "is_git_repo": true
+  },
+  {
+    "name": "laika-telegram-assistant",
+    "path": "/Users/petrlavrov/work/archive/laika-telegram-assistant",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:38.997033",
+    "is_git_repo": true
+  },
+  {
+    "name": "calmmage-feature-bot",
+    "path": "/Users/petrlavrov/work/archive/calmmage-feature-bot",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:51.537897",
+    "is_git_repo": true
+  },
+  {
+    "name": "FastUI",
+    "path": "/Users/petrlavrov/work/archive/FastUI",
+    "source": "local",
+    "last_modified": "2024-09-08T05:39:33.507736",
+    "is_git_repo": true
+  },
+  {
+    "name": "calmmage",
+    "path": "/Users/petrlavrov/work/archive/calmmage",
+    "source": "local",
+    "last_modified": "2024-10-13T04:37:26.967293",
+    "is_git_repo": true
+  },
+  {
+    "name": "taskzilla-cm",
+    "path": "/Users/petrlavrov/work/experiments/taskzilla-cm",
+    "source": "local",
+    "last_modified": "2024-10-22T13:27:03.414804",
+    "is_git_repo": true
+  },
+  {
+    "name": "teletalk-template",
+    "path": "/Users/petrlavrov/work/experiments/teletalk-template",
+    "source": "local",
+    "last_modified": "2024-10-15T04:52:02.516016",
+    "is_git_repo": true
+  },
+  {
+    "name": "chat_summary_bot",
+    "path": "/Users/petrlavrov/work/archive/chat_summary_bot",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:55.367043",
+    "is_git_repo": true
+  },
+  {
+    "name": "abstract-tool-user",
+    "path": "/Users/petrlavrov/work/archive/abstract-tool-user",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:47.398307",
+    "is_git_repo": true
+  },
+  {
+    "name": "gpt_api",
+    "path": "/Users/petrlavrov/work/archive/gpt_api",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:01.830707",
+    "is_git_repo": true
+  },
+  {
+    "name": "calmapp",
+    "path": "/Users/petrlavrov/work/projects/calmapp",
+    "source": "local",
+    "last_modified": "2024-10-24T04:18:30.852590",
+    "is_git_repo": true
+  },
+  {
+    "name": "calmmage-private",
+    "path": "/Users/petrlavrov/work/projects/calmmage-private",
+    "source": "local",
+    "last_modified": "2024-11-09T00:28:53.765563",
+    "is_git_repo": true
+  },
+  {
+    "name": ".idea",
+    "path": "/Users/petrlavrov/work/projects/.idea",
+    "source": "local",
+    "last_modified": "2024-09-15T18:01:03.036164",
+    "is_git_repo": false
+  },
+  {
+    "name": "drainage-massage",
+    "path": "/Users/petrlavrov/work/archive/drainage-massage",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:35.115459",
+    "is_git_repo": true
+  },
+  {
+    "name": "examples",
+    "path": "/Users/petrlavrov/work/projects/examples",
+    "source": "local",
+    "last_modified": "2024-09-26T18:42:19.490911",
+    "is_git_repo": true
+  },
+  {
+    "name": "calmlib",
+    "path": "/Users/petrlavrov/work/projects/calmlib",
+    "source": "local",
+    "last_modified": "2024-11-05T00:02:08.881241",
+    "is_git_repo": true
+  },
+  {
+    "name": "notion-assistant",
+    "path": "/Users/petrlavrov/work/archive/notion-assistant",
+    "source": "local",
+    "last_modified": "2024-08-18T06:07:38.611545",
+    "is_git_repo": true
+  },
+  {
+    "name": "command-ai",
+    "path": "/Users/petrlavrov/work/archive/command-ai",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:55.881018",
+    "is_git_repo": true
+  },
+  {
+    "name": "k8s",
+    "path": "/Users/petrlavrov/work/archive/k8s",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:36.499353",
+    "is_git_repo": true
+  },
+  {
+    "name": "botspot",
+    "path": "/Users/petrlavrov/work/projects/botspot",
+    "source": "local",
+    "last_modified": "2024-11-06T23:28:26.157022",
+    "is_git_repo": true
+  },
+  {
+    "name": "bot_scheduler",
+    "path": "/Users/petrlavrov/work/archive/bot_scheduler",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:41.366538",
+    "is_git_repo": true
+  },
+  {
+    "name": "grammar_corrector_bot",
+    "path": "/Users/petrlavrov/work/archive/grammar_corrector_bot",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:44.957399",
+    "is_git_repo": true
+  },
+  {
+    "name": "web_scrapers",
+    "path": "/Users/petrlavrov/work/archive/web_scrapers",
+    "source": "local",
+    "last_modified": "2024-08-18T06:06:11.753739",
+    "is_git_repo": true
+  },
+  {
+    "name": "seasonal-dir-template",
+    "path": "/Users/petrlavrov/work/projects/seasonal-dir-template",
+    "source": "local",
+    "last_modified": "2024-10-14T23:40:41.849448",
+    "is_git_repo": true
+  },
+  {
+    "name": "dev-env-experiments",
+    "path": "/Users/petrlavrov/work/experiments/dev-env-experiments",
+    "source": "local",
+    "last_modified": "2024-11-10T00:20:37.538679",
+    "is_git_repo": true
+  },
+  {
+    "name": "gpt_python_sandbox",
+    "path": "/Users/petrlavrov/work/archive/gpt_python_sandbox",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:02.342328",
+    "is_git_repo": true
+  },
+  {
+    "name": "video-to-audio-bot",
+    "path": "/Users/petrlavrov/work/archive/video-to-audio-bot",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:26.546179",
+    "is_git_repo": true
+  },
+  {
+    "name": "gpt-kit",
+    "path": "/Users/petrlavrov/work/archive/gpt-kit",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:01.336701",
+    "is_git_repo": true
+  },
+  {
+    "name": "python-project-template",
+    "path": "/Users/petrlavrov/work/archive/python-project-template",
+    "source": "local",
+    "last_modified": "2024-09-14T03:20:27.556336",
+    "is_git_repo": true
+  },
+  {
+    "name": "club146bot",
+    "path": "/Users/petrlavrov/work/experiments/club146bot",
+    "source": "local",
+    "last_modified": "2024-10-24T16:16:10.754678",
+    "is_git_repo": true
+  },
+  {
+    "name": "obsidian_coding",
+    "path": "/Users/petrlavrov/work/archive/obsidian_coding",
+    "source": "local",
+    "last_modified": "2024-10-15T03:18:01.769690",
+    "is_git_repo": false
+  },
+  {
+    "name": "calmmage-services-registry",
+    "path": "/Users/petrlavrov/work/archive/calmmage-services-registry",
+    "source": "local",
+    "last_modified": "2024-10-12T01:54:12.175887",
+    "is_git_repo": true
+  },
+  {
+    "name": "calmmage-task-tracker",
+    "path": "/Users/petrlavrov/work/archive/calmmage-task-tracker",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:53.058849",
+    "is_git_repo": true
+  },
+  {
+    "name": "gpt-chatbot-that-stays-on-point",
+    "path": "/Users/petrlavrov/work/archive/gpt-chatbot-that-stays-on-point",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:44.034378",
+    "is_git_repo": true
+  },
+  {
+    "name": "bot-lib",
+    "path": "/Users/petrlavrov/work/projects/bot-lib",
+    "source": "local",
+    "last_modified": "2024-10-02T21:59:22.977003",
+    "is_git_repo": true
+  },
+  {
+    "name": "pretty-please-bot",
+    "path": "/Users/petrlavrov/work/archive/pretty-please-bot",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:17.929605",
+    "is_git_repo": true
+  },
+  {
+    "name": "message-history-bot",
+    "path": "/Users/petrlavrov/work/archive/message-history-bot",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:16.881149",
+    "is_git_repo": true
+  },
+  {
+    "name": "dnd-dice-thrower",
+    "path": "/Users/petrlavrov/work/archive/dnd-dice-thrower",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:33.644251",
+    "is_git_repo": true
+  },
+  {
+    "name": "archivist-bot",
+    "path": "/Users/petrlavrov/work/archive/archivist-bot",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:47.953673",
+    "is_git_repo": true
+  },
+  {
+    "name": "LLM-Tester-WIP",
+    "path": "/Users/petrlavrov/work/archive/LLM-Tester-WIP",
+    "source": "local",
+    "last_modified": "2024-08-18T06:06:10.210906",
+    "is_git_repo": true
+  },
+  {
+    "name": "fork-repeater_bot_tg",
+    "path": "/Users/petrlavrov/work/archive/fork-repeater_bot_tg",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:59.426502",
+    "is_git_repo": true
+  },
+  {
+    "name": "parse-finance-emails",
+    "path": "/Users/petrlavrov/work/archive/parse-finance-emails",
+    "source": "local",
+    "last_modified": "2024-08-21T21:18:25.524974",
+    "is_git_repo": true
+  },
+  {
+    "name": "base-template",
+    "path": "/Users/petrlavrov/work/archive/base-template",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:48.439510",
+    "is_git_repo": true
+  },
+  {
+    "name": "outstanding-items-bot",
+    "path": "/Users/petrlavrov/work/projects/outstanding-items-bot",
+    "source": "local",
+    "last_modified": "2024-11-07T02:50:39.432070",
+    "is_git_repo": true
+  },
+  {
+    "name": "try-teletalk",
+    "path": "/Users/petrlavrov/work/archive/try-teletalk",
+    "source": "local",
+    "last_modified": "2024-10-03T00:36:11.037739",
+    "is_git_repo": true
+  },
+  {
+    "name": "bot-lib-bot-template",
+    "path": "/Users/petrlavrov/work/archive/bot-lib-bot-template",
+    "source": "local",
+    "last_modified": "2024-09-15T04:41:59.077003",
+    "is_git_repo": true
+  },
+  {
+    "name": "isnimschikov-bot-template",
+    "path": "/Users/petrlavrov/work/archive/isnimschikov-bot-template",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:02.853891",
+    "is_git_repo": true
+  },
+  {
+    "name": "lessmore",
+    "path": "/Users/petrlavrov/work/archive/lessmore",
+    "source": "local",
+    "last_modified": "2024-08-31T16:28:25.455750",
+    "is_git_repo": true
+  },
+  {
+    "name": "neuro_backend",
+    "path": "/Users/petrlavrov/work/archive/neuro_backend",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:45.981833",
+    "is_git_repo": true
+  },
+  {
+    "name": "fairytale-bot",
+    "path": "/Users/petrlavrov/work/archive/fairytale-bot",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:57.903098",
+    "is_git_repo": true
+  },
+  {
+    "name": "notion_assistant",
+    "path": "/Users/petrlavrov/work/archive/notion_assistant",
+    "source": "local",
+    "last_modified": "2024-08-18T06:01:17.418795",
+    "is_git_repo": true
+  },
+  {
+    "name": "bot-template",
+    "path": "/Users/petrlavrov/work/archive/bot-template",
+    "source": "local",
+    "last_modified": "2024-08-18T06:00:49.456363",
+    "is_git_repo": true
+  }
+]

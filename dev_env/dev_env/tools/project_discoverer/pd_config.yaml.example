@@ -1,0 +1,19 @@
+# Glob patterns for different destination types
+glob_patterns:
+  main: 
+    - "*"  # Direct children only
+  examples:
+    - "*/*"        # category/project
+    - "*/*/*"      # category/subcategory/project
+  library:
+    - "dev/*"      # dev/project
+    - "dev/*/*"    # dev/category/project
+
+# Special patterns for specific destinations
+seasonal_patterns:
+  - "seasonal/*/*/*"  # seasonal/season_n/group/project
+
+# Destinations that use seasonal patterns
+seasonal_destinations:
+  - calmmage-private
+  - calmmage

@@ -1,0 +1,81 @@
+# Project sorting configuration
+
+# part 1: general
+dry_run: true
+root_paths:
+  - ~/work/projects
+  - ~/work/archive
+  - ~/work/experiments
+
+# will include only these orgs
+# github_orgs:
+#   - calmmage
+github_skip_orgs:
+  - tgneuro
+#  - akudrinsky
+  - OlejaTheHuman
+#  - MikhailVodolagin
+  - AlexanderAbramovPav
+
+# Date formatting
+date_format:
+  use_relative_dates: true
+  short_format: true
+
+  # Only used if use_relative_dates disabled  Use relative dates for dates within a week
+#  use_relative_for_recent: true
+#  recent_threshold_days: 7
+
+# part 2: manual sorting
+
+actual:
+  - calmlib
+  - dev-env
+  - botspot
+  # - calmmage
+  - calmmage-private
+  - examples
+  - codechat
+  - calmmage
+
+archive:
+  - siri-ask-gpt
+  - calmapp
+  - new-bot-lib
+
+experiments:
+  - taskzilla-cm
+
+ignore:
+  - python-o365
+  - isnimschikov-bot-template
+  - foam-template
+  - TextTailor-Scrapers
+
+# secondary groups
+cool:
+  - fedor-bot-idea
+  - video-to-audio-bot
+  - generate-dir-link
+  - gpt-chatbot-that-stays-on-point
+  - dnd-dice-thrower
+
+libs:
+  - calmlib
+  - examples
+  - botspot
+#  - calmapp
+
+templates:
+  - base-template
+#   - typescript-project-template
+  - python-project-template
+  - seasonal-dir-template
+  - bot-lib-bot-template
+
+unfinished:
+  - resu_me_hh_app
+
+memorable:
+  - dnd-dice-thrower
+  - siri-ask-gpt
