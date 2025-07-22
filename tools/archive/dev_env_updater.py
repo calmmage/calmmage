@@ -9,11 +9,12 @@ from subprocess import check_output, run
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# update for new locations...
-# export STABLE_DEV_ENV_DIR="/Users/petrlavrov/calmmage/config/"
-# export STABLE_VENV_PATH="/Users/petrlavrov/calmmage/config"
-# export ACTIVE_DEV_ENV_DIR="/Users/petrlavrov/calmmage/"
+# update for new locations
+# # export STABLE_DEV_ENV_DIR="/Users/petrlavrov/calmmage/config/"
+# export STABLE_VENV_PATH="/Users/petrlavrov/calmmage/config/.venv"
+# # export ACTIVE_DEV_ENV_DIR="/Users/petrlavrov/calmmage/"
 # export ACTIVE_VENV_PATH="/Users/petrlavrov/calmmage/.venv"
+# export CALMMAGE_DIR="/Users/petrlavrov/calmmage"
 
 
 def get_dev_env_path():
@@ -25,7 +26,7 @@ def get_dev_env_path():
         )
 
     # Source the file and get the environment variable
-    cmd = f"source {location_file} && echo $STABLE_DEV_ENV_DIR"
+    cmd = f"source {location_file} && echo $CALMMAGE_DIR"
     try:
         dev_env_path = check_output(["bash", "-c", cmd], text=True).strip()
         return Path(dev_env_path)
@@ -77,7 +78,8 @@ def clone_or_update_dev_env():
                 [
                     "git",
                     "clone",
-                    "https://github.com/calmmage/dev-env.git",
+                    # "https://github.com/calmmage/dev-env.git",
+                    "https://github.com/calmmage/calmmage.git",
                     str(dev_env_path),
                 ],
                 check=True,
