@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 # export ACTIVE_DEV_ENV_DIR="/Users/petrlavrov/calmmage/"
 # export ACTIVE_VENV_PATH="/Users/petrlavrov/calmmage/.venv"
 
+
 def get_dev_env_path():
     """Get dev-env path by sourcing ~/.dev-env-location"""
     location_file = Path.home() / ".dev-env-location"
