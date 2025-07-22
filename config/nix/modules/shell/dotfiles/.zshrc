@@ -627,6 +627,6 @@ run_with_poetry() {
 }
 
 # requires export STABLE_DEV_ENV_DIR="/path/to/stable/dev/env"
-# default - STABLE_DEV_ENV_DIR="$HOME/.calmmage/dev_env"
+# default - STABLE_DEV_ENV_DIR="/Users/petrlavrov/calmmage/config/"
 # requires export STABLE_VENV_PATH="/path/to/stable/venv"
-# default - STABLE_VENV_PATH="$HOME/.calmmage/dev_env/.venv"
+# default - STABLE_VENV_PATH="/Users/petrlavrov/calmmage/config/.venv"

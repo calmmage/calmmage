@@ -182,7 +182,7 @@
               autoMigrate = true;
             };
           }
-          ./hosts/darwin
+          ./modules/darwin
         ];
       }
     ) userConfigs;

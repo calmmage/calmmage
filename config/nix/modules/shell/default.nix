@@ -24,9 +24,9 @@ in
   ];
 
   home.file = {
-    ".inputrc".source = ./dotfiles/inputrc;
-    ".zshrc.custom".source = ./dotfiles/zshrc;  # Add your zshrc file
-    ".aliases".source = ./dotfiles/aliases;  # Add your aliases file
+    ".inputrc".source = ./dotfiles/.inputrc;
+    ".zshrc.custom".source = ./dotfiles/.zshrc;  # Add your zshrc file
+    ".aliases".source = ./dotfiles/.aliases;  # Add your aliases file
     ".zsh-custom-functions" = {
       text = ''
         function my_custom_function() {
