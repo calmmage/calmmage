@@ -1,3 +1,16 @@
+# ------------------------------------
+# DEPRECATED
+# ------------------------------------
+
+# Move this to makefile
+
+
+
+
+
+
+
+
 #!/bin/bash
 # bootstrap.sh - Full System Setup Script
 # This script performs a complete setup of the development environment on a fresh macOS system.
@@ -28,16 +41,12 @@ set -e
 setup_persistent_location() {
     local location_file="$HOME/.dev-env-location"
     if [ ! -f "$location_file" ]; then
-        echo "Please enter target dev-env location (default: $HOME/.calmmage/dev-env):"
+        echo "Please enter target calmmage repo location (default: $HOME/calmmage):"
         read -r user_location
-        STABLE_DEV_ENV_DIR=${user_location:-$HOME/.calmmage/dev-env}
-        ACTIVE_DEV_ENV_DIR="$HOME/work/projects/dev-env"
-        STABLE_VENV_PATH="$STABLE_DEV_ENV_DIR/.venv"
-        ACTIVE_VENV_PATH="$ACTIVE_DEV_ENV_DIR/.venv"
-        echo "export STABLE_DEV_ENV_DIR=\"$STABLE_DEV_ENV_DIR\"" > "$location_file"
-        echo "export ACTIVE_DEV_ENV_DIR=\"$ACTIVE_DEV_ENV_DIR\"" >> "$location_file"
-        echo "export STABLE_VENV_PATH=\"$STABLE_VENV_PATH\"" >> "$location_file"
-        echo "export ACTIVE_VENV_PATH=\"$ACTIVE_VENV_PATH\"" >> "$location_file"
+        CALMMAGE_DIR=${user_location:-$HOME/calmmage}
+        CALMMAGE_VENV_PATH="$CALMMAGE_DIR/.venv"
+        echo "export CALMMAGE_DIR=\"$CALMMAGE_DIR\"" >> "$location_file"
+        echo "export CALMMAGE_VENV_PATH=\"$CALMMAGE_VENV_PATH\"" >> "$location_file"
     fi
     source "$location_file"
 }
@@ -101,7 +110,7 @@ install_dependencies() {
 
 ensure_dev_env_repo() {
     local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    local updater_script="$script_dir/tools/dev_env_updater.py"
+    local updater_script="$script_dir/tools/archive/dev_env_updater.py"
     
     if [ ! -f "$updater_script" ]; then
         echo "Error: Could not find dev_env_updater.py at $updater_script"
@@ -111,15 +120,15 @@ ensure_dev_env_repo() {
     echo "Ensuring dev-env repository is present and up to date..."
     python3 "$updater_script"
     
-    if [ ! -d "$STABLE_DEV_ENV_DIR" ]; then
-        echo "Error: Failed to setup dev-env repository at $STABLE_DEV_ENV_DIR"
+    if [ ! -d "$CALMMAGE_DIR" ]; then
+        echo "Error: Failed to setup calmmage repository at $CALMMAGE_DIR"
         exit 1
     fi
 }
 
 setup_nix_configuration() {
     echo "Setting up Nix configuration..."
-    cd "$STABLE_DEV_ENV_DIR/nix"
+    cd "$CALMMAGE_DIR/config/nix"
     
     # TODO: guide the user through setting up user.yaml config file
     # # Run configuration script

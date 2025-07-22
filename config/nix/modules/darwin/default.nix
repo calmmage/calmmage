@@ -83,7 +83,7 @@ in
 
     systemPath = [
       "/opt/homebrew/bin"
-      # "$STABLE_DEV_ENV_DIR/tools/" - remove for now - can't get it to work
+      # "$CALMMAGE_DIR/tools/" - remove for now - can't get it to work
     ];
     pathsToLink = [ "/Applications" ];
   };

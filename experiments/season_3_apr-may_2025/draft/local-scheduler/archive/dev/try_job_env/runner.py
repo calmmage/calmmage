@@ -10,11 +10,11 @@ env_file_path = Path(
     "/Users/petrlavrov/work/projects/calmmage/experiments/season_3_apr_2025/draft/local-scheduler/dev/try_job_env/.env"
 )
 
-stable_venv_path = os.getenv("STABLE_VENV_PATH")
-if not stable_venv_path:
-    raise ValueError("STABLE_VENV_PATH environment variable is not set")
+calmmage_venv_path = os.getenv("CALMMAGE_VENV_PATH")
+if not calmmage_venv_path:
+    raise ValueError("CALMMAGE_VENV_PATH environment variable is not set")
 
-python_executable_path = Path(stable_venv_path) / "bin" / "python"
+python_executable_path = Path(calmmage_venv_path) / "bin" / "python"
 from pydantic import BaseModel
 from typing import Optional
 

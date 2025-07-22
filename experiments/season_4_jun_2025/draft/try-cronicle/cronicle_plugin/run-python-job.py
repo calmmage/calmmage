@@ -32,17 +32,14 @@ def run_script(script_path, python_exec, env_file, cli_args):
         raise Exception("script_path is required")
     if is_empty(python_exec):
         # take the default python exec from the system
-        # # Define environment variables
-        # STABLE_DEV_ENV_DIR="/Users/petrlavrov/.calmmage/dev_env"
-        # STABLE_VENV_PATH="/Users/petrlavrov/.calmmage/dev_env/.venv"
-        # ACTIVE_DEV_ENV_DIR="/Users/petrlavrov/work/projects/dev-env"
-        # ACTIVE_VENV_PATH="/Users/petrlavrov/work/projects/dev-env/.venv"
+        # CALMMAGE_DIR="$(realpath "~/calmmage")"
+        # CALMMAGE_VENV_PATH="$(realpath "$CALMMAGE_DIR/.venv")"
         # python_exec = "/Users/petrlavrov/.calmmage/dev_env/.venv/bin/python"
-        venv_path = os.getenv("STABLE_VENV_PATH")
+        venv_path = os.getenv("CALMMAGE_VENV_PATH")
         if venv_path:
             python_exec = venv_path + "/bin/python"
         else:
-            raise Exception("STABLE_VENV_PATH is not set")
+            raise Exception("CALMMAGE_VENV_PATH is not set")
 
     if is_empty(env_file):
         # try the location of the script

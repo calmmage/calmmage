@@ -170,10 +170,10 @@ def enrich_task(task: TaskDescription) -> TaskDescription:
     Enrich the task with the default values
     """
     if task.python_executable_path is None:
-        stable_venv_path = os.getenv("STABLE_VENV_PATH")
-        if stable_venv_path is None:
-            raise ValueError("STABLE_VENV_PATH is not set")
-        default_executable_path = Path(stable_venv_path) / "bin" / "python"
+        calmmage_venv_path = os.getenv("CALMMAGE_VENV_PATH")
+        if calmmage_venv_path is None:
+            raise ValueError("CALMMAGE_VENV_PATH is not set")
+        default_executable_path = Path(calmmage_venv_path) / "bin" / "python"
         task.python_executable_path = default_executable_path
     if task.env_file_path is None:
         task.env_file_path = task.script_path.parent / ".env"

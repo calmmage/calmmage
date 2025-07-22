@@ -7,15 +7,15 @@ export PATH=~/.npm-global/bin:$PATH
 [ -f ~/.dev-env-location ] && source ~/.dev-env-location
 
 # Add warning if DEV_ENV_PATH is not set
-if [ -z "$STABLE_DEV_ENV_DIR" ]; then
-    echo "Warning: STABLE_DEV_ENV_DIR is not set."
+if [ -z "$CALMMAGE_DIR" ]; then
+    echo "Warning: CALMMAGE_DIR is not set."
     echo "This variable should point to the root directory of your calmmage development environment."
     echo " "
-    echo "Example: To add a Python tool located at \$DEV_ENV_PATH/tools/your_tool.py:"
-    echo "1. Ensure your_tool.py is executable (chmod +x \$DEV_ENV_PATH/tools/your_tool.py)."
-    echo "     alias toolname=\"$STABLE_VENV_PATH/bin/python $STABLE_DEV_ENV_DIR/tools/your_tool.py\""
+    echo "Example: To add a Python tool located at \$CALMMAGE_DIR/tools/your_tool.py:"
+    echo "1. Ensure your_tool.py is executable (chmod +x \$CALMMAGE_DIR/tools/your_tool.py)."
+    echo "     alias toolname=\"$CALMMAGE_VENV_PATH/bin/python $CALMMAGE_DIR/tools/your_tool.py\""
     echo " "
-    echo "     alias toolname=\"\$STABLE_VENV_PATH/bin/typer $STABLE_DEV_ENV_DIR/tools/your_tool/your_tool.py\""
+    echo "     alias toolname=\"\$CALMMAGE_VENV_PATH/bin/typer $CALMMAGE_DIR/tools/your_tool/your_tool.py\""
     echo "3. Add the alias to your ~/.aliases file."
     echo "4. Reload your shell or run 'source ~/.aliases'."
 fi
@@ -23,13 +23,13 @@ fi
 # Function to explain how to add a new tool alias
 add_tool() {
     echo "Instructions for adding a new tool alias:"
-    echo "1. Make sure STABLE_DEV_ENV_DIR is set correctly at ~/.dev-env-location"
+    echo "1. Make sure CALMMAGE_DIR is set correctly at ~/.dev-env-location"
     echo "2. Add your tool script to dev_env repo in tools/"
     echo "3. Add an alias to dev_env/nix/modules/home-manager/dotfiles/zshrc in one of these formats:"
     echo "   - For direct Python scripts:"
-    echo "     alias toolname=\"$STABLE_VENV_PATH/bin/python \$STABLE_DEV_ENV_DIR/tools/your_tool.py\""
+    echo "     alias toolname=\"$CALMMAGE_VENV_PATH/bin/python \$CALMMAGE_DIR/tools/your_tool.py\""
     echo "   - For Typer CLI tools:" 
-    echo "     alias toolname=\"\$STABLE_VENV_PATH/bin/typer \$STABLE_DEV_ENV_DIR/tools/your_tool/your_tool.py\""
+    echo "     alias toolname=\"\$CALMMAGE_VENV_PATH/bin/typer \$CALMMAGE_DIR/tools/your_tool/your_tool.py\""
     echo "4. nix-shell -p zsh"
     echo "5. source ~/.zshrc (or restart your terminal)"
 }
@@ -595,8 +595,8 @@ change_dir_regexp() {
 
 run_with_poetry() {
     # Check if the environment variable is set
-    if [ -z "$STABLE_DEV_ENV_DIR" ]; then
-        echo "Warning: STABLE_DEV_ENV_DIR is not set. Some aliases may not work."
+    if [ -z "$CALMMAGE_DIR" ]; then
+        echo "Warning: CALMMAGE_DIR is not set. Some aliases may not work."
         echo "Poetry environment not found or activated."
         return 1
     fi
@@ -620,13 +620,13 @@ run_with_poetry() {
 
     # Activate the Poetry environment, run the script with any additional args, and deactivate
     (
-        source "$STABLE_VENV_PATH/bin/activate" && \
+        source "$CALMMAGE_VENV_PATH/bin/activate" && \
         python "$SCRIPT_PATH" "$@" && \
         deactivate
     )
 }
 
-# requires export STABLE_DEV_ENV_DIR="/path/to/stable/dev/env"
-# default - STABLE_DEV_ENV_DIR="/Users/petrlavrov/calmmage/config/"
-# requires export STABLE_VENV_PATH="/path/to/stable/venv"
-# default - STABLE_VENV_PATH="/Users/petrlavrov/calmmage/config/.venv"
+# requires export CALMMAGE_DIR="/path/to/stable/dev/env"
+# default - CALMMAGE_DIR="/Users/petrlavrov/calmmage/config/"
+# requires export CALMMAGE_VENV_PATH="/path/to/stable/venv"
+# default - CALMMAGE_VENV_PATH="/Users/petrlavrov/calmmage/config/.venv"

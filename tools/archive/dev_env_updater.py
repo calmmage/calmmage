@@ -10,11 +10,17 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # update for new locations
+# old:
 # # export STABLE_DEV_ENV_DIR="/Users/petrlavrov/calmmage/config/"
 # export STABLE_VENV_PATH="/Users/petrlavrov/calmmage/config/.venv"
 # # export ACTIVE_DEV_ENV_DIR="/Users/petrlavrov/calmmage/"
 # export ACTIVE_VENV_PATH="/Users/petrlavrov/calmmage/.venv"
+
+# new:
 # export CALMMAGE_DIR="/Users/petrlavrov/calmmage"
+# CALMMAGE_DIR="$(realpath "~/calmmage")"
+# export CALMMAGE_DIR="/Users/petrlavrov/calmmage/.venv"
+# CALMMAGE_VENV_PATH="$(realpath "$CALMMAGE_DIR/.venv")"
 
 
 def get_dev_env_path():
@@ -22,7 +28,7 @@ def get_dev_env_path():
     location_file = Path.home() / ".dev-env-location"
     if not location_file.exists():
         raise RuntimeError(
-            "Dev-env location not configured. Please run bootstrap.sh first"
+            "Dev-env location not configured. Please run bootstrap-dev-env.sh first"
         )
 
     # Source the file and get the environment variable

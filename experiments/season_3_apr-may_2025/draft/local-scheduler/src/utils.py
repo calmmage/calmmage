@@ -9,12 +9,12 @@ def discover_python_executable() -> str:
     """
     Discover the python executable path.
     """
-    # 1. check if STABLE_VENV_PATH is set
-    stable_venv_path = os.environ.get("STABLE_VENV_PATH")
-    if stable_venv_path:
-        python_executable_path = Path(stable_venv_path) / "bin" / "python3"
+    # 1. check if CALMMAGE_VENV_PATH is set
+    calmmage_venv_path = os.environ.get("CALMMAGE_VENV_PATH")
+    if calmmage_venv_path:
+        python_executable_path = Path(calmmage_venv_path) / "bin" / "python3"
         if python_executable_path.exists():
-            logger.info("Found python executable path with STABLE_VENV_PATH")
+            logger.info("Found python executable path with CALMMAGE_VENV_PATH")
             return str(python_executable_path)
 
     # 2. try relpath

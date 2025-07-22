@@ -3,7 +3,7 @@
 alias fix_repo="typer $CALMMAGE_DIR/tools/repo_fixer/repo_fixer.py run"
 
 # Add an alias to update dev-env
-#alias update-dev-env='python3 $STABLE_DEV_ENV_DIR/tools/dev_env_updater.py'
+#alias update-dev-env='python3 $CALMMAGE_DIR/tools/archive/dev_env_updater.py'
 
 # alias help="echo \"$HELP\""
 # open code with sublime
@@ -51,8 +51,8 @@ alias cpa="copy_absolute_path"
 alias runp="run_with_poetry"
 
 alias lnsafe="runp $CALMMAGE_DIR/tools/lnsafe.py"
-alias typer=$ACTIVE_VENV_PATH/bin/typer
-alias ipython=$ACTIVE_VENV_PATH/bin/ipython
+alias typer=$CALMMAGE_VENV_PATH/bin/typer
+alias ipython=$CALMMAGE_VENV_PATH/bin/ipython
 
 alias np="typer $CALMMAGE_DIR/tools/project_manager/pm_cli.py run new-project"
 alias nmp="typer $CALMMAGE_DIR/tools/project_manager/pm_cli.py run new-mini-project"
@@ -62,7 +62,7 @@ alias pm="typer $CALMMAGE_DIR/tools/project_manager/pm_cli.py run"
 alias nt="typer $CALMMAGE_DIR/tools/project_manager/pm_cli.py run new-todo"
 alias nf="typer $CALMMAGE_DIR/tools/project_manager/pm_cli.py run new-feature"
 
-# alias js='typer $ACTIVE_DEV_ENV_DIR/tools/job_scheduler/job_manager_client.py run'
+# alias js='typer $CALMMAGE_DIR/tools/job_scheduler/job_manager_client.py run'
 
 # alias gcu="(gcloud compute ssh --zone "europe-west1-b" "instance-default-mar-2023"  --project "jarvis-mar-2022-pub")"
 # todo: create free tier aws instance

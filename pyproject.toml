@@ -1,6 +1,6 @@
 [project]
 name = "calmmage"
-version = "2025.1.4" # bugfix open-dir
+version = "2025.1.5" # bugfix open-dir
 description = "Personal GitHub repo for tools, projects, and personal website"
 readme = "README.md"
 classifiers = [
@@ -20,9 +20,6 @@ dependencies = [
     "typer[all]>=0.9.0",
     "tqdm",
     "loguru",
-    # "calmlib @ git+https://github.com/calmmage/calmlib.git@main",
-    "calmlib @ {root:uri}/src/calmlib",
-    #    "botspot @ git+https://github.com/calmmage/botspot.git@main",
     "PyGithub",
     "python-dotenv",
     "gitpython",
@@ -82,9 +79,15 @@ build-backend = "hatchling.build"
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["calmmage"]
+packages = ["src/lib", "tools"]
 
 [dependency-groups]
+extras = [
+    # "calmlib @ git+https://github.com/calmmage/calmlib.git@main"
+    "calmlib @ {root:uri}/src/calmlib",
+    "botspot @ git+https://github.com/calmmage/botspot.git@main",
+]
+
 dev = [
     "pyinstaller",
     "jupyter>=1.0.0",
@@ -114,6 +117,7 @@ test = [
     "pyright<2.0.0,>=1.1.401",
     "ruff<1.0.0,>=0.11.12",
 ]
+
 docs = [
     #mkdocs = ">=1.6"
 ]
