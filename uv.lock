@@ -326,7 +326,7 @@ wheels = [
 [[package]]
 name = "calmlib"
 version = "1.1.3"
-source = { directory = "calmlib" }
+source = { directory = "src/calmlib" }
 dependencies = [
     { name = "deprecated" },
     { name = "litellm" },
@@ -354,6 +354,7 @@ dependencies = [
     { name = "calmlib" },
     { name = "croniter" },
     { name = "deprecated" },
+    { name = "dotenv" },
     { name = "gitpython" },
     { name = "langchain" },
     { name = "langchain-anthropic" },
@@ -370,6 +371,7 @@ dependencies = [
     { name = "pillow" },
     { name = "pygithub" },
     { name = "pymongo" },
+    { name = "pyperclip" },
     { name = "pyrogram" },
     { name = "python-dotenv" },
     { name = "pytimeparse" },
@@ -414,9 +416,10 @@ test = [
 requires-dist = [
     { name = "apscheduler", specifier = ">=3.11.0,<4.0.0" },
     { name = "boto3", specifier = ">=1.35.90,<2.0.0" },
-    { name = "calmlib", directory = "calmlib" },
+    { name = "calmlib", directory = "src/calmlib" },
     { name = "croniter", specifier = ">=6.0.0" },
     { name = "deprecated", specifier = ">=1.2.15,<2.0.0" },
+    { name = "dotenv", specifier = ">=0.9.9" },
     { name = "gitpython" },
     { name = "langchain", specifier = ">=0.3.14,<1.0.0" },
     { name = "langchain-anthropic", specifier = ">=0.3.3,<1.0.0" },
@@ -433,6 +436,7 @@ requires-dist = [
     { name = "pillow", specifier = ">=10.3.0,<11.0.0" },
     { name = "pygithub" },
     { name = "pymongo", specifier = ">=4.9" },
+    { name = "pyperclip", specifier = ">=1.9.0" },
     { name = "pyrogram", specifier = ">=2.0.106,<3.0.0" },
     { name = "python-dotenv" },
     { name = "pytimeparse", specifier = ">=1.1.8,<2.0.0" },
@@ -818,6 +822,17 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/b5/4a/263763cb2ba3816dd94b08ad3a33d5fdae34ecb856678773cc40a3605829/dnspython-2.7.0.tar.gz", hash = "sha256:ce9c432eda0dc91cf618a5cedf1a4e142651196bbcd2c80e89ed5a907e5cfaf1", size = 345197, upload-time = "2024-10-05T20:14:59.362Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/68/1b/e0a87d256e40e8c888847551b20a017a6b98139178505dc7ffb96f04e954/dnspython-2.7.0-py3-none-any.whl", hash = "sha256:b4c34b7d10b51bcc3a5071e7b8dee77939f1e878477eeecc965e9835f63c6c86", size = 313632, upload-time = "2024-10-05T20:14:57.687Z" },
+]
+
+[[package]]
+name = "dotenv"
+version = "0.9.9"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "python-dotenv" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b2/b7/545d2c10c1fc15e48653c91efde329a790f2eecfbbf2bd16003b5db2bab0/dotenv-0.9.9-py2.py3-none-any.whl", hash = "sha256:29cf74a087b31dafdb5a446b6d7e11cbce8ed2741540e2339c69fbef92c94ce9", size = 1892, upload-time = "2025-02-19T22:15:01.647Z" },
 ]
 
 [[package]]
@@ -3161,6 +3176,12 @@ sdist = { url = "https://files.pythonhosted.org/packages/bb/22/f1129e69d94ffff62
 wheels = [
     { url = "https://files.pythonhosted.org/packages/05/e7/df2285f3d08fee213f2d041540fa4fc9ca6c2d44cf36d3a035bf2a8d2bcc/pyparsing-3.2.3-py3-none-any.whl", hash = "sha256:a749938e02d6fd0b59b356ca504a24982314bb090c383e3cf201c95ef7e2bfcf", size = 111120, upload-time = "2025-03-25T05:01:24.908Z" },
 ]
+
+[[package]]
+name = "pyperclip"
+version = "1.9.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/30/23/2f0a3efc4d6a32f3b63cdff36cd398d9701d26cda58e3ab97ac79fb5e60d/pyperclip-1.9.0.tar.gz", hash = "sha256:b7de0142ddc81bfc5c7507eea19da920b92252b548b96186caf94a5e2527d310", size = 20961, upload-time = "2024-06-18T20:38:48.401Z" }
 
 [[package]]
 name = "pyright"
