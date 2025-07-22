@@ -15,7 +15,7 @@ in
 
   # use_direnv = true;
   use_direnv = false;
-  use_devenv = true;
+  use_devenv = false;
   # pick one or the other
   use_nix_homebrew = false;
   # use_nix_homebrew = true;
