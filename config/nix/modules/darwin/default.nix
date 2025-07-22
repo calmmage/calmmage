@@ -8,7 +8,7 @@ in
   imports = [
   # todo: re-enable secrets
 #   secrets.nix
-    home-manager.nix
+    ./home-manager.nix
     agenix.darwinModules.default
   ];
 
