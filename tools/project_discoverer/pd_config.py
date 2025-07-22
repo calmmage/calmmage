@@ -13,7 +13,9 @@ class ProjectDiscovererConfig(BaseSettings):
         "library": ["dev/*", "dev/*/*"],  # dev folder patterns
     }
     # Special patterns for specific destinations
-    seasonal_patterns: List[str] = ["seasonal/*/*/*"]  # seasonal/season_n/group/project
+    seasonal_patterns: List[str] = [
+        "experiments/*/*/*"
+    ]  # experiments/season_n/group/project
     seasonal_destinations: List[str] = ["calmmage-private", "calmmage"]
 
     @classmethod

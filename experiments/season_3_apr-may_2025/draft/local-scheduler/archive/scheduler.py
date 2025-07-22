@@ -206,7 +206,7 @@ def main():
     # just run a test task for now
     test_task = TaskDescription(
         script_path=Path(
-            "/Users/petrlavrov/work/projects/calmmage/seasonal/season_3_apr_2025/draft/local-scheduler/target_job.py"
+            "/Users/petrlavrov/work/projects/calmmage/experiments/season_3_apr_2025/draft/local-scheduler/target_job.py"
         ),
         # cron="* * * * *",
         # period=60

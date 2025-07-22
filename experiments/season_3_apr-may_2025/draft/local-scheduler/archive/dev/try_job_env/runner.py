@@ -4,10 +4,10 @@ from subprocess import run
 from dotenv import dotenv_values
 
 job_path = Path(
-    "/Users/petrlavrov/work/projects/calmmage/seasonal/season_3_apr_2025/draft/local-scheduler/dev/try_job_env/job.py"
+    "/Users/petrlavrov/work/projects/calmmage/experiments/season_3_apr_2025/draft/local-scheduler/dev/try_job_env/job.py"
 )
 env_file_path = Path(
-    "/Users/petrlavrov/work/projects/calmmage/seasonal/season_3_apr_2025/draft/local-scheduler/dev/try_job_env/.env"
+    "/Users/petrlavrov/work/projects/calmmage/experiments/season_3_apr_2025/draft/local-scheduler/dev/try_job_env/.env"
 )
 
 stable_venv_path = os.getenv("STABLE_VENV_PATH")

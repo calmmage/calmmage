@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-target_path = "/Users/petrlavrov/work/projects/calmmage/seasonal/season_3_apr_2025/draft/local-scheduler/dev/try_job_env/sample.txt"
+target_path = "/Users/petrlavrov/work/projects/calmmage/experiments/season_3_apr_2025/draft/local-scheduler/dev/try_job_env/sample.txt"
 
 
 def main():

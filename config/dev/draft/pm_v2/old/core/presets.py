@@ -44,8 +44,8 @@ class PresetJan2024(Preset):
     #       "code/seasonal/latest/add_new_project": "~calmlib/tools/add_new_project.py",
     # }
     # this is the path that the 'new_project' tool will use
-    seasonal_projects_dir = "projects/calmmage-private/seasonal/"
-    new_projects_dir = "projects/calmmage-private/seasonal/latest/experiments"
+    seasonal_projects_dir = "projects/calmmage-private/experiments/"
+    new_projects_dir = "projects/calmmage-private/experiments/latest/draft"
     project_unsorted_dir = "structured/unsorted"
     # scripts_dir = "workspace/launchd/scripts"
     scripts_dir = "scripts"

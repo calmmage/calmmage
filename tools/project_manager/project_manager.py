@@ -325,7 +325,7 @@ class ProjectManager:
 
     def _get_latest_seasonal_folder(self, destination: Destination) -> Optional[Path]:
         """Get latest seasonal folder"""
-        seasonal_base = destination.path / "seasonal"
+        seasonal_base = destination.path / "experiments"
 
         # option 1: check all seasonal folders
         existing_seasons = [p for p in seasonal_base.glob("season_*") if p.is_dir()]
@@ -369,13 +369,15 @@ class ProjectManager:
         logger.debug(f"Generated period: {period}")
 
         new_folder = (
-            destination.path / "seasonal" / f"season_{season_num}_{period}_{date.year}"
+            destination.path
+            / "experiments"
+            / f"season_{season_num}_{period}_{date.year}"
         )
         logger.debug(f"New folder path: {new_folder}")
         new_folder.mkdir(parents=True, exist_ok=True)
 
         # update latest symlink
-        latest_link = destination.path / "seasonal" / "latest"
+        latest_link = destination.path / "experiments" / "latest"
         if latest_link.exists() or latest_link.is_symlink():
             logger.debug(f"Removing existing symlink: {latest_link}")
             latest_link.unlink()
