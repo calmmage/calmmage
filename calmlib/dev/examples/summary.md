@@ -2,7 +2,6 @@
 basic actions I needed at some point and the go-tos for doing them.
 covered topics
 
-
 # read write
 ```python
 calmlib.read_write.dump # , load - serialization,

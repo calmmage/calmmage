@@ -15,7 +15,7 @@ classifiers = [
 ]
 
 # todo: cleanup dependencies to speed up installation and resolving
-packages=[
+packages = [
     { include = "calmlib", from = "." },
 ]
 
