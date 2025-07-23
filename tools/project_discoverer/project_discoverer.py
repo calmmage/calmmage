@@ -65,9 +65,17 @@ class ProjectDiscoverer:
         for p in [path] + list(path.parents):
             try:
                 # mini-projects
-                if p.parent.name in ["draft", "wip", "unsorted", "paused"]:
+                # todo: add the new 'season' folder logic
+                if p.parent.name in [
+                    "draft",
+                    "wip",
+                    "unsorted",
+                    "paused",
+                    "_archive",
+                ] or p.parent.name.startswith("season_"):
                     logger.debug(f"Found mini-project: {p}")
                     res.append(p)
+
 
                 # main destinations
                 # todo: use destinations registry instead!

@@ -92,8 +92,8 @@ What it does:
 2) sets up zshrc and aliases (add source to ~/.zshrc)
 3) sets up env variables CALMMAGE_DIR, CALMMAGE_VENV_PATH
 ```bash
-export CALMMAGE_DIR="$(realpath "~/calmmage")"
-export CALMMAGE_VENV_PATH="$(realpath "$CALMMAGE_DIR/.venv")"
+export CALMMAGE_DIR="$HOME/calmmage"
+export CALMMAGE_VENV_PATH="$CALMMAGE_DIR/.venv"
 ```
 
 # Dev
