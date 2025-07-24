@@ -11,8 +11,7 @@ PLUGIN_DIR := plugin
 help:
 	@echo "🕒 Cronicle Scheduler Tool"
 	@echo ""
-	@echo "Setup & Installation:"
-	@echo "  make install        - Install Python dependencies"
+	@echo "Setup:"
 	@echo "  make setup-plugin   - Setup Cronicle plugin"
 	@echo "  make show-plugin-id - Show current plugin ID"
 	@echo "  make set-plugin-id ID=your_id - Set plugin ID manually"
@@ -49,14 +48,9 @@ check-env:
 		exit 1; \
 	fi
 
-# Installation
-install:
-	@echo "📦 Installing Cronicle Scheduler dependencies..."
-	@$(PYTHON) -m pip install typer rich requests python-dotenv
-
 # Job Management Commands
 list: check-env
-	@$(PYTHON) $(CLI_DIR)/cronicle_manager.py list
+	@uv run typer $(CLI_DIR)/cronicle_manager.py run list
 
 create: check-env
 	@if [ -z "$(NAME)" ] || [ -z "$(JOB)" ]; then \
@@ -64,7 +58,7 @@ create: check-env
 		echo "   Usage: make create NAME='Job Title' JOB=/path/to/script.py"; \
 		exit 1; \
 	fi
-	@$(PYTHON) $(CLI_DIR)/cronicle_manager.py create "$(NAME)" "$(JOB)"
+	@uv run typer $(CLI_DIR)/cronicle_manager.py run create "$(NAME)" "$(JOB)"
 
 create-scheduled: check-env
 	@if [ -z "$(NAME)" ] || [ -z "$(JOB)" ]; then \
@@ -75,7 +69,7 @@ create-scheduled: check-env
 	if [ -n "$(HOURS)" ]; then ARGS="$$ARGS --hours $(HOURS)"; fi; \
 	if [ -n "$(MINUTES)" ]; then ARGS="$$ARGS --minutes $(MINUTES)"; fi; \
 	if [ -n "$(WEEKDAYS)" ]; then ARGS="$$ARGS --weekdays $(WEEKDAYS)"; fi; \
-	$(PYTHON) $(CLI_DIR)/cronicle_manager.py create $$ARGS
+	uv run typer $(CLI_DIR)/cronicle_manager.py run create $$ARGS
 
 create-with-env: check-env
 	@if [ -z "$(NAME)" ] || [ -z "$(JOB)" ]; then \
@@ -85,7 +79,7 @@ create-with-env: check-env
 	@ARGS="$(NAME)" "$(JOB)"; \
 	if [ -n "$(ENV)" ]; then ARGS="$$ARGS --env-file $(ENV)"; fi; \
 	if [ -n "$(KWARGS)" ]; then ARGS="$$ARGS --kwargs '$(KWARGS)'"; fi; \
-	$(PYTHON) $(CLI_DIR)/cronicle_manager.py create $$ARGS
+	uv run typer $(CLI_DIR)/cronicle_manager.py run create $$ARGS
 
 run: check-env
 	@if [ -z "$(ID)" ]; then \
@@ -93,7 +87,7 @@ run: check-env
 		echo "   Usage: make run ID=event_id"; \
 		exit 1; \
 	fi
-	@$(PYTHON) $(CLI_DIR)/cronicle_manager.py run $(ID)
+	@uv run typer $(CLI_DIR)/cronicle_manager.py run run $(ID)
 
 delete: check-env
 	@if [ -z "$(ID)" ]; then \
@@ -101,7 +95,7 @@ delete: check-env
 		echo "   Usage: make delete ID=event_id"; \
 		exit 1; \
 	fi
-	@$(PYTHON) $(CLI_DIR)/cronicle_manager.py delete $(ID)
+	@uv run typer $(CLI_DIR)/cronicle_manager.py run delete $(ID)
 
 status: check-env
 	@if [ -z "$(ID)" ]; then \
@@ -109,12 +103,12 @@ status: check-env
 		echo "   Usage: make status ID=job_id"; \
 		exit 1; \
 	fi
-	@$(PYTHON) $(CLI_DIR)/cronicle_manager.py status $(ID)
+	@uv run typer $(CLI_DIR)/cronicle_manager.py run status $(ID)
 
 # Testing
 test: check-env
 	@echo "🔍 Testing Cronicle connection..."
-	@$(PYTHON) $(CLI_DIR)/cronicle_manager.py list > /dev/null && \
+	@uv run typer $(CLI_DIR)/cronicle_manager.py run list > /dev/null && \
 		echo "✅ Cronicle connection successful!" || \
 		echo "❌ Cronicle connection failed!"
 
@@ -122,7 +116,7 @@ test-plugin:
 	@echo "🧪 Testing job executor plugin..."
 	@echo "Testing with simple Python script..."
 	@echo 'print("Hello from test job!")' > /tmp/test_job.py
-	@$(PYTHON) $(PLUGIN_DIR)/job_executor.py --executable /tmp/test_job.py
+	@uv run python $(PLUGIN_DIR)/job_executor.py --executable /tmp/test_job.py
 	@rm -f /tmp/test_job.py
 	@echo "✅ Plugin test completed!"
 
