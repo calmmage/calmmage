@@ -1,0 +1,24 @@
+{
+  "generic_job_executor": {
+    "title": "Generic Job Executor",
+    "description": "Executes any job (Python, Typer, binary) with custom environment and parameters",
+    "binary": "/Users/petrlavrov/work/projects/calmmage/tools/cronicle_scheduler/plugin/job_executor.py",
+    "params": {
+      "executable": { 
+        "type": "string", 
+        "desc": "Path to executable (Python script, Typer app, binary, etc.)", 
+        "required": 1 
+      },
+      "env_file": { 
+        "type": "string", 
+        "desc": "Path to .env file to load environment variables", 
+        "required": 0 
+      },
+      "kwargs": { 
+        "type": "string", 
+        "desc": "JSON string of kwargs to pass to executable (e.g., '{\"flag\": true, \"name\": \"value\"}')", 
+        "required": 0 
+      }
+    }
+  }
+}
