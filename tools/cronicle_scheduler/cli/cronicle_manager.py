@@ -34,6 +34,39 @@ CRONICLE_URL = os.environ.get("CRONICLE_URL", "http://localhost:3012")
 CRONICLE_API_KEY = os.environ.get("CRONICLE_API_KEY")
 
 
+def get_plugin_id() -> str:
+    """Get the custom plugin ID, prompting user if not found."""
+    plugin_id_file = Path(__file__).parent.parent / ".plugin_id"
+
+    if plugin_id_file.exists():
+        plugin_id = plugin_id_file.read_text().strip()
+        console.log(f"Using plugin ID: {plugin_id}")
+        return plugin_id
+
+    # Plugin ID file missing - prompt user
+    console.print("[yellow]⚠️  Plugin ID file not found![/yellow]")
+    console.print("")
+    console.print("📋 To find your plugin ID:")
+    console.print("1. Open Cronicle web interface")
+    console.print("2. Go to Admin > Plugins")
+    console.print("3. Find your 'Generic Job Executor' plugin")
+    console.print("4. Copy the Plugin ID (e.g., 'pmc6gxqss0t')")
+    console.print("")
+    console.print("🔧 If plugin is missing, install it using:")
+    plugin_config_path = Path(__file__).parent.parent / "plugin" / "plugin_config.pixl"
+    console.print(f"   cat {plugin_config_path}")
+    console.print("   # Copy the JSON content to Cronicle Admin > Plugins > Add Plugin")
+    console.print("")
+
+    plugin_id = typer.prompt("Enter your plugin ID")
+
+    # Save for future use
+    plugin_id_file.write_text(plugin_id)
+    console.print(f"[green]✅ Plugin ID saved to {plugin_id_file}[/green]")
+
+    return plugin_id
+
+
 def get_client() -> CronicleClient:
     """Get configured Cronicle client."""
     if not CRONICLE_API_KEY:
@@ -93,9 +126,13 @@ def create_job(
             raise typer.Exit(1)
     
     try:
+        # Get plugin ID
+        plugin_id = get_plugin_id()
+        
         response = client.create_event(
             title=name,
             executable=executable,
+            plugin=plugin_id,
             category=category,
             target=target,
             timing=timing if timing else None,

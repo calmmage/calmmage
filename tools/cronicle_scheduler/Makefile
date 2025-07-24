@@ -14,6 +14,8 @@ help:
 	@echo "Setup & Installation:"
 	@echo "  make install        - Install Python dependencies"
 	@echo "  make setup-plugin   - Setup Cronicle plugin"
+	@echo "  make show-plugin-id - Show current plugin ID"
+	@echo "  make set-plugin-id ID=your_id - Set plugin ID manually"
 	@echo ""
 	@echo "Job Management:"
 	@echo "  make list           - List all Cronicle jobs"
@@ -131,15 +133,39 @@ setup-plugin:
 	@echo "🔍 Job executor: $(PLUGIN_DIR)/job_executor.py"
 	@echo ""
 	@echo "📖 Manual setup required:"
-	@echo "1. Copy plugin_config.pixl contents to Cronicle web interface"
+	@echo "1. Copy plugin_config.pixl contents to Cronicle web interface (Admin > Plugins > Add Plugin)"
 	@echo "2. Update binary path in plugin config to: $$(pwd)/$(PLUGIN_DIR)/job_executor.py"
-	@echo "3. Install plugin in Cronicle admin panel"
+	@echo "3. Install plugin and note the Plugin ID"
+	@echo "4. Plugin ID will be prompted on first use and saved to .plugin_id file"
 	@echo ""
 	@echo "Current plugin binary path should be:"
 	@echo "   $$(pwd)/$(PLUGIN_DIR)/job_executor.py"
+	@echo ""
+	@if [ -f .plugin_id ]; then \
+		echo "✅ Plugin ID file exists: $$(cat .plugin_id)"; \
+	else \
+		echo "⚠️  Plugin ID file not found - will be created on first use"; \
+	fi
 
 # Development helpers
 dev-test: test-plugin test
+
+# Plugin ID management
+show-plugin-id:
+	@if [ -f .plugin_id ]; then \
+		echo "✅ Current plugin ID: $$(cat .plugin_id)"; \
+	else \
+		echo "❌ Plugin ID not set. Run a create command to set it interactively."; \
+	fi
+
+set-plugin-id:
+	@if [ -z "$(ID)" ]; then \
+		echo "❌ Error: ID parameter required"; \
+		echo "   Usage: make set-plugin-id ID=your_plugin_id"; \
+		exit 1; \
+	fi
+	@echo "$(ID)" > .plugin_id
+	@echo "✅ Plugin ID set to: $(ID)"
 
 # Show plugin info
 plugin-info:
@@ -147,6 +173,7 @@ plugin-info:
 	@echo "Plugin config: $(PLUGIN_DIR)/plugin_config.pixl"
 	@echo "Job executor: $(PLUGIN_DIR)/job_executor.py"
 	@echo "Binary path for Cronicle: $$(pwd)/$(PLUGIN_DIR)/job_executor.py"
+	@echo "Plugin ID: $$([ -f .plugin_id ] && cat .plugin_id || echo 'Not set')"
 	@echo ""
 	@echo "Supported parameters:"
 	@echo "  - executable: Path to script/binary to run"

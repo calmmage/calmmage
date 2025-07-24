@@ -22,3 +22,14 @@
     }
   }
 }
+
+<!-- 
+INSTALLATION INSTRUCTIONS:
+1. Copy the JSON content above (without this comment block)
+2. Go to Cronicle web interface > Admin > Plugins
+3. Click "Add Plugin" 
+4. Paste the JSON content
+5. Click "Create Plugin"
+6. Note the Plugin ID that gets generated
+7. The Plugin ID will be automatically prompted when first using the CLI
+-->
