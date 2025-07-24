@@ -109,3 +109,24 @@ alias ma=myalias
 # sort projects based on config.yaml groups
 alias sort_projects="typer $CALMMAGE_DIR/tools/project_arranger/cli.py run sort"
 
+# Job Scheduling System - Component 1: Cronicle Integration
+alias cj="typer $CALMMAGE_DIR/tools/cronicle_scheduler/cli/cronicle_manager.py run"
+# alias cjl="typer $CALMMAGE_DIR/tools/cronicle_scheduler/cli/cronicle_manager.py run list"
+# new job
+alias nj="typer $CALMMAGE_DIR/tools/cronicle_scheduler/cli/cronicle_manager.py run create"
+# alias cjr="typer $CALMMAGE_DIR/tools/cronicle_scheduler/cli/cronicle_manager.py run run"
+# alias cjd="typer $CALMMAGE_DIR/tools/cronicle_scheduler/cli/cronicle_manager.py run delete"
+# alias cjs="typer $CALMMAGE_DIR/tools/cronicle_scheduler/cli/cronicle_manager.py run status"
+
+# Job Scheduling System - Component 2: Local Job Runner
+alias rj="typer $CALMMAGE_DIR/tools/local_job_runner/cli.py run run"
+alias lj="typer $CALMMAGE_DIR/tools/local_job_runner/cli.py run list"  
+alias tj="typer $CALMMAGE_DIR/tools/local_job_runner/cli.py run test"
+alias jl="typer $CALMMAGE_DIR/tools/local_job_runner/cli.py run logs"
+
+# Job Scheduling - Common workflows
+alias run_startup_jobs="typer $CALMMAGE_DIR/tools/local_job_runner/cli.py run run"
+alias job_logs="typer $CALMMAGE_DIR/tools/local_job_runner/cli.py run logs"
+alias cronicle_jobs="typer $CALMMAGE_DIR/tools/cronicle_scheduler/cli/cronicle_manager.py run list"
+alias add_cronicle="typer $CALMMAGE_DIR/tools/cronicle_scheduler/cli/cronicle_manager.py run create"
+
