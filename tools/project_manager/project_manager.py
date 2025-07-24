@@ -385,10 +385,10 @@ class ProjectManager:
         latest_link.symlink_to(new_folder)
 
         # create folder structure
-        children = ["draft", "wip", "unsorted", "paused"]
-        for child in children:
-            (new_folder / child).mkdir(exist_ok=True)
-        logger.debug(f"Created folder structure: {children}")
+        # children = ["draft", "wip", "unsorted", "paused"]
+        # for child in children:
+        #     (new_folder / child).mkdir(exist_ok=True)
+        # logger.debug(f"Created folder structure: {children}")
 
         return new_folder
 
@@ -572,61 +572,61 @@ class ProjectManager:
         else:
             return self._init_season_metadata(season)
 
-    def _update_season_dates(
-        self,
-        season: Path,
-        start: Optional[datetime] = None,
-        end: Optional[datetime] = None,
-    ) -> Path:
-        """Update season name and folder to the latest date range"""
-        metadata = self._get_season_metadata(season)
-        _, num, period, year = season.name.split("_")
-        if start is None:
-            start = datetime.fromisoformat(metadata["start"])
-        if end is None:
-            end = datetime.fromisoformat(metadata["end"])
-        period = self._get_period_from_date_range(start, end)
-
-        # Calculate new name and path
-        new_name = f"season_{num}_{period}_{year}"
-        new_path = season.with_name(new_name)
-
-        # Only proceed with rename if needed
-        # if new_name != season.name:
-        # disable renaming for now - this is a disaster from git perspective
-        # if False:
-        #     logger.info(f"Auto-renaming season folder from {season.name} to {new_name}")
-        #
-        #     # Update latest symlink first if it points to this season
-        #     latest_link = season.parent / "latest"
-        #     if latest_link.exists() and latest_link.is_symlink():
-        #         try:
-        #             if latest_link.resolve() == season.resolve():
-        #                 latest_link.unlink()
-        #                 season.rename(new_path)
-        #                 latest_link.symlink_to(new_path)
-        #                 # Update metadata in new location
-        #                 metadata = {"start": start.isoformat(), "end": end.isoformat()}
-        #                 new_metadata_file = self._get_season_metadata_file(new_path)
-        #                 new_metadata_file.write_text(json.dumps(metadata))
-        #                 return new_path
-        #         except OSError as e:
-        #             logger.warning(f"Error handling symlink: {e}")
-        #
-        #     # If no symlink or it points elsewhere, just rename
-        #     season.rename(new_path)
-        #
-        #     # Update metadata in new location
-        #     metadata = {"start": start.isoformat(), "end": end.isoformat()}
-        #     new_metadata_file = self._get_season_metadata_file(new_path)
-        #     new_metadata_file.write_text(json.dumps(metadata))
-        # else:
-        # Just update metadata if no rename needed
-        metadata = {"start": start.isoformat(), "end": end.isoformat()}
-        metadata_file = self._get_season_metadata_file(season)
-        metadata_file.write_text(json.dumps(metadata))
-
-        return new_path
+    # def _update_season_dates(
+    #     self,
+    #     season: Path,
+    #     start: Optional[datetime] = None,
+    #     end: Optional[datetime] = None,
+    # ) -> Path:
+    #     """Update season name and folder to the latest date range"""
+    #     metadata = self._get_season_metadata(season)
+    #     _, num, period, year = season.name.split("_")
+    #     if start is None:
+    #         start = datetime.fromisoformat(metadata["start"])
+    #     if end is None:
+    #         end = datetime.fromisoformat(metadata["end"])
+    #     period = self._get_period_from_date_range(start, end)
+    #
+    #     # Calculate new name and path
+    #     new_name = f"season_{num}_{period}_{year}"
+    #     new_path = season.with_name(new_name)
+    #
+    #     # Only proceed with rename if needed
+    #     # if new_name != season.name:
+    #     # disable renaming for now - this is a disaster from git perspective
+    #     # if False:
+    #     #     logger.info(f"Auto-renaming season folder from {season.name} to {new_name}")
+    #     #
+    #     #     # Update latest symlink first if it points to this season
+    #     #     latest_link = season.parent / "latest"
+    #     #     if latest_link.exists() and latest_link.is_symlink():
+    #     #         try:
+    #     #             if latest_link.resolve() == season.resolve():
+    #     #                 latest_link.unlink()
+    #     #                 season.rename(new_path)
+    #     #                 latest_link.symlink_to(new_path)
+    #     #                 # Update metadata in new location
+    #     #                 metadata = {"start": start.isoformat(), "end": end.isoformat()}
+    #     #                 new_metadata_file = self._get_season_metadata_file(new_path)
+    #     #                 new_metadata_file.write_text(json.dumps(metadata))
+    #     #                 return new_path
+    #     #         except OSError as e:
+    #     #             logger.warning(f"Error handling symlink: {e}")
+    #     #
+    #     #     # If no symlink or it points elsewhere, just rename
+    #     #     season.rename(new_path)
+    #     #
+    #     #     # Update metadata in new location
+    #     #     metadata = {"start": start.isoformat(), "end": end.isoformat()}
+    #     #     new_metadata_file = self._get_season_metadata_file(new_path)
+    #     #     new_metadata_file.write_text(json.dumps(metadata))
+    #     # else:
+    #     # Just update metadata if no rename needed
+    #     metadata = {"start": start.isoformat(), "end": end.isoformat()}
+    #     metadata_file = self._get_season_metadata_file(season)
+    #     metadata_file.write_text(json.dumps(metadata))
+    #
+    #     return new_path
 
     def get_seasonal_folder(self, private: bool = False) -> Path:
         """Get or create appropriate seasonal folder based on count and time thresholds"""
@@ -647,8 +647,8 @@ class ProjectManager:
             )
 
         # - sanity check name
-        logger.debug(f"Updating season dates for {latest_season}")
-        latest_season = self._update_season_dates(latest_season, end=datetime.now())
+        # logger.debug(f"Updating season dates for {latest_season}")
+        # latest_season = self._update_season_dates(latest_season, end=datetime.now())
         logger.debug(f"Final season folder: {latest_season}")
 
         return latest_season
@@ -697,8 +697,9 @@ class ProjectManager:
                 )
 
         # - create dir
-        draft_dir = seasonal_folder / "draft"
-        project_dir = draft_dir / name
+        # draft_dir = seasonal_folder / "draft"
+        project_dir = seasonal_folder / name
+        # project_dir = draft_dir / name
 
         if project_dir.exists():
             if list(project_dir.iterdir()):
