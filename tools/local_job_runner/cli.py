@@ -18,7 +18,7 @@ from rich.table import Table
 import json
 from datetime import datetime
 
-from .job_runner import LocalJobRunner, JobOutcome
+from tools.local_job_runner.job_runner import LocalJobRunner, JobOutcome
 
 app = typer.Typer(help="Local Job Runner - Execute and manage local jobs")
 console = Console()

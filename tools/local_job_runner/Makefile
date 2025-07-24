@@ -12,8 +12,7 @@ LOG_DIR := ~/Library/Logs/CalmmageScheduler
 help:
 	@echo "🏃 Local Job Runner Tool"
 	@echo ""
-	@echo "Setup & Installation:"
-	@echo "  make install        - Install Python dependencies"
+	@echo "Setup:"
 	@echo "  make setup          - Create directories and setup environment"
 	@echo ""
 	@echo "Job Execution:"
@@ -36,14 +35,6 @@ help:
 	@echo "  make dev-test       - Setup examples and run them"
 	@echo "  make clean-logs     - Clean old log files"
 
-# Installation
-install:
-	@echo "📦 Installing Local Job Runner dependencies..."
-	@$(PYTHON) -m pip install typer rich pydantic pyyaml
-	@echo "📦 Installing optional dependencies..."
-	@$(PYTHON) -m pip install pymongo  # For MongoDB jobs
-	@echo "✅ Dependencies installed!"
-
 # Setup
 setup:
 	@echo "🔧 Setting up Local Job Runner..."
@@ -57,10 +48,10 @@ setup:
 run:
 	@if [ -n "$(JOBS_DIR_OVERRIDE)" ]; then \
 		echo "🏃 Running jobs from: $(JOBS_DIR_OVERRIDE)"; \
-		$(PYTHON) cli.py run --jobs-dir "$(JOBS_DIR_OVERRIDE)"; \
+		uv run typer cli.py run run --jobs-dir "$(JOBS_DIR_OVERRIDE)"; \
 	else \
 		echo "🏃 Running jobs from: $(JOBS_DIR)"; \
-		$(PYTHON) cli.py run --jobs-dir "$(JOBS_DIR)"; \
+		uv run typer cli.py run run --jobs-dir "$(JOBS_DIR)"; \
 	fi
 
 # Use custom jobs directory
@@ -71,7 +62,7 @@ run-custom:
 		exit 1; \
 	fi
 	@echo "🏃 Running jobs from custom directory: $(DIR)"
-	@$(PYTHON) cli.py run --jobs-dir "$(DIR)"
+	@uv run typer cli.py run run --jobs-dir "$(DIR)"
 
 # Test specific job
 test-job:
@@ -81,12 +72,12 @@ test-job:
 		exit 1; \
 	fi
 	@echo "🧪 Testing job: $(JOB)"
-	@$(PYTHON) cli.py test "$(JOB)" --jobs-dir "$(JOBS_DIR)"
+	@uv run typer cli.py run test "$(JOB)" --jobs-dir "$(JOBS_DIR)"
 
 # Job management
 list:
 	@echo "📋 Listing available jobs in: $(JOBS_DIR)"
-	@$(PYTHON) cli.py list --jobs-dir "$(JOBS_DIR)"
+	@uv run typer cli.py run list --jobs-dir "$(JOBS_DIR)"
 
 list-custom:
 	@if [ -z "$(DIR)" ]; then \
@@ -95,16 +86,16 @@ list-custom:
 		exit 1; \
 	fi
 	@echo "📋 Listing jobs in: $(DIR)"
-	@$(PYTHON) cli.py list --jobs-dir "$(DIR)"
+	@uv run typer cli.py run list --jobs-dir "$(DIR)"
 
 # Logs
 logs:
 	@echo "📄 Viewing recent job logs..."
-	@$(PYTHON) cli.py logs --latest
+	@uv run typer cli.py run logs --latest
 
 logs-all:
 	@echo "📄 Viewing all job logs..."
-	@$(PYTHON) cli.py logs --latest=false --count=20
+	@uv run typer cli.py run logs --latest=false --count=20
 
 logs-count:
 	@if [ -z "$(COUNT)" ]; then \
@@ -113,7 +104,7 @@ logs-count:
 		exit 1; \
 	fi
 	@echo "📄 Viewing last $(COUNT) job runs..."
-	@$(PYTHON) cli.py logs --latest=false --count=$(COUNT)
+	@uv run typer cli.py run logs --latest=false --count=$(COUNT)
 
 # Templates
 list-templates:
@@ -155,9 +146,9 @@ setup-examples:
 test:
 	@echo "🧪 Running Local Job Runner tests..."
 	@echo "✅ Testing job listing..."
-	@$(PYTHON) cli.py list --jobs-dir "$(TEMPLATES_DIR)" > /dev/null
+	@uv run typer cli.py run list --jobs-dir "$(TEMPLATES_DIR)" > /dev/null
 	@echo "✅ Testing with template directory..."
-	@$(PYTHON) cli.py run --jobs-dir "$(TEMPLATES_DIR)/hello_world_job" > /dev/null || echo "⚠️  Template test may require dependencies"
+	@uv run typer cli.py run run --jobs-dir "$(TEMPLATES_DIR)/hello_world_job" > /dev/null || echo "⚠️  Template test may require dependencies"
 	@echo "✅ Basic tests completed!"
 
 # Development helpers
@@ -180,7 +171,7 @@ clean-logs-all:
 # Show environment info
 info:
 	@echo "🔧 Local Job Runner Information:"
-	@echo "Python: $$($(PYTHON) --version)"
+	@echo "Python: $$(python3 --version)"
 	@echo "Jobs directory: $(JOBS_DIR)"
 	@echo "Templates directory: $(TEMPLATES_DIR)"
 	@echo "Log directory: $(LOG_DIR)"

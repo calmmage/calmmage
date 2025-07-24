@@ -25,12 +25,14 @@ from enum import Enum
 import argparse
 from dataclasses import dataclass, asdict
 
-# For AI-powered summaries (using calmlib if available)
+# For AI-powered summaries (using calmlib utilities)
 try:
-    from calmlib.llm import LLMWrapper
+    from calmlib.llm import query_llm_text, query_llm_structured
+    from pydantic import BaseModel
     HAS_LLM = True
 except ImportError:
     HAS_LLM = False
+    BaseModel = None
 
 
 class JobOutcome(Enum):
@@ -39,6 +41,21 @@ class JobOutcome(Enum):
     FAIL = "fail"
     WARNING = "warning"
     DONE_NOTHING = "done_nothing"
+
+
+if HAS_LLM:
+    class JobAnalysis(BaseModel):
+        """Structured AI analysis of job execution."""
+        outcome_assessment: str  # One of: "ok", "fail", "warning", "done_nothing"
+        did_meaningful_work: bool  # True if job performed actual changes/work
+        summary: str  # 1-2 sentence summary of what happened
+        key_indicators: List[str]  # List of key output indicators that led to this assessment
+        
+        class Config:
+            extra = "forbid"
+else:
+    # Fallback when LLM not available
+    JobAnalysis = None
 
 
 @dataclass
@@ -96,9 +113,12 @@ class LocalJobRunner:
         print(f"Running job: {job_name}")
         
         try:
+            # Use absolute path to avoid path resolution issues
+            absolute_job_path = job_path.resolve()
+            
             result = subprocess.run(
-                [sys.executable, str(job_path)],
-                cwd=job_path.parent,
+                [sys.executable, str(absolute_job_path)],
+                cwd=Path.cwd(),  # Run from the main project directory
                 capture_output=True,
                 text=True,
                 timeout=300  # 5 minute timeout
@@ -110,6 +130,9 @@ class LocalJobRunner:
             stderr = result.stderr
             
             # Determine outcome based on exit code and output
+            # TODO: This is basic heuristic-based detection. The AI analysis below
+            # can provide more sophisticated outcome assessment by analyzing the actual
+            # content and meaning of the output, not just simple pattern matching.
             if exit_code == 0:
                 if not stdout.strip() and not stderr.strip():
                     outcome = JobOutcome.DONE_NOTHING
@@ -169,7 +192,7 @@ class LocalJobRunner:
     
     def _generate_summary(self, job_name: str, exit_code: int, stdout: str, stderr: str, outcome: JobOutcome) -> str:
         """Generate AI-powered summary of job execution."""
-        if not self.llm:
+        if not HAS_LLM:
             # Fallback to simple summary
             if outcome == JobOutcome.OK:
                 return f"Job '{job_name}' completed successfully"
@@ -181,27 +204,77 @@ class LocalJobRunner:
                 return f"Job '{job_name}' failed with exit code {exit_code}"
         
         try:
-            prompt = f"""
-            Analyze this job execution and provide a concise 1-2 sentence summary:
+            # First, try structured analysis for better outcome determination
+            analysis_prompt = f"""
+            Analyze this job execution output and provide structured assessment:
             
             Job Name: {job_name}
             Exit Code: {exit_code}
-            Outcome: {outcome.value}
+            Initial Outcome Assessment: {outcome.value}
             
             STDOUT:
-            {stdout[:1000] if stdout else "(no output)"}
+            {stdout[:2000] if stdout else "(no output)"}
             
-            STDERR:
+            STDERR:  
             {stderr[:1000] if stderr else "(no errors)"}
             
-            Please provide a brief, informative summary of what happened.
+            Analyze the output and determine:
+            1. What was the actual outcome (ok/fail/warning/done_nothing)?
+            2. Did the job perform meaningful work or just run without changes?
+            3. What are the key indicators in the output that led to this assessment?
+            4. Provide a concise 1-2 sentence summary.
+            
+            Consider:
+            - Jobs that only print greetings or basic info likely "done_nothing"
+            - Jobs that generate statistics, reports, or analysis did meaningful work
+            - Jobs that fail with errors should be marked as "fail"
+            - Jobs with warnings but successful completion should be "warning"
             """
             
-            response = self.llm.call(prompt, max_tokens=100)
-            return response.strip()
+            try:
+                if JobAnalysis is None:
+                    raise Exception("JobAnalysis model not available")
+                    
+                analysis = query_llm_structured(
+                    analysis_prompt,
+                    JobAnalysis,
+                    system_message="You are analyzing job execution outputs to categorize their success and meaningfulness.",
+                    model="claude-3.5",  # Use faster model for analysis
+                    max_tokens=300
+                )
+                
+                # Update outcome if AI suggests different assessment
+                if analysis.outcome_assessment != outcome.value:
+                    print(f"  🤖 AI revised outcome: {outcome.value} → {analysis.outcome_assessment}")
+                    # TODO: Consider updating the actual outcome in JobResult
+                
+                # Return AI-generated summary with meaningfulness indicator
+                meaning_indicator = "🔄" if analysis.did_meaningful_work else "⚪"
+                return f"{meaning_indicator} {analysis.summary}"
+                
+            except Exception as e:
+                print(f"  ⚠️  Structured analysis failed ({e}), falling back to text generation")
+                
+                # Fallback to simple text generation
+                simple_prompt = f"""
+                Briefly summarize what this job did in 1-2 sentences:
+                
+                Job: {job_name}
+                Exit Code: {exit_code}
+                Output: {stdout[:500] if stdout else '(no output)'}
+                Errors: {stderr[:300] if stderr else '(no errors)'}
+                """
+                
+                response = query_llm_text(
+                    simple_prompt,
+                    system_message="Provide a concise job execution summary.",
+                    max_tokens=100
+                )
+                return response.strip()
             
         except Exception as e:
-            print(f"Warning: Could not generate AI summary: {e}")
+            print(f"  ⚠️  AI summary generation failed: {e}")
+            # Final fallback to simple summary
             return f"Job '{job_name}' finished with outcome: {outcome.value}"
     
     def run_all_jobs(self) -> None:
@@ -235,11 +308,16 @@ class LocalJobRunner:
         log_file = self.log_dir / f"job_run_{timestamp}.json"
         
         # Convert results to dict for JSON serialization
+        def serialize_result(result):
+            result_dict = asdict(result)
+            result_dict["outcome"] = result.outcome.value  # Convert enum to string
+            return result_dict
+            
         log_data = {
             "run_timestamp": timestamp,
             "jobs_directory": str(self.jobs_dir),
             "total_jobs": len(self.results),
-            "results": [asdict(result) for result in self.results]
+            "results": [serialize_result(result) for result in self.results]
         }
         
         with open(log_file, 'w') as f:
@@ -248,11 +326,88 @@ class LocalJobRunner:
         return log_file
     
     def print_summary(self) -> None:
-        """Print final summary report."""
+        """Print final summary report using Rich tables."""
         if not self.results:
             print("No jobs were executed")
             return
+
+        # Import Rich here to avoid issues if not available
+        try:
+            from rich.console import Console
+            from rich.table import Table
+            console = Console()
+        except ImportError:
+            self._print_simple_summary()
+            return
         
+        console.print("\n[bold blue]JOB EXECUTION SUMMARY[/bold blue]")
+        
+        # Create main results table
+        table = Table(show_header=True, header_style="bold magenta")
+        table.add_column("Job Name", style="cyan", no_wrap=True)
+        table.add_column("Status", justify="center")
+        table.add_column("Duration", justify="right", style="green")
+        table.add_column("Summary", style="white")
+        
+        # Count outcomes and total duration
+        outcome_counts = {outcome: 0 for outcome in JobOutcome}
+        total_duration = 0
+        
+        for result in self.results:
+            outcome_counts[result.outcome] += 1
+            total_duration += result.duration_seconds
+            
+            # Status with emoji and color
+            status_info = {
+                JobOutcome.OK: ("✅ OK", "green"),
+                JobOutcome.FAIL: ("❌ FAIL", "red"),
+                JobOutcome.WARNING: ("⚠️  WARN", "yellow"),
+                JobOutcome.DONE_NOTHING: ("⚪ NOTHING", "dim")
+            }
+            
+            status_text, status_color = status_info.get(result.outcome, ("? UNKNOWN", "white"))
+            
+            # Truncate summary if too long
+            summary = result.summary
+            if len(summary) > 60:
+                summary = summary[:57] + "..."
+            
+            table.add_row(
+                result.job_name,
+                f"[{status_color}]{status_text}[/{status_color}]",
+                f"{result.duration_seconds:.1f}s",
+                summary
+            )
+        
+        console.print(table)
+        
+        # Print summary statistics
+        stats_table = Table(show_header=False, box=None, padding=(0, 1))
+        stats_table.add_column("Metric", style="bold")
+        stats_table.add_column("Value", style="cyan")
+        
+        stats_table.add_row("Total Jobs:", str(len(self.results)))
+        stats_table.add_row("Total Duration:", f"{total_duration:.1f}s")
+        
+        for outcome, count in outcome_counts.items():
+            if count > 0:
+                emoji = {"ok": "✅", "fail": "❌", "warning": "⚠️", "done_nothing": "⚪"}
+                stats_table.add_row(f"{emoji.get(outcome.value, '?')} {outcome.value.title()}:", str(count))
+        
+        console.print("\n[bold]Statistics:[/bold]")
+        console.print(stats_table)
+        
+        # Show errors for failed jobs
+        failed_jobs = [r for r in self.results if r.outcome == JobOutcome.FAIL]
+        if failed_jobs:
+            console.print("\n[bold red]Failed Job Details:[/bold red]")
+            for result in failed_jobs:
+                if result.stderr:
+                    error_msg = result.stderr[:200] + "..." if len(result.stderr) > 200 else result.stderr
+                    console.print(f"[red]• {result.job_name}:[/red] {error_msg}")
+    
+    def _print_simple_summary(self) -> None:
+        """Fallback summary printing without Rich."""
         print("\n" + "="*60)
         print("JOB EXECUTION SUMMARY")
         print("="*60)
