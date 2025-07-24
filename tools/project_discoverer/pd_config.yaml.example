@@ -11,7 +11,10 @@ glob_patterns:
 
 # Special patterns for specific destinations
 seasonal_patterns:
-  - "seasonal/*/*/*"  # seasonal/season_n/group/project
+  # experiments/season_n/project
+  - "experiments/season_*/*",
+  # experiments/season_n/_archive/project
+  - "experiments/season_*/_archive/*"
 
 # Destinations that use seasonal patterns
 seasonal_destinations:

@@ -62,6 +62,9 @@
       "pinentry-mac"
       "npm"
       "pnpm"
+      
+      # Database tools
+      "mongosh"  # MongoDB Shell
     ];
 
     casks = [
