@@ -65,6 +65,16 @@ class JobOutcome(Enum):
     DONE_NOTHING = "done_nothing"
 
 
+class JobStatus(Enum):
+    """Standardized job status for infrastructure monitoring."""
+
+    SUCCESS = "success"
+    FAIL = "fail"
+    NO_CHANGE = "no_change"
+    HANGING = "hanging"
+    REQUIRES_ATTENTION = "requires_attention"
+
+
 if HAS_LLM:
     class JobAnalysis(BaseModel):
         """Structured AI analysis of job execution."""
@@ -103,6 +113,7 @@ class LocalJobRunner:
         self.log_dir.mkdir(parents=True, exist_ok=True)
         
         self.results: List[JobResult] = []
+        self._include_disabled = False  # Flag for including disabled jobs
         
         # Initialize LLM for summaries if available
         self.llm = None
@@ -112,17 +123,38 @@ class LocalJobRunner:
             except Exception as e:
                 print(f"Warning: Could not initialize LLM for summaries: {e}")
     
-    def find_jobs(self) -> List[Path]:
-        """Find all Python files in the jobs directory."""
+    def find_jobs(self, include_disabled: bool = False) -> List[Path]:
+        """
+        Find all Python files in the jobs directory.
+        
+        Args:
+            include_disabled: If True, include jobs starting with '_' (disabled jobs)
+        
+        Returns:
+            List of job file paths, sorted by name
+        """
         if not self.jobs_dir.exists():
             print(f"Jobs directory does not exist: {self.jobs_dir}")
             return []
         
         jobs = []
+        disabled_jobs = []
+        
         for file_path in self.jobs_dir.rglob("*.py"):
-            if file_path.name.startswith("_"):  # Skip private files
-                continue
-            jobs.append(file_path)
+            if file_path.name.startswith("_"):
+                disabled_jobs.append(file_path)
+                if include_disabled:
+                    jobs.append(file_path)
+            else:
+                jobs.append(file_path)
+        
+        # Report disabled jobs if any were found
+        if disabled_jobs and not include_disabled:
+            print(f"ℹ️  Found {len(disabled_jobs)} disabled job(s) (starting with '_'):")
+            for disabled_job in sorted(disabled_jobs):
+                print(f"   📋 {disabled_job.stem} (disabled)")
+            print(f"   💡 To enable: rename without '_' prefix")
+            print(f"   💡 To run disabled jobs: use --include-disabled flag")
         
         return sorted(jobs)
     
@@ -223,10 +255,80 @@ class LocalJobRunner:
                 timestamp=timestamp
             )
     
+    def _parse_job_output(self, stdout: str, stderr: str) -> dict:
+        """Parse job output for FINAL STATUS and FINAL NOTES."""
+        result = {
+            "status": None,
+            "notes": None,
+            "raw_status_line": None,
+            "raw_notes_line": None
+        }
+        
+        # Combine stdout and stderr for parsing
+        full_output = stdout + "\n" + stderr
+        lines = full_output.split('\n')
+        
+        for line in lines:
+            line = line.strip()
+            
+            # Parse FINAL STATUS
+            if line.startswith("🎯 FINAL STATUS:"):
+                result["raw_status_line"] = line
+                # Extract status after the colon and before any dash
+                status_part = line.split(":", 1)[1].strip()
+                if " - " in status_part:
+                    status_keyword = status_part.split(" - ")[0].strip()
+                else:
+                    status_keyword = status_part
+                
+                # Only accept the standard enum values
+                try:
+                    result["status"] = JobStatus(status_keyword.lower())
+                except ValueError:
+                    print(f"⚠️  Warning: Invalid FINAL STATUS '{status_keyword}' in job output. Valid values: {[s.value for s in JobStatus]}")
+                    result["status"] = None
+            
+            # Parse FINAL NOTES
+            elif line.startswith("📝 FINAL NOTES:"):
+                result["raw_notes_line"] = line
+                # Extract notes after the colon
+                notes_part = line.split(":", 1)[1].strip()
+                result["notes"] = notes_part
+        
+        return result
+
     def _generate_summary(self, job_name: str, exit_code: int, stdout: str, stderr: str, outcome: JobOutcome) -> str:
-        """Generate AI-powered summary of job execution."""
+        """Generate summary of job execution with manual parsing fallback."""
+        
+        # First try to parse structured output
+        parsed = self._parse_job_output(stdout, stderr)
+        
+        if parsed["status"] is not None:
+            # We found structured status output
+            status_emojis = {
+                JobStatus.SUCCESS: "✅",
+                JobStatus.FAIL: "❌", 
+                JobStatus.NO_CHANGE: "⚪",
+                JobStatus.HANGING: "⏳",
+                JobStatus.REQUIRES_ATTENTION: "⚠️"
+            }
+            
+            emoji = status_emojis.get(parsed["status"], "📋")
+            status_text = parsed["status"].value.replace("_", " ").title()
+            
+            if parsed["notes"]:
+                return f"{emoji} {status_text}: {parsed['notes']}"
+            else:
+                # Extract description from the raw status line if available
+                if parsed["raw_status_line"] and " - " in parsed["raw_status_line"]:
+                    description = parsed["raw_status_line"].split(" - ", 1)[1]
+                    return f"{emoji} {status_text}: {description}"
+                else:
+                    return f"{emoji} {status_text}"
+        
+        # Fallback for jobs without structured output
         if not HAS_LLM:
-            # Fallback to simple summary
+            # Simple fallback summary
             if outcome == JobOutcome.OK:
                 return f"Job '{job_name}' completed successfully"
             elif outcome == JobOutcome.DONE_NOTHING:
@@ -286,7 +388,7 @@ class LocalJobRunner:
                 return f"{meaning_indicator} {analysis.summary}"
                 
             except Exception as e:
-                print(f"  ⚠️  Structured analysis failed ({e}), falling back to text generation")
+                print(f"  ⚠️  Warning: Structured LLM analysis failed ({e}), falling back to text generation")
                 
                 # Fallback to simple text generation
                 simple_prompt = f"""
@@ -306,7 +408,7 @@ class LocalJobRunner:
                 return response.strip()
             
         except Exception as e:
-            print(f"  ⚠️  AI summary generation failed: {e}")
+            print(f"  ⚠️  Warning: AI summary generation failed: {e}")
             # Final fallback to simple summary
             return f"Job '{job_name}' finished with outcome: {outcome.value}"
     
@@ -370,7 +472,7 @@ class LocalJobRunner:
 
     async def run_all_jobs_async(self) -> None:
         """Run all jobs concurrently with live progress updates."""
-        jobs = self.find_jobs()
+        jobs = self.find_jobs(include_disabled=self._include_disabled)
         
         if not jobs:
             print("No jobs found to run")
@@ -403,6 +505,7 @@ class LocalJobRunner:
                 except Exception as e:
                     # Create failure result for exceptions
                     job_name = job_path.stem
+                    print(f"  ⚠️  Warning: Job '{job_name}' failed with exception: {e}")
                     result = JobResult(
                         job_name=job_name,
                         job_path=str(job_path),
@@ -591,16 +694,24 @@ def main():
         help="Directory to store logs",
         default=None
     )
+    parser.add_argument(
+        "--include-disabled",
+        action="store_true",
+        help="Include disabled jobs (starting with '_')"
+    )
     
     args = parser.parse_args()
     
     runner = LocalJobRunner(args.jobs_dir, args.log_dir)
+    runner._include_disabled = args.include_disabled
     
     print("Starting job runner...")
     print(f"📁 Jobs directory: {runner.jobs_dir}")
     print(f"📝 Log directory: {runner.log_dir}")
     print(f"⏰ Job timeout: {JOB_TIMEOUT_SECONDS // 60} minutes ({JOB_TIMEOUT_SECONDS} seconds)")
     print(f"🐍 Python executable: {get_python_executable()}")
+    if args.include_disabled:
+        print("🔴 Including disabled jobs (starting with '_')")
     print()
     
     # Run all jobs

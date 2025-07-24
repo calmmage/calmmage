@@ -19,7 +19,12 @@ import json
 from datetime import datetime
 from src.lib.utils import get_scheduled_tasks_dir
 
-from tools.local_job_runner.job_runner import LocalJobRunner, JobOutcome
+from tools.local_job_runner.job_runner import (
+    LocalJobRunner,
+    JobOutcome,
+    JOB_TIMEOUT_SECONDS,
+    get_python_executable,
+)
 
 app = typer.Typer(help="Local Job Runner - Execute and manage local jobs")
 console = Console()
@@ -32,7 +37,8 @@ DEFAULT_LOG_DIR = Path.home() / "Library" / "Logs" / "CalmmageScheduler"
 def run_jobs(
     jobs_dir: Annotated[Path, typer.Option(help="Directory containing jobs")] = DEFAULT_JOBS_DIR,
     log_dir: Annotated[Optional[Path], typer.Option(help="Log directory")] = None,
-    job_pattern: Annotated[Optional[str], typer.Option(help="Run only jobs matching pattern")] = None
+    job_pattern: Annotated[Optional[str], typer.Option(help="Run only jobs matching pattern")] = None,
+    include_disabled: Annotated[bool, typer.Option("--include-disabled", help="Include disabled jobs (starting with '_')")] = False
 ):
     """Run all jobs in the specified directory."""
     
@@ -45,17 +51,22 @@ def run_jobs(
     console.print("🚀 Starting job runner...")
     console.print(f"📁 Jobs directory: {jobs_dir}")
     console.print(f"📝 Log directory: {runner.log_dir}")
+    console.print(f"⏰ Job timeout: {JOB_TIMEOUT_SECONDS // 60} minutes ({JOB_TIMEOUT_SECONDS} seconds)")
+    console.print(f"🐍 Python executable: {get_python_executable()}")
     console.print()
     
-    # Filter jobs if pattern provided
+    # Find jobs with disabled flag
     if job_pattern:
-        all_jobs = runner.find_jobs()
+        all_jobs = runner.find_jobs(include_disabled=include_disabled)
         filtered_jobs = [job for job in all_jobs if job_pattern in job.name]
         if not filtered_jobs:
             console.print(f"[yellow]No jobs found matching pattern: {job_pattern}[/yellow]")
             return
         console.print(f"Running {len(filtered_jobs)} jobs matching '{job_pattern}'")
         # TODO: Implement pattern filtering in job_runner
+    else:
+        # Set the include_disabled flag for the runner
+        runner._include_disabled = include_disabled
     
     # Run all jobs
     runner.run_all_jobs()
@@ -70,7 +81,8 @@ def run_jobs(
 
 @app.command("list")
 def list_jobs(
-    jobs_dir: Annotated[Path, typer.Option(help="Directory containing jobs")] = DEFAULT_JOBS_DIR
+    jobs_dir: Annotated[Path, typer.Option(help="Directory containing jobs")] = DEFAULT_JOBS_DIR,
+    include_disabled: Annotated[bool, typer.Option("--include-disabled", help="Include disabled jobs (starting with '_')")] = False
 ):
     """List all available jobs."""
     
@@ -79,7 +91,7 @@ def list_jobs(
         raise typer.Exit(1)
     
     runner = LocalJobRunner(jobs_dir)
-    jobs = runner.find_jobs()
+    jobs = runner.find_jobs(include_disabled=include_disabled)
     
     if not jobs:
         console.print("No jobs found")
@@ -87,6 +99,7 @@ def list_jobs(
     
     table = Table(title=f"Available Jobs in {jobs_dir}")
     table.add_column("Job Name", style="cyan")
+    table.add_column("Status", style="white", justify="center")
     table.add_column("File Path", style="magenta")
     table.add_column("Size", style="green")
     table.add_column("Modified", style="yellow")
@@ -96,8 +109,17 @@ def list_jobs(
         size = f"{stat.st_size} bytes"
         modified = datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M")
         
+        # Determine job status
+        if job_path.name.startswith("_"):
+            status = "[red]🔴 DISABLED[/red]"
+            job_name_style = "[dim]" + job_path.stem + "[/dim]"
+        else:
+            status = "[green]🟢 ENABLED[/green]"
+            job_name_style = job_path.stem
+        
         table.add_row(
-            job_path.stem,
+            job_name_style,
+            status,
             str(job_path.relative_to(jobs_dir)),
             size,
             modified

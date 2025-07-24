@@ -52,8 +52,9 @@ def count_files_in_directory(path: str) -> dict:
                 files += 1
                 try:
                     total_size += item.stat().st_size
-                except:
-                    pass  # Skip files we can't read
+                except (OSError, PermissionError) as e:
+                    print(f"⚠️  Warning: Cannot read file {item}: {e}")
+                    continue  # Skip files we can't read
             elif item.is_dir():
                 dirs += 1
         
