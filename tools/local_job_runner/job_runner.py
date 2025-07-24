@@ -19,6 +19,7 @@ import subprocess
 import json
 import time
 import asyncio
+import os
 from datetime import datetime
 from pathlib import Path
 from typing import List, Optional
@@ -26,6 +27,23 @@ from enum import Enum
 import argparse
 from dataclasses import dataclass, asdict
 from src.lib.utils import get_scheduled_tasks_dir
+
+# Job execution configuration
+JOB_TIMEOUT_SECONDS = 300  # 5 minutes
+
+def get_python_executable() -> str:
+    """Get the Python executable to use for running jobs."""
+    calmmage_venv = os.getenv('CALMMAGE_VENV_PATH')
+    if calmmage_venv:
+        python_path = Path(calmmage_venv) / "bin" / "python"
+        if python_path.exists():
+            return str(python_path)
+        else:
+            print(f"⚠️  Warning: CALMMAGE_VENV_PATH set but {python_path} not found, using current Python")
+    else:
+        print("⚠️  Warning: CALMMAGE_VENV_PATH not set, using current Python interpreter")
+    
+    return sys.executable
 
 # For AI-powered summaries (using calmlib utilities)
 try:
@@ -119,10 +137,11 @@ class LocalJobRunner:
         try:
             # Use absolute path to avoid path resolution issues
             absolute_job_path = job_path.resolve()
+            python_executable = get_python_executable()
             
             # Create subprocess asynchronously with timeout
             process = await asyncio.create_subprocess_exec(
-                sys.executable, str(absolute_job_path),
+                python_executable, str(absolute_job_path),
                 cwd=Path.cwd(),  # Run from the main project directory
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE
@@ -131,7 +150,7 @@ class LocalJobRunner:
             # Wait for completion with timeout
             try:
                 stdout_bytes, stderr_bytes = await asyncio.wait_for(
-                    process.communicate(), timeout=300  # 5 minute timeout
+                    process.communicate(), timeout=JOB_TIMEOUT_SECONDS
                 )
                 exit_code = process.returncode
                 stdout = stdout_bytes.decode('utf-8')
@@ -139,7 +158,7 @@ class LocalJobRunner:
             except asyncio.TimeoutError:
                 process.kill()
                 await process.wait()
-                raise subprocess.TimeoutExpired(f"Job {job_name}", 300)
+                raise subprocess.TimeoutExpired(f"Job {job_name}", JOB_TIMEOUT_SECONDS)
             
             duration = time.time() - start_time
             
@@ -174,7 +193,7 @@ class LocalJobRunner:
             
         except subprocess.TimeoutExpired:
             duration = time.time() - start_time
-            summary = f"Job '{job_name}' timed out after 5 minutes"
+            summary = f"Job '{job_name}' timed out after {JOB_TIMEOUT_SECONDS // 60} minutes"
             
             return JobResult(
                 job_name=job_name,
@@ -291,8 +310,66 @@ class LocalJobRunner:
             # Final fallback to simple summary
             return f"Job '{job_name}' finished with outcome: {outcome.value}"
     
+    def print_live_results_table(self, total_jobs: int) -> None:
+        """Print a live-updating table of completed jobs."""
+        if not self.results:
+            return
+            
+        # Import Rich for live table display
+        from rich.console import Console
+        from rich.table import Table
+        from rich.live import Live
+        
+        console = Console()
+        
+        # Create table
+        table = Table(title=f"Job Execution Progress ({len(self.results)}/{total_jobs} completed)")
+        table.add_column("Job Name", style="cyan", no_wrap=True)
+        table.add_column("Status", justify="center")
+        table.add_column("Duration", justify="right", style="green")
+        table.add_column("Summary", style="white")
+        
+        # Add completed jobs to table
+        for result in self.results:
+            # Status with emoji and color
+            status_info = {
+                JobOutcome.OK: ("✅ OK", "green"),
+                JobOutcome.FAIL: ("❌ FAIL", "red"),
+                JobOutcome.WARNING: ("⚠️  WARN", "yellow"),
+                JobOutcome.DONE_NOTHING: ("⚪ NOTHING", "dim")
+            }
+            
+            status_text, status_color = status_info.get(result.outcome, ("? UNKNOWN", "white"))
+            
+            # Truncate summary if too long
+            summary = result.summary
+            if len(summary) > 60:
+                summary = summary[:57] + "..."
+            
+            table.add_row(
+                result.job_name,
+                f"[{status_color}]{status_text}[/{status_color}]",
+                f"{result.duration_seconds:.1f}s",
+                summary
+            )
+        
+        # Show still-running jobs
+        completed_names = {r.job_name for r in self.results}
+        running_count = total_jobs - len(self.results)
+        if running_count > 0:
+            table.add_row(
+                f"[yellow]{running_count} jobs still running...[/yellow]",
+                "[yellow]🔄 RUNNING[/yellow]",
+                "[yellow]...[/yellow]",
+                "[yellow]In progress...[/yellow]"
+            )
+        
+        # Clear screen and print table
+        console.clear()
+        console.print(table)
+
     async def run_all_jobs_async(self) -> None:
-        """Run all jobs concurrently and collect results."""
+        """Run all jobs concurrently with live progress updates."""
         jobs = self.find_jobs()
         
         if not jobs:
@@ -300,39 +377,63 @@ class LocalJobRunner:
             return
         
         print(f"Found {len(jobs)} jobs to run")
-        print("Running jobs concurrently...")
+        print("Running jobs concurrently with live updates...")
+        print(f"⏰ Job timeout: {JOB_TIMEOUT_SECONDS // 60} minutes ({JOB_TIMEOUT_SECONDS} seconds)")
+        print(f"🐍 Python executable: {get_python_executable()}")
+        print("(Press Ctrl+C to stop)\n")
         
-        # Run all jobs concurrently
-        tasks = [self.execute_job_async(job_path) for job_path in jobs]
-        results = await asyncio.gather(*tasks, return_exceptions=True)
+        # Start all jobs concurrently
+        tasks = {asyncio.create_task(self.execute_job_async(job_path)): job_path 
+                for job_path in jobs}
         
-        # Process results and handle exceptions
-        for i, result in enumerate(results):
-            if isinstance(result, Exception):
-                # Create a failure result for exceptions
-                job_name = jobs[i].stem
-                result = JobResult(
-                    job_name=job_name,
-                    job_path=str(jobs[i]),
-                    outcome=JobOutcome.FAIL,
-                    exit_code=-1,
-                    duration_seconds=0.0,
-                    stdout="",
-                    stderr=str(result),
-                    summary=f"Job '{job_name}' failed with exception: {str(result)}",
-                    timestamp=datetime.now().isoformat()
-                )
+        # Poll for completion with live updates
+        while tasks:
+            # Wait for at least one task to complete (with timeout for updates)
+            done, pending = await asyncio.wait(
+                tasks.keys(), 
+                return_when=asyncio.FIRST_COMPLETED,
+                timeout=2.0  # Update display every 2 seconds
+            )
             
-            self.results.append(result)
+            # Process completed tasks
+            for task in done:
+                job_path = tasks[task]
+                try:
+                    result = await task
+                except Exception as e:
+                    # Create failure result for exceptions
+                    job_name = job_path.stem
+                    result = JobResult(
+                        job_name=job_name,
+                        job_path=str(job_path),
+                        outcome=JobOutcome.FAIL,
+                        exit_code=-1,
+                        duration_seconds=0.0,
+                        stdout="",
+                        stderr=str(e),
+                        summary=f"Job '{job_name}' failed with exception: {str(e)}",
+                        timestamp=datetime.now().isoformat()
+                    )
+                
+                self.results.append(result)
+                del tasks[task]
             
-            # Print immediate feedback
-            status_color = {
-                JobOutcome.OK: "✅",
-                JobOutcome.DONE_NOTHING: "⚪",
-                JobOutcome.WARNING: "⚠️",
-                JobOutcome.FAIL: "❌"
-            }
-            
+            # Update display with current results
+            self.print_live_results_table(len(jobs))
+        
+        # Final status update
+        print(f"\n🎉 All {len(jobs)} jobs completed!")
+        
+        # Print simple final status for each job
+        status_color = {
+            JobOutcome.OK: "✅",
+            JobOutcome.DONE_NOTHING: "⚪",
+            JobOutcome.WARNING: "⚠️",
+            JobOutcome.FAIL: "❌"
+        }
+        
+        print("\nFinal Results:")
+        for result in self.results:
             print(f"  {status_color.get(result.outcome, '?')} {result.job_name} "
                   f"({result.duration_seconds:.1f}s) - {result.summary}")
     
@@ -496,8 +597,10 @@ def main():
     runner = LocalJobRunner(args.jobs_dir, args.log_dir)
     
     print("Starting job runner...")
-    print(f"Jobs directory: {runner.jobs_dir}")
-    print(f"Log directory: {runner.log_dir}")
+    print(f"📁 Jobs directory: {runner.jobs_dir}")
+    print(f"📝 Log directory: {runner.log_dir}")
+    print(f"⏰ Job timeout: {JOB_TIMEOUT_SECONDS // 60} minutes ({JOB_TIMEOUT_SECONDS} seconds)")
+    print(f"🐍 Python executable: {get_python_executable()}")
     print()
     
     # Run all jobs
