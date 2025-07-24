@@ -385,7 +385,7 @@ requires-dist = [
 
 [[package]]
 name = "calmmage"
-version = "2025.4.2"
+version = "2025.4.3"
 source = { editable = "." }
 dependencies = [
     { name = "apscheduler" },
@@ -414,6 +414,7 @@ dependencies = [
     { name = "python-dotenv" },
     { name = "pytimeparse" },
     { name = "qrcode" },
+    { name = "rich" },
     { name = "seaborn" },
     { name = "telethon" },
     { name = "tqdm" },
@@ -482,6 +483,7 @@ requires-dist = [
     { name = "python-dotenv" },
     { name = "pytimeparse", specifier = ">=1.1.8,<2.0.0" },
     { name = "qrcode", specifier = ">=8.0,<9.0" },
+    { name = "rich", specifier = ">=14.0.0" },
     { name = "seaborn", specifier = ">=0.13.2,<1.0.0" },
     { name = "telethon", specifier = ">=1.38.1,<2.0.0" },
     { name = "tqdm" },

@@ -18,19 +18,23 @@ import sys
 import subprocess
 import json
 import time
+import asyncio
 from datetime import datetime
 from pathlib import Path
 from typing import List, Optional
 from enum import Enum
 import argparse
 from dataclasses import dataclass, asdict
+from src.lib.utils import get_scheduled_tasks_dir
 
 # For AI-powered summaries (using calmlib utilities)
 try:
     from calmlib.llm import query_llm_text, query_llm_structured
     from pydantic import BaseModel
     HAS_LLM = True
-except ImportError:
+except ImportError as e:
+    print(f"⚠️  Warning: LLM utilities not available: {e}")
+    print("   AI summaries will be disabled, using fallback text summaries")
     HAS_LLM = False
     BaseModel = None
 
@@ -104,7 +108,7 @@ class LocalJobRunner:
         
         return sorted(jobs)
     
-    def execute_job(self, job_path: Path) -> JobResult:
+    async def execute_job_async(self, job_path: Path) -> JobResult:
         """Execute a single job and capture results."""
         job_name = job_path.stem
         start_time = time.time()
@@ -116,18 +120,28 @@ class LocalJobRunner:
             # Use absolute path to avoid path resolution issues
             absolute_job_path = job_path.resolve()
             
-            result = subprocess.run(
-                [sys.executable, str(absolute_job_path)],
+            # Create subprocess asynchronously with timeout
+            process = await asyncio.create_subprocess_exec(
+                sys.executable, str(absolute_job_path),
                 cwd=Path.cwd(),  # Run from the main project directory
-                capture_output=True,
-                text=True,
-                timeout=300  # 5 minute timeout
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
             )
             
+            # Wait for completion with timeout
+            try:
+                stdout_bytes, stderr_bytes = await asyncio.wait_for(
+                    process.communicate(), timeout=300  # 5 minute timeout
+                )
+                exit_code = process.returncode
+                stdout = stdout_bytes.decode('utf-8')
+                stderr = stderr_bytes.decode('utf-8')
+            except asyncio.TimeoutError:
+                process.kill()
+                await process.wait()
+                raise subprocess.TimeoutExpired(f"Job {job_name}", 300)
+            
             duration = time.time() - start_time
-            exit_code = result.returncode
-            stdout = result.stdout
-            stderr = result.stderr
             
             # Determine outcome based on exit code and output
             # TODO: This is basic heuristic-based detection. The AI analysis below
@@ -277,8 +291,8 @@ class LocalJobRunner:
             # Final fallback to simple summary
             return f"Job '{job_name}' finished with outcome: {outcome.value}"
     
-    def run_all_jobs(self) -> None:
-        """Run all jobs and collect results."""
+    async def run_all_jobs_async(self) -> None:
+        """Run all jobs concurrently and collect results."""
         jobs = self.find_jobs()
         
         if not jobs:
@@ -286,9 +300,29 @@ class LocalJobRunner:
             return
         
         print(f"Found {len(jobs)} jobs to run")
+        print("Running jobs concurrently...")
         
-        for job_path in jobs:
-            result = self.execute_job(job_path)
+        # Run all jobs concurrently
+        tasks = [self.execute_job_async(job_path) for job_path in jobs]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        # Process results and handle exceptions
+        for i, result in enumerate(results):
+            if isinstance(result, Exception):
+                # Create a failure result for exceptions
+                job_name = jobs[i].stem
+                result = JobResult(
+                    job_name=job_name,
+                    job_path=str(jobs[i]),
+                    outcome=JobOutcome.FAIL,
+                    exit_code=-1,
+                    duration_seconds=0.0,
+                    stdout="",
+                    stderr=str(result),
+                    summary=f"Job '{job_name}' failed with exception: {str(result)}",
+                    timestamp=datetime.now().isoformat()
+                )
+            
             self.results.append(result)
             
             # Print immediate feedback
@@ -301,6 +335,14 @@ class LocalJobRunner:
             
             print(f"  {status_color.get(result.outcome, '?')} {result.job_name} "
                   f"({result.duration_seconds:.1f}s) - {result.summary}")
+    
+    def execute_job(self, job_path: Path) -> JobResult:
+        """Synchronous wrapper for single job execution (used by CLI test command)."""
+        return asyncio.run(self.execute_job_async(job_path))
+    
+    def run_all_jobs(self) -> None:
+        """Synchronous wrapper for async job execution."""
+        asyncio.run(self.run_all_jobs_async())
     
     def save_logs(self) -> Path:
         """Save detailed logs to file."""
@@ -331,14 +373,10 @@ class LocalJobRunner:
             print("No jobs were executed")
             return
 
-        # Import Rich here to avoid issues if not available
-        try:
-            from rich.console import Console
-            from rich.table import Table
-            console = Console()
-        except ImportError:
-            self._print_simple_summary()
-            return
+        # Import Rich - let it fail if not available
+        from rich.console import Console
+        from rich.table import Table
+        console = Console()
         
         console.print("\n[bold blue]JOB EXECUTION SUMMARY[/bold blue]")
         
@@ -444,7 +482,7 @@ def main():
         "--jobs-dir",
         type=Path,
         help="Directory containing jobs to run",
-        default=Path.cwd() / "jobs"
+        default=get_scheduled_tasks_dir()
     )
     parser.add_argument(
         "--log-dir",

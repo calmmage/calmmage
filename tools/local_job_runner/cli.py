@@ -17,13 +17,14 @@ from rich.console import Console
 from rich.table import Table
 import json
 from datetime import datetime
+from src.lib.utils import get_scheduled_tasks_dir
 
 from tools.local_job_runner.job_runner import LocalJobRunner, JobOutcome
 
 app = typer.Typer(help="Local Job Runner - Execute and manage local jobs")
 console = Console()
 
-DEFAULT_JOBS_DIR = Path.cwd() / "scripts" / "scheduled_tasks"
+DEFAULT_JOBS_DIR = get_scheduled_tasks_dir()
 DEFAULT_LOG_DIR = Path.home() / "Library" / "Logs" / "CalmmageScheduler"
 
 
@@ -63,7 +64,8 @@ def run_jobs(
     log_file = runner.save_logs()
     console.print(f"\n📄 Detailed logs saved to: {log_file}")
     
-    # Print summary (already handled by runner)
+    # Print Rich table summary
+    runner.print_summary()
 
 
 @app.command("list")
