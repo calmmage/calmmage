@@ -47,6 +47,11 @@ class ObsidianSorterConfig(BaseModel):
         default=False,
         description="Preview changes without actually moving files"
     )
+
+    non_daily_target: Path = Field(
+        default=Path("Inbox"),
+        description="Where to move non-daily notes from daily folder (relative to obsidian_root)",
+    )
     
     @property
     def full_inbox_path(self) -> Path:

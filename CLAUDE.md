@@ -96,6 +96,11 @@ uv run typer path/to/cli.py run [command] [args]
 
 **Never use bare python or direct script execution - always prefix with `uv run`**
 
+**CRITICAL: Never use sys.path.append() in tools/**
+- uv installs calmmage as a package - imports work directly
+- Use absolute imports: `from tools.module_name.file import Class`
+- Do NOT add `sys.path.append(str(Path(__file__).parent.parent.parent))`
+
 ## Additional Context
 
 Refer to the existing developer planning system in:
