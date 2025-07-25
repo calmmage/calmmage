@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(typer:*)",
+      "Bash(mv:*)",
+      "Bash(chmod:*)"
+    ],
+    "deny": []
+  }
+}

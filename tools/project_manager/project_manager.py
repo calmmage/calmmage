@@ -710,9 +710,6 @@ class ProjectManager:
                 logger.warning(f"Directory already exists but is empty: {project_dir}")
 
         if not dry_run:
-            # Ensure draft directory exists
-            draft_dir.mkdir(exist_ok=True, parents=True)
-
             if template:
                 # Copy template contents
                 template_path = self._get_template_path(template)

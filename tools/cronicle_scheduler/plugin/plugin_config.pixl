@@ -1,0 +1,40 @@
+{
+  "generic_job_executor": {
+    "title": "Python Job Executor",
+    "description": "Executes Python scripts with custom environment and CLI arguments",
+    "binary": "/Users/petrlavrov/work/projects/calmmage/tools/cronicle_scheduler/plugin/job_executor.py",
+    "params": {
+      "script_path": { 
+        "type": "string", 
+        "desc": "Path to Python script to execute", 
+        "required": 1 
+      },
+      "python_exec": { 
+        "type": "string", 
+        "desc": "Python executable to use (defaults to $CALMMAGE_VENV_PATH/bin/python if empty)", 
+        "required": 0 
+      },
+      "env_file": { 
+        "type": "string", 
+        "desc": "Path to .env file (defaults to script directory/.env if empty)", 
+        "required": 0 
+      },
+      "cli_args": { 
+        "type": "string", 
+        "desc": "Command line arguments to pass to script (e.g., '--verbose --timeout 300')", 
+        "required": 0 
+      }
+    }
+  }
+}
+
+<!-- 
+INSTALLATION INSTRUCTIONS:
+1. Copy the JSON content above (without this comment block)
+2. Go to Cronicle web interface > Admin > Plugins
+3. Click "Add Plugin" 
+4. Paste the JSON content
+5. Click "Create Plugin"
+6. Note the Plugin ID that gets generated
+7. The Plugin ID will be automatically prompted when first using the CLI
+-->
