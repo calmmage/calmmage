@@ -29,21 +29,22 @@ date_format:
 # part 2: manual sorting
 
 actual:
-  - calmlib
-  - dev-env
   - botspot
-  # - calmmage
   - calmmage-private
   - examples
   - codechat
   - calmmage
 
+  - realistic-ai-bot
+  - outstanding-items-bot
+  - botspot-template
+  - formatter-bot
+
 archive:
   - siri-ask-gpt
-  - calmapp
-  - new-bot-lib
   - calmmage-gpt-bot
   - mentor-146-bot
+  - anna-flower-shop
 
 experiments:
   - taskzilla-cm
@@ -53,6 +54,12 @@ ignore:
   - isnimschikov-bot-template
   - foam-template
   - TextTailor-Scrapers
+  - calmlib
+  - deprecated_calmlib
+  - dev-env
+  - deprecated_dev-env
+  - telegram-downloader
+  - deprecated_telegram-downloader
 
 # secondary groups
 cool:
@@ -61,23 +68,24 @@ cool:
   - generate-dir-link
   - gpt-chatbot-that-stays-on-point
   - dnd-dice-thrower
-
-libs:
-  - calmlib
-  - examples
-  - botspot
-#  - calmapp
-
+  - anna-flower-shop
+#
+#libs:
+#  - calmlib
+#  - examples
+#  - botspot
+##  - calmapp
+#
 templates:
   - base-template
 #   - typescript-project-template
   - python-project-template
   - seasonal-dir-template
   - bot-lib-bot-template
-
-unfinished:
-  - resu_me_hh_app
-
+#
+#unfinished:
+#  - resu_me_hh_app
+#
 memorable:
   - dnd-dice-thrower
   - siri-ask-gpt
