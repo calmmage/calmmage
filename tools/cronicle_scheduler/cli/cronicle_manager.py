@@ -13,6 +13,7 @@ This CLI allows you to:
 import typer
 import os
 import json
+import random
 from typing import Optional
 from typing_extensions import Annotated
 from pathlib import Path
@@ -76,10 +77,62 @@ def get_client() -> CronicleClient:
     return CronicleClient(CRONICLE_URL, CRONICLE_API_KEY)
 
 
+def generate_job_name_from_path(script_path: str) -> str:
+    """
+    Generate a job name from script path using AI (placeholder for now).
+    
+    TODO: Implement AI-powered name generation based on script content/path.
+    For now, converts filename to Title Case.
+    """
+    try:
+        # For now: simple Title Case conversion from filename
+        filename = Path(script_path).stem
+        # Convert underscores/hyphens to spaces and title case
+        name = filename.replace("_", " ").replace("-", " ").title()
+        return name
+    except Exception:
+        return "Auto Generated Job"
+
+
+def parse_schedule_keyword(schedule: str) -> dict:
+    """
+    Parse schedule keywords into timing parameters.
+    
+    TODO: Implement AI-powered natural language schedule parsing.
+    For now, supports basic keywords and cron-like expressions.
+    """
+    schedule = schedule.lower().strip()
+    
+    # Basic keyword mappings
+    keyword_mappings = {
+        "minutely": {"minutes": list(range(60))},  # Every minute
+        "hourly": {"minutes": [0]},  # Top of every hour
+        "daily": {"hours": [random.randint(8, 20)], "minutes": [random.randint(0, 59)]},  # Random time 8-20
+        "weekly": {"weekdays": [1], "hours": [random.randint(8, 20)], "minutes": [random.randint(0, 59)]},  # Monday
+        "monthly": {"days": [1], "hours": [random.randint(8, 20)], "minutes": [random.randint(0, 59)]},  # 1st of month
+        "quarterly": {"months": [1, 4, 7, 10], "days": [1], "hours": [random.randint(8, 20)]},  # Quarters
+        "yearly": {"months": [1], "days": [1], "hours": [random.randint(8, 20)]}  # New Year
+    }
+    
+    if schedule in keyword_mappings:
+        return keyword_mappings[schedule]
+    
+    # TODO: Add AI-powered parsing for complex expressions like:
+    # - "every weekday at 9am"
+    # - "twice a week"
+    # - "monthly on the 15th"
+    # - "every other day"
+    
+    # For now, if not a keyword, assume it's a cron expression or return daily default
+    console.print(f"[yellow]⚠️  Schedule '{schedule}' not recognized, using 'daily' default[/yellow]")
+    return keyword_mappings["daily"]
+
+
 @app.command("create")
 def create_job(
-    name: Annotated[str, typer.Argument(help="Job name/title")],
-    executable: Annotated[str, typer.Argument(help="Path to executable")],
+    name: Annotated[Optional[str], typer.Argument(help="Job name/title")] = None,
+    executable: Annotated[Optional[str], typer.Argument(help="Path to executable")] = None,
+    schedule: Annotated[Optional[str], typer.Option(help="Schedule (daily/hourly/weekly/monthly/minutely/yearly/quarterly or cron)")] = None,
     category: Annotated[str, typer.Option(help="Job category")] = "general",
     target: Annotated[str, typer.Option(help="Target server/group")] = "all_servers",
     hours: Annotated[Optional[str], typer.Option(help="Comma-separated hours (0-23)")] = None,
@@ -93,8 +146,56 @@ def create_job(
     
     client = get_client()
     
+    # Interactive prompts for missing parameters
+    
+    # 1. Handle executable path (script path)
+    if not executable:
+        executable = typer.prompt("📄 Enter script path")
+    
+    # Convert relative path to absolute
+    executable_path = Path(executable)
+    if not executable_path.is_absolute():
+        executable_path = Path.cwd() / executable_path
+    executable = str(executable_path.resolve())
+    
+    # Validate script exists
+    if not Path(executable).exists():
+        console.print(f"[red]Error: Script not found: {executable}[/red]")
+        raise typer.Exit(1)
+    
+    # 2. Handle job name
+    if not name:
+        suggested_name = generate_job_name_from_path(executable)
+        name = typer.prompt(f"📝 Enter job name", default=suggested_name)
+    
+    # 3. Handle schedule
+    if not schedule and not hours and not minutes and not weekdays:
+        console.print("\n⏰ [bold]Schedule Options:[/bold]")
+        console.print("   • [cyan]daily[/cyan] - Random time between 8-20")
+        console.print("   • [cyan]hourly[/cyan] - Top of every hour")
+        console.print("   • [cyan]weekly[/cyan] - Monday random time")
+        console.print("   • [cyan]monthly[/cyan] - 1st of month")
+        console.print("   • [cyan]minutely[/cyan] - Every minute")
+        console.print("   • [cyan]yearly[/cyan] - New Year's Day")
+        console.print("   • [cyan]quarterly[/cyan] - Start of quarters")
+        console.print("")
+        schedule = typer.prompt("📅 Enter schedule", default="daily")
+    
     # Parse timing
     timing = {}
+    
+    # If schedule keyword provided, parse it
+    if schedule:
+        timing = parse_schedule_keyword(schedule)
+        console.print(f"[green]✅ Using schedule: {schedule}[/green]")
+        if "hours" in timing:
+            console.print(f"   Hours: {timing['hours']}")
+        if "minutes" in timing:
+            console.print(f"   Minutes: {timing['minutes']}")
+        if "weekdays" in timing:
+            console.print(f"   Weekdays: {timing['weekdays']}")
+    
+    # Override with explicit timing parameters if provided (takes precedence over schedule keywords)
     if hours:
         try:
             timing["hours"] = [int(h.strip()) for h in hours.split(",")]
@@ -128,6 +229,15 @@ def create_job(
     try:
         # Get plugin ID
         plugin_id = get_plugin_id()
+        
+        # Show summary before creating
+        console.print(f"\n📋 [bold]Job Summary:[/bold]")
+        console.print(f"   Name: [cyan]{name}[/cyan]")
+        console.print(f"   Script: [yellow]{executable}[/yellow]")
+        if timing:
+            console.print(f"   Schedule: [green]{timing}[/green]")
+        console.print(f"   Plugin: [magenta]{plugin_id}[/magenta]")
+        console.print("")
         
         response = client.create_event(
             title=name,
