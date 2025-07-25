@@ -141,18 +141,22 @@ def execute_actions(actions: List[Dict], config: ObsidianSorterConfig, dry_run: 
 
 
 @app.command()
-def main(
+def cleanup_daily(
     config_path: Path = typer.Option("config.yaml", help="Config file"),
-    dry_run: bool = typer.Option(False, "--dry-run", help="Show planned actions without executing"),
-    yes: bool = typer.Option(False, "--yes", "-y", help="Execute without confirmation")
+    dry_run: bool = typer.Option(
+        False, "--dry-run", help="Show planned actions without executing"
+    ),
+    yes: bool = typer.Option(False, "--yes", "-y", help="Execute without confirmation"),
 ):
-    """Organize daily notes - analyze and optionally execute changes."""
+    """Clean up daily folder - move daily notes IN, non-daily OUT."""
     
     # Load config
     try:
         config = ObsidianSorterConfig.parse_file(config_path)
     except:
         config = ObsidianSorterConfig()
+    
+    console.print("[bold blue]🗂️  CLEANUP DAILY FOLDER[/bold blue]")
     
     # Show current analysis
     all_files = list(config.obsidian_root.rglob("*.md"))
@@ -214,6 +218,63 @@ def main(
     
     # Execute actions
     execute_actions(actions, config, dry_run=False)
+
+
+@app.command()
+def auto_link(
+    config_path: Path = typer.Option("config.yaml", help="Config file"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Show planned actions without executing"),
+    yes: bool = typer.Option(False, "--yes", "-y", help="Execute without confirmation")
+):
+    """Auto-link files to daily notes based on edit dates."""
+    
+    # Load config
+    try:
+        config = ObsidianSorterConfig.parse_file(config_path)
+    except:
+        config = ObsidianSorterConfig()
+    
+    console.print("[bold blue]🔗 AUTO-LINK TO DAILY NOTES[/bold blue]")
+    console.print("📝 TODO: Implement auto-linking logic")
+    console.print("   - Scan files for edit dates")
+    console.print("   - Find/create corresponding daily notes")
+    console.print("   - Add [[filename]] links to '## Auto Links' section")
+    
+    if dry_run:
+        console.print("\n[yellow]DRY RUN MODE - No links will be created[/yellow]")
+        return
+    
+    if not yes:
+        if not typer.confirm("\nProceed with auto-linking? (Currently does nothing)"):
+            console.print("Operation cancelled.")
+            return
+    
+    console.print("[green]Auto-linking placeholder completed![/green]")
+
+
+@app.command()
+def run_all(
+    config_path: Path = typer.Option("config.yaml", help="Config file"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Show planned actions without executing"),
+    yes: bool = typer.Option(False, "--yes", "-y", help="Execute without confirmation")
+):
+    """Run all daily note operations: cleanup + auto-linking."""
+    
+    console.print("[bold green]🚀 RUNNING ALL DAILY NOTE OPERATIONS[/bold green]")
+    console.print()
+    
+    # Run cleanup daily first
+    console.print("[bold]Step 1: Cleanup Daily Folder[/bold]")
+    cleanup_daily(config_path, dry_run, yes)
+    
+    console.print("\n" + "="*50)
+    console.print()
+    
+    # Run auto-linking second
+    console.print("[bold]Step 2: Auto-Link Files[/bold]")
+    auto_link(config_path, dry_run, yes)
+    
+    console.print("\n[bold green]✅ All operations completed![/bold green]")
 
 
 if __name__ == "__main__":
