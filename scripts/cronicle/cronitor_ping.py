@@ -114,22 +114,22 @@ def main():
     
     # Report results
     if result["success"]:
-        print(f"✅ Cronitor ping successful!")
+        print("✅ Cronitor ping successful!")
         print(f"   Status code: {result['status_code']}")
         if result["response_text"]:
             print(f"   Response: {result['response_text']}")
         
-        print(f"\n🎯 FINAL STATUS: success")
+        print("\n🎯 FINAL STATUS: success")
         print(f"📝 FINAL NOTES: Cronitor heartbeat sent successfully (HTTP {result['status_code']})")
         return 0
         
     else:
-        print(f"❌ Cronitor ping failed!")
+        print("❌ Cronitor ping failed!")
         print(f"   Error: {result['error']}")
         if result["status_code"]:
             print(f"   Status code: {result['status_code']}")
         
-        print(f"\n🎯 FINAL STATUS: fail")
+        print("\n🎯 FINAL STATUS: fail")
         print(f"📝 FINAL NOTES: Cronitor heartbeat failed - {result['error']}")
         return 1
 
@@ -140,11 +140,11 @@ if __name__ == "__main__":
         sys.exit(exit_code)
     except KeyboardInterrupt:
         print("\n⚠️  Cronitor ping interrupted by user")
-        print(f"\n🎯 FINAL STATUS: fail")
-        print(f"📝 FINAL NOTES: Job interrupted by user")
+        print("\n🎯 FINAL STATUS: fail")
+        print("📝 FINAL NOTES: Job interrupted by user")
         sys.exit(130)
     except Exception as e:
         print(f"\n💥 Unexpected error during Cronitor ping: {e}")
-        print(f"\n🎯 FINAL STATUS: fail")
+        print("\n🎯 FINAL STATUS: fail")
         print(f"📝 FINAL NOTES: Unexpected error - {e}")
         sys.exit(1)
