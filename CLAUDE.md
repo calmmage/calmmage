@@ -75,6 +75,27 @@ Core Features
 - Storage: PostgreSQL, Redis cache, S3 assets
 ```
 
+## Python Execution Requirements
+
+**CRITICAL: Always use uv for Python command execution**
+
+**For running Python scripts:**
+```bash
+uv run python script.py
+```
+
+**For running Typer CLI tools:**
+```bash
+uv run typer path/to/cli.py run [command] [args]
+```
+
+**Examples:**
+- `uv run python tools/obsidian_sorter/daily_notes_simple.py`
+- `uv run typer tools/obsidian_sorter/cli.py run sort`
+- `uv run typer tools/cronicle_scheduler/cli/cronicle_manager.py run create`
+
+**Never use bare python or direct script execution - always prefix with `uv run`**
+
 ## Additional Context
 
 Refer to the existing developer planning system in:
