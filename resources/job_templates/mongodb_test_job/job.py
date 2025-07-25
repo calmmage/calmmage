@@ -111,7 +111,7 @@ def main():
     
     # Connect to database
     db = connect_to_mongodb()
-    if not db:
+    if db is None:
         logger.error("❌ Cannot connect to MongoDB")
         return 1
     
