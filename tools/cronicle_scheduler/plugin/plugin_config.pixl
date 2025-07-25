@@ -1,22 +1,27 @@
 {
   "generic_job_executor": {
-    "title": "Generic Job Executor",
-    "description": "Executes any job (Python, Typer, binary) with custom environment and parameters",
+    "title": "Python Job Executor",
+    "description": "Executes Python scripts with custom environment and CLI arguments",
     "binary": "/Users/petrlavrov/work/projects/calmmage/tools/cronicle_scheduler/plugin/job_executor.py",
     "params": {
-      "executable": { 
+      "script_path": { 
         "type": "string", 
-        "desc": "Path to executable (Python script, Typer app, binary, etc.)", 
+        "desc": "Path to Python script to execute", 
         "required": 1 
+      },
+      "python_exec": { 
+        "type": "string", 
+        "desc": "Python executable to use (defaults to $CALMMAGE_VENV_PATH/bin/python if empty)", 
+        "required": 0 
       },
       "env_file": { 
         "type": "string", 
-        "desc": "Path to .env file to load environment variables", 
+        "desc": "Path to .env file (defaults to script directory/.env if empty)", 
         "required": 0 
       },
-      "kwargs": { 
+      "cli_args": { 
         "type": "string", 
-        "desc": "JSON string of kwargs to pass to executable (e.g., '{\"flag\": true, \"name\": \"value\"}')", 
+        "desc": "Command line arguments to pass to script (e.g., '--verbose --timeout 300')", 
         "required": 0 
       }
     }
