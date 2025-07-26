@@ -1,0 +1,40 @@
+# Calmmage Ecosystem
+- **botspot**: Telegram bot framework with routing and middleware
+  - Location: `~/work/projects/botspot/`
+  - Import: `from botspot import get_chat_fetcher, llm_provider, commands_menu`
+  - Usage: Component-based architecture with send_safe, chat_binder, user_interactions
+- **calmlib**: Personal utility library with read/write, logging, service registry
+  - Location: `~/work/projects/calmmage/calmlib/`
+  - Import: Look around and see what's available at runtime - structure may be updated
+  - Usage: Various python utils for file operations, logging, service management
+- **tools**: Collection of CLI utilities and automation tools
+  - Location: `~/work/projects/calmmage/tools/` with subdirectories for each tool
+  - Import: `from tools.tool_name.module import Class`
+  - Usage: `uv run typer ~/work/projects/calmmage/tools/tool_name/cli.py run [command]`
+- **docker**: Containerization for local services and deployment
+  - Location: Local Docker Desktop installation
+  - Usage: `docker run -d --name mongodb mongo:latest`, containers accessible on localhost
+- **mongodb**: Document database for data storage and querying
+  - Location: localhost MongoDB via Docker
+  - Usage: Connection string from ~/.env, accessible through botspot mongo_database component
+- **scripts**: Scheduled jobs and automation scripts
+  - Location: `~/work/projects/calmmage/scripts/scheduled_tasks/` and `~/work/projects/calmmage/scripts/cronicle/`
+  - Usage: Jobs report status via `🎯 FINAL STATUS:` and `📝 FINAL NOTES:` format
+- **~/.env**: Environment variables via planned calmlib env key discovery
+  - Location: `~/.env` file in user home directory
+  - Usage: dotenv loading, planned calmlib utilities for key discovery and management
+- **cronicle**: Job scheduler for automated tasks and workflows
+  - Location: `~/work/projects/calmmage/tools/cronicle_scheduler/cli/cronicle_manager.py`
+  - Usage: `uv run typer ~/work/projects/calmmage/tools/cronicle_scheduler/cli/cronicle_manager.py run [command]`
+- **cronitor**: Health monitoring and alerting for scheduled jobs
+  - Location: `~/work/projects/calmmage/scripts/cronicle/cronitor_ping.py`
+  - Usage: HTTP pings to cronitor.io for job health monitoring
+- **telegram-downloader**: Message download, parsing, and processing ecosystem
+  - Location: `~/work/projects/calmmage/tools/telegram_downloader/`
+  - Usage: Downloads telegram messages to local MongoDB via Docker, stores in structured format with chat/user metadata
+- **obsidian-ecosystem**: Note management with database-like access to people/contacts, bookmarks, posts/blog/zettelkasten fields
+  - Location: `~/work/projects/calmmage/tools/obsidian_sorter/` for sorting automation
+  - Usage: Database-like access to Obsidian vault with structured data fields for contacts, bookmarks, content
+- **nix-config**: System configuration with tool aliases and environment setup
+  - Location: `~/work/projects/calmmage/config/nix/` with aliases in `shell/aliases/` subdirectory
+  - Usage: Shell aliases that link calmmage tools with typer commands, see alias definitions for tool access patterns

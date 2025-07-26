@@ -1,0 +1,11 @@
+# Python Libraries
+- **pathlib**: File system path handling
+- **dotenv**: Loads `.env` variables
+- **requests**: HTTP requests for APIs
+- **loguru**: Colorful, easy logging
+- **typer**: Modern CLI with type hints
+- **rich**: Enhanced terminal output (tables, colors)
+- **fastapi**: Fast web APIs with async
+- **fastui**: Declarative web UIs for FastAPI
+- **pydantic**: Data validation with type hints
+- **tqdm**: Progress bars for loops

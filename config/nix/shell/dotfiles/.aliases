@@ -130,3 +130,7 @@ alias job_logs="typer $CALMMAGE_DIR/tools/local_job_runner/cli.py run logs"
 alias cronicle_jobs="typer $CALMMAGE_DIR/tools/cronicle_scheduler/cli/cronicle_manager.py run list"
 alias add_cronicle="typer $CALMMAGE_DIR/tools/cronicle_scheduler/cli/cronicle_manager.py run create"
 
+# AI Instructions Tool - deploy AI instructions to current project
+alias ai_setup="typer $CALMMAGE_DIR/tools/ai_instructions_tool/cli.py run deploy"
+alias ai_setup_all="typer $CALMMAGE_DIR/tools/ai_instructions_tool/cli.py run deploy --tool claude --tool cursor --tool gemini --no-interactive"
+
