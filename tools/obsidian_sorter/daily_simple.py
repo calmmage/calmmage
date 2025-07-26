@@ -611,9 +611,9 @@ def run_all(
     dry_run: bool = typer.Option(False, "--dry-run", help="Show planned actions without executing"),
     yes: bool = typer.Option(False, "--yes", "-y", help="Execute without confirmation")
 ):
-    """Run all daily note operations: cleanup + auto-linking."""
+    """Run all note operations: daily cleanup + weekly cleanup + auto-linking."""
     
-    console.print("[bold green]🚀 RUNNING ALL DAILY NOTE OPERATIONS[/bold green]")
+    console.print("[bold green]🚀 RUNNING ALL NOTE OPERATIONS[/bold green]")
     console.print()
     
     # Run cleanup daily first
@@ -623,8 +623,15 @@ def run_all(
     console.print("\n" + "="*50)
     console.print()
     
-    # Run auto-linking second
-    console.print("[bold]Step 2: Auto-Link Files[/bold]")
+    # Run cleanup weekly second
+    console.print("[bold]Step 2: Cleanup Weekly Folder[/bold]")
+    cleanup_weekly(config_path, dry_run, yes)
+    
+    console.print("\n" + "="*50)
+    console.print()
+    
+    # Run auto-linking third
+    console.print("[bold]Step 3: Auto-Link Files[/bold]")
     auto_link(config_path, dry_run, yes, skip_date_conflicts=False)
     
     console.print("\n[bold green]✅ All operations completed![/bold green]")
