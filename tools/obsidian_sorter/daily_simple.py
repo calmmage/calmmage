@@ -731,7 +731,7 @@ def execute_weekly_actions(actions: List[Dict], config: ObsidianSorterConfig, dr
     try:
         import obsidiantools.api as otools
         # Initialize obsidian vault for proper link handling
-        vault = otools.Vault(str(config.obsidian_root))
+        vault = otools.Vault(config.obsidian_root)
         vault_connected = vault.connect().gather()
         console.print("[green]Connected to Obsidian vault with obsidiantools[/green]")
     except Exception as e:
