@@ -4,7 +4,8 @@
       "Bash(mkdir:*)",
       "Bash(typer:*)",
       "Bash(mv:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(uv run:*)"
     ],
     "deny": []
   }

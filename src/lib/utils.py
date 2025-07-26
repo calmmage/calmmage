@@ -37,7 +37,7 @@ def get_scheduled_tasks_dir() -> Path:
     Returns:
         Path: The absolute path to the scheduled_tasks directory
     """
-    return repo_root / "scripts" / "scheduled_tasks"
+    return repo_root / "scripts" / "local_jobs"
 
 def get_config_dir() -> Path:
     """
