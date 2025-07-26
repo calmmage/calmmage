@@ -1,7 +1,7 @@
 [project]
 name = "calmmage"
 # update project folder structure for project_manager and project_discoverer
-version = "2025.4.8"
+version = "2025.4.10"
 description = "Personal GitHub repo for tools, projects, and personal website"
 readme = "README.md"
 classifiers = [
@@ -68,6 +68,7 @@ dependencies = [
     "dotenv>=0.9.9",
     "pyperclip>=1.9.0",
     "rich>=14.0.0",
+    "obsidiantools>=0.11.0",
 ]
 
 [project.urls]

@@ -4,7 +4,7 @@
 .PHONY: help install test run list logs test-job setup dev-test
 
 PYTHON := python3
-JOBS_DIR := ../../scripts/scheduled_tasks
+JOBS_DIR := ../../scripts/local_jobs
 TEMPLATES_DIR := ../../resources/job_templates
 LOG_DIR := ~/Library/Logs/CalmmageScheduler
 
