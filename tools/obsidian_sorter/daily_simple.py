@@ -76,78 +76,7 @@ def get_week_for_date(date: datetime) -> tuple:
     return week_number, week_start
 
 
-def create_weekly_note_link(config: ObsidianSorterConfig, file_path: Path, target_date: str = None) -> bool:
-    """Add link to weekly note based on specified date or file's edit date."""
-    try:
-        if target_date:
-            # Parse target date and find corresponding week
-            target_datetime = datetime.strptime(target_date, "%d %b %Y")
-        else:
-            # Fall back to file modification time
-            target_datetime = datetime.fromtimestamp(file_path.stat().st_mtime)
-        
-        # Get week info
-        week_num, week_start = get_week_for_date(target_datetime)
-        weekly_name = f"Week {week_num} - {week_start.strftime('%d %b %Y')}.md"
-        weekly_path = config.obsidian_root / "weekly_workspaces" / weekly_name
-        
-        # Create weekly note if it doesn't exist (using template)
-        if not weekly_path.exists():
-            weekly_path.parent.mkdir(parents=True, exist_ok=True)
-            # Basic weekly note content
-            weekly_content = f"""## Priorities
-
-| Date                |                |
-| ------------------- | -------------- |
-| ONE Focus           | Sleep in time! |
-| Focus of the season |                |
-| Daily focus         |                |
-
-## Plans
-
-## Auto Links
-
-- [[{file_path.stem}]]
-"""
-            weekly_path.write_text(weekly_content)
-            return True
-        
-        # Add link to existing weekly note
-        content = weekly_path.read_text()
-        link = f"- [[{file_path.stem}]]"
-        
-        # Skip if link already exists
-        if link in content:
-            return True
-            
-        if "## Auto Links" in content:
-            # Find the Auto Links section and add after it
-            lines = content.split('\n')
-            auto_links_idx = None
-            for i, line in enumerate(lines):
-                if line.strip() == "## Auto Links":
-                    auto_links_idx = i
-                    break
-            
-            if auto_links_idx is not None:
-                # Insert after Auto Links header
-                insert_idx = auto_links_idx + 1
-                while insert_idx < len(lines) and lines[insert_idx].strip() == "":
-                    insert_idx += 1
-                lines.insert(insert_idx, link)
-                content = '\n'.join(lines)
-        else:
-            # Create Auto Links section at the end
-            if not content.endswith('\n'):
-                content += '\n'
-            content += f"\n## Auto Links\n\n{link}\n"
-        
-        weekly_path.write_text(content)
-        return True
-        
-    except Exception as e:
-        console.print(f"[red]Error linking {file_path.name} to weekly note: {e}[/red]")
-        return False
+# Removed create_weekly_note_link - not needed for weekly cleanup
 
 
 def get_weekly_planned_actions(config: ObsidianSorterConfig) -> List[Dict]:
@@ -164,9 +93,17 @@ def get_weekly_planned_actions(config: ObsidianSorterConfig) -> List[Dict]:
         is_old_weekly = is_weekly_old_format(file.name)
         current_location = file.parent
         
+        # Check if file is in weekly_workspaces tree (including archive folders)
+        try:
+            # Check if current location is weekly_workspaces or a subdirectory of it
+            current_location.relative_to(weekly_folder)
+            is_in_weekly_tree = True
+        except ValueError:
+            is_in_weekly_tree = False
+        
         # Determine action
-        if is_weekly and current_location != weekly_folder:
-            # Weekly note not in weekly folder - move to weekly
+        if is_weekly and not is_in_weekly_tree:
+            # Weekly note not in weekly tree - move to main weekly folder
             actions.append({
                 "file": file,
                 "action": "move_to_weekly",
@@ -174,7 +111,7 @@ def get_weekly_planned_actions(config: ObsidianSorterConfig) -> List[Dict]:
                 "to": weekly_folder
             })
         elif not is_weekly and not is_old_weekly and current_location == weekly_folder:
-            # Non-weekly note in weekly folder - move out
+            # Non-weekly note in main weekly folder (not archive) - move out
             actions.append({
                 "file": file,
                 "action": "move_from_weekly",
@@ -182,13 +119,22 @@ def get_weekly_planned_actions(config: ObsidianSorterConfig) -> List[Dict]:
                 "to": non_weekly_target
             })
         elif is_old_weekly:
-            # Old format weekly note - needs renaming
-            actions.append({
-                "file": file,
-                "action": "rename_old_weekly",
-                "from": current_location,
-                "to": current_location  # Same location, just rename
-            })
+            # Old format weekly note - needs renaming (with year prefix)
+            match = re.match(r'^Week (\d+) - (\d{1,2} [A-Za-z]{3} (\d{4}))\.md$', file.name)
+            if match:
+                week_num = match.group(1)
+                date_part = match.group(2)
+                year = match.group(3)
+                new_name = f"Week {year}-{week_num} - {date_part}.md"
+                
+                actions.append({
+                    "file": file,
+                    "action": "rename_old_weekly",
+                    "from": current_location,
+                    "to": current_location,  # Same location, just rename
+                    "old_name": file.name,
+                    "new_name": new_name
+                })
     
     return actions
 
@@ -738,15 +684,18 @@ def cleanup_weekly(
         
         if action["action"] == "move_to_weekly":
             action_text = "→ weekly_workspaces/"
+            from_path = action["from"].relative_to(config.obsidian_root)
+            to_path = action["to"].relative_to(config.obsidian_root)
+            table.add_row(file.name, action_text, str(from_path), str(to_path))
         elif action["action"] == "move_from_weekly":
             action_text = "← from weekly_workspaces/"
+            from_path = action["from"].relative_to(config.obsidian_root)
+            to_path = action["to"].relative_to(config.obsidian_root)
+            table.add_row(file.name, action_text, str(from_path), str(to_path))
         else:  # rename_old_weekly
-            action_text = "🔄 rename (add year)"
-        
-        from_path = action["from"].relative_to(config.obsidian_root)
-        to_path = action["to"].relative_to(config.obsidian_root)
-        
-        table.add_row(file.name, action_text, str(from_path), str(to_path))
+            action_text = f"🔄 rename → {action['new_name']}"
+            from_path = action["from"].relative_to(config.obsidian_root)
+            table.add_row(file.name, action_text, str(from_path), "(same location)")
     
     console.print(table)
     console.print(f"\nTotal actions: {len(actions)}")
@@ -762,11 +711,90 @@ def cleanup_weekly(
             console.print("Operation cancelled.")
             return
     
-    # Execute actions (will need to implement the rename logic)
-    console.print("\n[yellow]TODO: Implement weekly actions execution with obsidiantools[/yellow]")
-    console.print("Need to handle:")
-    console.print("- Moving weekly notes IN/OUT")
-    console.print("- Renaming old format with proper link updates")
+    # Execute actions
+    execute_weekly_actions(actions, config, dry_run)
+
+
+def execute_weekly_actions(actions: List[Dict], config: ObsidianSorterConfig, dry_run: bool = True) -> None:
+    """Execute the planned weekly actions with proper link handling."""
+    if dry_run:
+        console.print("[yellow]DRY RUN MODE - No files will be moved or renamed[/yellow]")
+        return
+    
+    try:
+        import obsidiantools.api as otools
+        # Initialize obsidian vault for proper link handling
+        vault = otools.Vault(str(config.obsidian_root))
+        vault_connected = vault.connect().gather()
+        console.print("[green]Connected to Obsidian vault with obsidiantools[/green]")
+    except Exception as e:
+        console.print(f"[yellow]Warning: Could not connect to obsidiantools: {e}[/yellow]")
+        console.print("[yellow]Falling back to basic file operations (links may break)[/yellow]")
+        vault_connected = None
+    
+    success_count = 0
+    failed_count = 0
+    
+    for action in actions:
+        file_path = action["file"]
+        action_type = action["action"]
+        
+        try:
+            if action_type == "move_to_weekly" or action_type == "move_from_weekly":
+                # Handle file moving
+                target_dir = action["to"]
+                target_dir.mkdir(parents=True, exist_ok=True)
+                
+                new_path = target_dir / file_path.name
+                if new_path.exists():
+                    console.print(f"[yellow]Skipping {file_path.name} - target exists[/yellow]")
+                    continue
+                
+                # Move the file
+                shutil.move(str(file_path), str(new_path))
+                success_count += 1
+                
+                if action_type == "move_to_weekly":
+                    console.print(f"[green]✓[/green] Moved {file_path.name} → weekly_workspaces/")
+                else:
+                    console.print(f"[green]✓[/green] Moved {file_path.name} ← from weekly_workspaces/")
+                    
+            elif action_type == "rename_old_weekly":
+                # Handle renaming with link updates
+                old_name = action["old_name"]
+                new_name = action["new_name"]
+                new_path = file_path.parent / new_name
+                
+                if new_path.exists():
+                    console.print(f"[yellow]Skipping rename {old_name} - target exists[/yellow]")
+                    continue
+                
+                if vault_connected:
+                    # Use obsidiantools to rename with link updates
+                    # This is a placeholder - obsidiantools doesn't have direct rename API
+                    # We'll use basic rename for now and note the limitation
+                    file_path.rename(new_path)
+                    console.print(f"[yellow]⚠️[/yellow] Renamed {old_name} → {new_name} (manual link updates may be needed)")
+                else:
+                    # Basic rename without link updates 
+                    file_path.rename(new_path)
+                    console.print(f"[yellow]⚠️[/yellow] Renamed {old_name} → {new_name} (links may break)")
+                
+                success_count += 1
+                
+        except Exception as e:
+            failed_count += 1
+            console.print(f"[red]✗[/red] Failed to process {file_path.name}: {e}")
+    
+    # Summary
+    console.print(f"\n[bold green]✅ Weekly cleanup completed![/bold green]")
+    console.print(f"[green]Successfully processed: {success_count} files[/green]")
+    if failed_count > 0:
+        console.print(f"[red]Failed: {failed_count} files[/red]")
+    
+    if any(action["action"] == "rename_old_weekly" for action in actions):
+        console.print("\n[yellow]📝 Note: Renamed files may have broken links.[/yellow]")
+        console.print("[yellow]Consider using Obsidian's 'Update links' feature if needed.[/yellow]")
 
 
 if __name__ == "__main__":
