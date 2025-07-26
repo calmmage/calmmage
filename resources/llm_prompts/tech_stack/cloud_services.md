@@ -1,0 +1,11 @@
+# Cloud Services
+- **slack-sdk**: Slack API for bots and messaging
+- **google-api-python-client**: Google Calendar API for events and schedules
+- **chrome-bookmarks**: Parse Chrome bookmarks from JSON
+- **obsidiantools**: Parse Obsidian vault, YAML frontmatter, and links
+- **py-obsidianmd**: Edit Obsidian metadata (YAML and Dataview fields)
+- **frontmatter**: Parse YAML frontmatter from Markdown
+- **pyyaml**: General YAML parsing for frontmatter
+- **discord.py**: Discord API for bots and server interactions
+- **notion-client**: Notion API for pages and databases
+- **linear-api**: Linear API for issues and projects

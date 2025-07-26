@@ -75,6 +75,15 @@ def get_projects_dir() -> Path:
     """
     return repo_root  # The calmmage project itself is the "projects" directory
 
+def get_resources_dir() -> Path:
+    """
+    Get the resources directory within the repository.
+    
+    Returns:
+        Path: The absolute path to the resources directory
+    """
+    return repo_root / "resources"
+
 # Backward compatibility
 def get_project_root() -> Path:
     """
