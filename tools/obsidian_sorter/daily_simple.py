@@ -289,10 +289,15 @@ def find_latest_daily_with_autolinks(config: ObsidianSorterConfig) -> datetime:
     return latest_date
 
 
-def get_auto_link_candidates(config: ObsidianSorterConfig) -> List[Dict]:
-    """Get files that need auto-linking (all non-daily files)."""
+def get_auto_link_candidates(
+    config: ObsidianSorterConfig, cutoff_date: datetime = None
+) -> List[Dict]:
+    """Get files that need auto-linking (only files modified after cutoff)."""
     candidates = []
     all_files = list(config.obsidian_root.rglob("*.md"))
+    
+    if cutoff_date is None:
+        cutoff_date = datetime(2000, 1, 1)  # Process all files if no cutoff
     
     for file in all_files:
         # Skip daily files
@@ -303,6 +308,10 @@ def get_auto_link_candidates(config: ObsidianSorterConfig) -> List[Dict]:
         stat = file.stat()
         edit_date = datetime.fromtimestamp(stat.st_mtime)
         creation_date = datetime.fromtimestamp(stat.st_ctime)
+        
+        # Skip files not modified after cutoff
+        if edit_date <= cutoff_date:
+            continue
         
         # Calculate date difference
         date_diff = abs((edit_date - creation_date).days)
@@ -316,7 +325,8 @@ def get_auto_link_candidates(config: ObsidianSorterConfig) -> List[Dict]:
             "creation_date": creation_date,
             "date_diff": date_diff,
             "filename_date": filename_date,
-            "suggested_date": filename_date or edit_date.strftime("%d %b %Y")
+            "edit_target_date": filename_date or edit_date.strftime("%d %b %Y"),
+            "creation_target_date": creation_date.strftime("%d %b %Y")
         })
     
     return candidates
@@ -339,11 +349,15 @@ def auto_link(
     
     console.print("[bold blue]🔗 AUTO-LINK TO DAILY NOTES[/bold blue]")
     
-    # Get candidates
-    candidates = get_auto_link_candidates(config)
+    # Find cutoff date (latest daily note with auto-links)
+    cutoff_date = find_latest_daily_with_autolinks(config)
+    console.print(f"📅 Cutoff date: {cutoff_date.strftime('%d %b %Y')} (only processing files modified after this)")
+    
+    # Get candidates after cutoff
+    candidates = get_auto_link_candidates(config, cutoff_date)
     
     if not candidates:
-        console.print("[green]No files need auto-linking![/green]")
+        console.print("[green]No new files need auto-linking![/green]")
         return
     
     # Categorize by date difference
@@ -366,24 +380,31 @@ def auto_link(
     console.print(f"⚠️  Batch confirm (3-20 days diff): {len(batch_confirm)}")
     console.print(f"🔍 Individual confirm (>20 days diff): {len(individual_confirm)}")
     
+    # Ask about creation date linking (soft confirmation)
+    link_to_creation = False
+    if not yes and not dry_run:
+        link_to_creation = typer.confirm("\n🔗 Also link files to their creation dates? (in addition to edit dates)")
+    elif not dry_run:
+        link_to_creation = True  # Auto-yes includes creation linking
+    
     # Show sample files in table
     if candidates:
         table = Table(title="Auto-Link Candidates (Sample)")
         table.add_column("File", style="cyan")
-        table.add_column("Date Source", style="yellow")
-        table.add_column("Target Date", style="green")
+        table.add_column("Edit → Daily", style="green")
+        table.add_column("Create → Daily", style="blue" if link_to_creation else "dim")
         table.add_column("Date Diff", style="red")
         
         # Show first 5 from each category
         sample_files = auto_proceed[:2] + batch_confirm[:2] + individual_confirm[:1]
         for candidate in sample_files:
-            source = "filename" if candidate["filename_date"] else "edit_date"
+            create_target = candidate["creation_target_date"] if link_to_creation else "skipped"
             diff_text = f"{candidate['date_diff']}d"
             
             table.add_row(
                 candidate["file"].name,
-                source,
-                candidate["suggested_date"],
+                candidate["edit_target_date"],
+                create_target,
                 diff_text
             )
         
@@ -438,15 +459,34 @@ def auto_link(
     failed_count = 0
     
     console.print(f"\n[bold blue]🔗 Processing {len(files_to_process)} files...[/bold blue]")
+    if link_to_creation:
+        console.print("[dim]Linking to both creation and edit dates[/dim]")
+    else:
+        console.print("[dim]Linking to edit dates only[/dim]")
     
     for candidate in files_to_process:
         file_path = candidate["file"]
-        target_date = candidate["suggested_date"]
+        edit_target = candidate["edit_target_date"]
+        creation_target = candidate["creation_target_date"]
+        
+        links_created = 0
         
         try:
-            if create_daily_note_link(config, file_path, target_date):
+            # Link to edit date
+            if create_daily_note_link(config, file_path, edit_target):
+                links_created += 1
+            
+            # Link to creation date (if different and requested)
+            if link_to_creation and creation_target != edit_target:
+                if create_daily_note_link(config, file_path, creation_target):
+                    links_created += 1
+            
+            if links_created > 0:
                 success_count += 1
-                console.print(f"[green]✓[/green] Linked {file_path.name} → {target_date}")
+                if link_to_creation and creation_target != edit_target:
+                    console.print(f"[green]✓[/green] Linked {file_path.name} → {edit_target} + {creation_target}")
+                else:
+                    console.print(f"[green]✓[/green] Linked {file_path.name} → {edit_target}")
             else:
                 failed_count += 1
                 console.print(f"[red]✗[/red] Failed to link {file_path.name}")
