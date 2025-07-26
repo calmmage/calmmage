@@ -55,11 +55,8 @@ ignore:
   - foam-template
   - TextTailor-Scrapers
   - calmlib
-  - deprecated_calmlib
   - dev-env
-  - deprecated_dev-env
   - telegram-downloader
-  - deprecated_telegram-downloader
 
 # secondary groups
 cool:
