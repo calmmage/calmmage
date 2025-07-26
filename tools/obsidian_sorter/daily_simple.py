@@ -263,6 +263,32 @@ def extract_date_from_filename(filename: str) -> str:
     return None
 
 
+def find_latest_daily_with_autolinks(config: ObsidianSorterConfig) -> datetime:
+    """Find the most recent daily note with Auto Links section."""
+    daily_folder = config.obsidian_root / "daily"
+    if not daily_folder.exists():
+        return datetime(2000, 1, 1)  # Very old date if no daily folder
+
+    latest_date = datetime(2000, 1, 1)
+
+    for daily_file in daily_folder.glob("*.md"):
+        if is_daily_standard(daily_file.name):
+            try:
+                # Parse date from filename
+                date_str = daily_file.stem  # Remove .md
+                file_date = datetime.strptime(date_str, "%d %b %Y")
+
+                # Check if it has Auto Links section
+                content = daily_file.read_text()
+                if "## Auto Links" in content:
+                    if file_date > latest_date:
+                        latest_date = file_date
+            except:
+                continue
+
+    return latest_date
+
+
 def get_auto_link_candidates(config: ObsidianSorterConfig) -> List[Dict]:
     """Get files that need auto-linking (all non-daily files)."""
     candidates = []
@@ -382,17 +408,27 @@ def auto_link(
         else:
             files_to_process.extend(batch_confirm)
     
-    # Individual confirmation (>20 days) - TODO: implement individual asking
+    # Individual confirmation (>20 days)
     if individual_confirm and not skip_date_conflicts:
-        console.print(f"\n🔍 {len(individual_confirm)} files have >20 day differences.")
-        console.print("TODO: Implement individual file confirmation")
+        if not yes:
+            console.print(f"\n🔍 {len(individual_confirm)} files have >20 day differences.")
+            console.print("Review each file individually:")
+            for candidate in individual_confirm:
+                file_name = candidate["file"].name
+                target_date = candidate["suggested_date"]
+                date_diff = candidate["date_diff"]
+                console.print(f"\n  📄 {file_name} → {target_date} ({date_diff}d difference)")
+                if typer.confirm(f"    Link this file?"):
+                    files_to_process.append(candidate)
+        else:
+            files_to_process.extend(individual_confirm)
     
     if not files_to_process:
         console.print("[yellow]No files selected for processing.[/yellow]")
         return
     
     # Final confirmation
-    if not yes and not skip_date_conflicts:
+    if not yes:
         if not typer.confirm(f"\nProceed with auto-linking {len(files_to_process)} files?"):
             console.print("Operation cancelled.")
             return
@@ -446,7 +482,7 @@ def run_all(
     
     # Run auto-linking second
     console.print("[bold]Step 2: Auto-Link Files[/bold]")
-    auto_link(config_path, dry_run, yes)
+    auto_link(config_path, dry_run, yes, skip_date_conflicts=False)
     
     console.print("\n[bold green]✅ All operations completed![/bold green]")
 
