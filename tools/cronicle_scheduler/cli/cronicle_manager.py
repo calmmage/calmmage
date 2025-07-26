@@ -21,7 +21,7 @@ from dotenv import load_dotenv
 from rich.console import Console
 from rich.table import Table
 
-from .cronicle_client import CronicleClient
+from tools.cronicle_scheduler.cli.cronicle_client import CronicleClient
 
 app = typer.Typer(help="Cronicle Job Manager - Schedule and manage jobs via Cronicle API")
 console = Console()
