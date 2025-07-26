@@ -5,7 +5,7 @@ import re
 import shutil
 from pathlib import Path
 from typing import List, Dict
-from datetime import datetime
+from datetime import datetime, timedelta
 import typer
 from rich.console import Console
 from rich.table import Table
@@ -34,6 +34,163 @@ def is_daily_alternative(filename: str) -> str:
         if re.match(pattern, filename, re.IGNORECASE):
             return fmt
     return None
+
+
+def is_weekly_standard(filename: str) -> bool:
+    """Check Week N - DD MMM YYYY format."""
+    return bool(re.match(r'^Week \d+ - \d{1,2} [A-Za-z]{3} \d{4}\.md$', filename))
+
+
+def is_weekly_old_format(filename: str) -> bool:
+    """Check old format that needs renaming: Week N - DD MMM YYYY from previous years."""
+    match = re.match(r'^Week \d+ - \d{1,2} [A-Za-z]{3} (\d{4})\.md$', filename)
+    if match:
+        year = int(match.group(1))
+        return year < 2025  # Current year
+    return False
+
+
+def get_week_for_date(date: datetime) -> tuple:
+    """Get week number and week start date for a given date."""
+    # Get the start of the year
+    year_start = datetime(date.year, 1, 1)
+    
+    # Find the first Monday of the year (ISO week standard)
+    days_to_monday = (7 - year_start.weekday()) % 7
+    if days_to_monday == 0:
+        days_to_monday = 7
+    first_monday = year_start + timedelta(days=days_to_monday - 1)
+    
+    # Calculate week number
+    if date < first_monday:
+        # This date belongs to the last week of previous year
+        prev_year_start = datetime(date.year - 1, 1, 1)
+        return get_week_for_date(date.replace(year=date.year - 1))
+    
+    days_since_first_monday = (date - first_monday).days
+    week_number = (days_since_first_monday // 7) + 1
+    
+    # Calculate the start of this specific week
+    week_start = first_monday + timedelta(weeks=week_number - 1)
+    
+    return week_number, week_start
+
+
+def create_weekly_note_link(config: ObsidianSorterConfig, file_path: Path, target_date: str = None) -> bool:
+    """Add link to weekly note based on specified date or file's edit date."""
+    try:
+        if target_date:
+            # Parse target date and find corresponding week
+            target_datetime = datetime.strptime(target_date, "%d %b %Y")
+        else:
+            # Fall back to file modification time
+            target_datetime = datetime.fromtimestamp(file_path.stat().st_mtime)
+        
+        # Get week info
+        week_num, week_start = get_week_for_date(target_datetime)
+        weekly_name = f"Week {week_num} - {week_start.strftime('%d %b %Y')}.md"
+        weekly_path = config.obsidian_root / "weekly_workspaces" / weekly_name
+        
+        # Create weekly note if it doesn't exist (using template)
+        if not weekly_path.exists():
+            weekly_path.parent.mkdir(parents=True, exist_ok=True)
+            # Basic weekly note content
+            weekly_content = f"""## Priorities
+
+| Date                |                |
+| ------------------- | -------------- |
+| ONE Focus           | Sleep in time! |
+| Focus of the season |                |
+| Daily focus         |                |
+
+## Plans
+
+## Auto Links
+
+- [[{file_path.stem}]]
+"""
+            weekly_path.write_text(weekly_content)
+            return True
+        
+        # Add link to existing weekly note
+        content = weekly_path.read_text()
+        link = f"- [[{file_path.stem}]]"
+        
+        # Skip if link already exists
+        if link in content:
+            return True
+            
+        if "## Auto Links" in content:
+            # Find the Auto Links section and add after it
+            lines = content.split('\n')
+            auto_links_idx = None
+            for i, line in enumerate(lines):
+                if line.strip() == "## Auto Links":
+                    auto_links_idx = i
+                    break
+            
+            if auto_links_idx is not None:
+                # Insert after Auto Links header
+                insert_idx = auto_links_idx + 1
+                while insert_idx < len(lines) and lines[insert_idx].strip() == "":
+                    insert_idx += 1
+                lines.insert(insert_idx, link)
+                content = '\n'.join(lines)
+        else:
+            # Create Auto Links section at the end
+            if not content.endswith('\n'):
+                content += '\n'
+            content += f"\n## Auto Links\n\n{link}\n"
+        
+        weekly_path.write_text(content)
+        return True
+        
+    except Exception as e:
+        console.print(f"[red]Error linking {file_path.name} to weekly note: {e}[/red]")
+        return False
+
+
+def get_weekly_planned_actions(config: ObsidianSorterConfig) -> List[Dict]:
+    """Get planned actions for weekly notes organization."""
+    actions = []
+    weekly_folder = config.obsidian_root / "weekly_workspaces"
+    non_weekly_target = config.obsidian_root / config.non_daily_target  # Reuse same target
+    
+    # Scan all files in vault
+    all_files = list(config.obsidian_root.rglob("*.md"))
+    
+    for file in all_files:
+        is_weekly = is_weekly_standard(file.name)
+        is_old_weekly = is_weekly_old_format(file.name)
+        current_location = file.parent
+        
+        # Determine action
+        if is_weekly and current_location != weekly_folder:
+            # Weekly note not in weekly folder - move to weekly
+            actions.append({
+                "file": file,
+                "action": "move_to_weekly",
+                "from": current_location,
+                "to": weekly_folder
+            })
+        elif not is_weekly and not is_old_weekly and current_location == weekly_folder:
+            # Non-weekly note in weekly folder - move out
+            actions.append({
+                "file": file,
+                "action": "move_from_weekly",
+                "from": current_location,
+                "to": non_weekly_target
+            })
+        elif is_old_weekly:
+            # Old format weekly note - needs renaming
+            actions.append({
+                "file": file,
+                "action": "rename_old_weekly",
+                "from": current_location,
+                "to": current_location  # Same location, just rename
+            })
+    
+    return actions
 
 
 def get_planned_actions(config: ObsidianSorterConfig) -> List[Dict]:
@@ -525,6 +682,91 @@ def run_all(
     auto_link(config_path, dry_run, yes, skip_date_conflicts=False)
     
     console.print("\n[bold green]✅ All operations completed![/bold green]")
+
+
+@app.command()
+def cleanup_weekly(
+    config_path: Path = typer.Option("config.yaml", help="Config file"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Show planned actions without executing"),
+    yes: bool = typer.Option(False, "--yes", "-y", help="Execute without confirmation"),
+):
+    """Clean up weekly folder - move weekly notes IN, non-weekly OUT, rename old formats."""
+    
+    # Load config
+    try:
+        config = ObsidianSorterConfig.parse_file(config_path)
+    except:
+        config = ObsidianSorterConfig()
+    
+    console.print("[bold blue]📅 CLEANUP WEEKLY FOLDER[/bold blue]")
+    console.print(f"📁 Vault: {config.obsidian_root}")
+    
+    # Show current analysis
+    all_files = list(config.obsidian_root.rglob("*.md"))
+    weekly_standard = [f for f in all_files if is_weekly_standard(f.name)]
+    weekly_old = [f for f in all_files if is_weekly_old_format(f.name)]
+    
+    console.print(f"📄 Total files: {len(all_files)}")
+    console.print(f"📅 Weekly (current format): {len(weekly_standard)}")
+    console.print(f"🔄 Weekly (old format, needs renaming): {len(weekly_old)}")
+    
+    if weekly_old:
+        console.print("\n🔄 Old format weekly notes to rename:")
+        for file in weekly_old[:5]:  # Show first 5
+            rel_path = file.relative_to(config.obsidian_root)
+            console.print(f"  {file.name} (in {rel_path.parent})")
+        if len(weekly_old) > 5:
+            console.print(f"  ... and {len(weekly_old) - 5} more")
+    
+    # Get planned actions
+    actions = get_weekly_planned_actions(config)
+    
+    if not actions:
+        console.print("\n[green]No weekly files need organizing![/green]")
+        return
+    
+    # Show planned actions in table
+    console.print()
+    table = Table(title="Planned Weekly Actions")
+    table.add_column("File Name", style="cyan")
+    table.add_column("Action", style="yellow")
+    table.add_column("From", style="red")
+    table.add_column("To", style="green")
+    
+    for action in actions:
+        file = action["file"]
+        
+        if action["action"] == "move_to_weekly":
+            action_text = "→ weekly_workspaces/"
+        elif action["action"] == "move_from_weekly":
+            action_text = "← from weekly_workspaces/"
+        else:  # rename_old_weekly
+            action_text = "🔄 rename (add year)"
+        
+        from_path = action["from"].relative_to(config.obsidian_root)
+        to_path = action["to"].relative_to(config.obsidian_root)
+        
+        table.add_row(file.name, action_text, str(from_path), str(to_path))
+    
+    console.print(table)
+    console.print(f"\nTotal actions: {len(actions)}")
+    
+    # Handle execution based on flags
+    if dry_run:
+        console.print("\n[yellow]DRY RUN MODE - No files will be moved or renamed[/yellow]")
+        return
+    
+    # Default behavior: ASK for confirmation
+    if not yes:
+        if not typer.confirm("\nProceed with these changes?"):
+            console.print("Operation cancelled.")
+            return
+    
+    # Execute actions (will need to implement the rename logic)
+    console.print("\n[yellow]TODO: Implement weekly actions execution with obsidiantools[/yellow]")
+    console.print("Need to handle:")
+    console.print("- Moving weekly notes IN/OUT")
+    console.print("- Renaming old format with proper link updates")
 
 
 if __name__ == "__main__":
