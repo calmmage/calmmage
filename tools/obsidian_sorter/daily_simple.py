@@ -70,33 +70,59 @@ def get_planned_actions(config: ObsidianSorterConfig) -> List[Dict]:
     return actions
 
 
-def create_daily_note_link(config: ObsidianSorterConfig, file_path: Path) -> bool:
-    """Add link to daily note based on file's edit date."""
+def create_daily_note_link(
+    config: ObsidianSorterConfig, file_path: Path, target_date: str = None
+) -> bool:
+    """Add link to daily note based on specified date or file's edit date."""
     try:
-        # Get file modification time
-        mod_time = datetime.fromtimestamp(file_path.stat().st_mtime)
+        if target_date:
+            # Use provided target date (from filename or user choice)
+            daily_name = target_date + ".md"
+        else:
+            # Fall back to file modification time
+            mod_time = datetime.fromtimestamp(file_path.stat().st_mtime)
+            daily_name = mod_time.strftime("%d %b %Y") + ".md"
         
-        # Generate daily note filename (DD MMM YYYY format)
-        daily_name = mod_time.strftime("%d %b %Y") + ".md"
         daily_path = config.obsidian_root / "daily" / daily_name
         
         # Create daily note if it doesn't exist
         if not daily_path.exists():
             daily_path.parent.mkdir(parents=True, exist_ok=True)
-            daily_path.write_text(f"# {mod_time.strftime('%d %b %Y')}\n\n## Auto Links\n\n- [[{file_path.stem}]]\n")
+            # Extract date for header from filename
+            header_date = daily_name.replace(".md", "")
+            daily_path.write_text(f"# {header_date}\n\n## Auto Links\n\n- [[{file_path.stem}]]\n")
             return True
         
         # Add link to existing daily note
         content = daily_path.read_text()
         link = f"- [[{file_path.stem}]]"
         
+        # Skip if link already exists
+        if link in content:
+            return True
+            
         if "## Auto Links" in content:
-            # Add to existing Auto Links section
-            if link not in content:
-                content = content.replace("## Auto Links", f"## Auto Links\n\n{link}")
+            # Find the Auto Links section and add after it
+            lines = content.split('\n')
+            auto_links_idx = None
+            for i, line in enumerate(lines):
+                if line.strip() == "## Auto Links":
+                    auto_links_idx = i
+                    break
+            
+            if auto_links_idx is not None:
+                # Insert after Auto Links header, preserving existing links
+                insert_idx = auto_links_idx + 1
+                # Skip empty lines after header
+                while insert_idx < len(lines) and lines[insert_idx].strip() == "":
+                    insert_idx += 1
+                lines.insert(insert_idx, link)
+                content = '\n'.join(lines)
         else:
-            # Create Auto Links section
-            content += f"\n\n## Auto Links\n\n{link}\n"
+            # Create Auto Links section at the end
+            if not content.endswith('\n'):
+                content += '\n'
+            content += f"\n## Auto Links\n\n{link}\n"
         
         daily_path.write_text(content)
         return True
@@ -120,7 +146,7 @@ def execute_actions(actions: List[Dict], config: ObsidianSorterConfig, dry_run: 
         try:
             # Create auto-link before moving (to preserve edit date)
             if action["action"] == "move_from_daily":
-                create_daily_note_link(config, file)
+                create_daily_note_link(config, file, target_date=None)
             
             # Create target directory
             target_dir.mkdir(parents=True, exist_ok=True)
@@ -220,13 +246,64 @@ def cleanup_daily(
     execute_actions(actions, config, dry_run=False)
 
 
+def extract_date_from_filename(filename: str) -> str:
+    """Extract date from filename patterns."""
+    # Common patterns: "Meeting - 25 Jul 2025", "2025-07-25 Notes", etc.
+    date_patterns = [
+        r'(\d{1,2} [A-Za-z]{3} \d{4})',  # 25 Jul 2025
+        r'(\d{4}-\d{1,2}-\d{1,2})',     # 2025-07-25
+        r'(\d{1,2}-[A-Za-z]{3}-\d{4})', # 25-Jul-2025
+        r'(\d{1,2}/\d{1,2}/\d{4})',     # 25/07/2025
+    ]
+    
+    for pattern in date_patterns:
+        match = re.search(pattern, filename, re.IGNORECASE)
+        if match:
+            return match.group(1)
+    return None
+
+
+def get_auto_link_candidates(config: ObsidianSorterConfig) -> List[Dict]:
+    """Get files that need auto-linking (all non-daily files)."""
+    candidates = []
+    all_files = list(config.obsidian_root.rglob("*.md"))
+    
+    for file in all_files:
+        # Skip daily files
+        if is_daily_standard(file.name) or is_daily_alternative(file.name):
+            continue
+            
+        # Get file dates
+        stat = file.stat()
+        edit_date = datetime.fromtimestamp(stat.st_mtime)
+        creation_date = datetime.fromtimestamp(stat.st_ctime)
+        
+        # Calculate date difference
+        date_diff = abs((edit_date - creation_date).days)
+        
+        # Extract date from filename
+        filename_date = extract_date_from_filename(file.name)
+        
+        candidates.append({
+            "file": file,
+            "edit_date": edit_date,
+            "creation_date": creation_date,
+            "date_diff": date_diff,
+            "filename_date": filename_date,
+            "suggested_date": filename_date or edit_date.strftime("%d %b %Y")
+        })
+    
+    return candidates
+
+
 @app.command()
 def auto_link(
     config_path: Path = typer.Option("config.yaml", help="Config file"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Show planned actions without executing"),
-    yes: bool = typer.Option(False, "--yes", "-y", help="Execute without confirmation")
+    yes: bool = typer.Option(False, "--yes", "-y", help="Execute without confirmation"),
+    skip_date_conflicts: bool = typer.Option(False, "--skip-date-conflicts", help="Auto-decline files with large date differences")
 ):
-    """Auto-link files to daily notes based on edit dates."""
+    """Auto-link files to daily notes based on edit/creation dates and filename patterns."""
     
     # Load config
     try:
@@ -235,21 +312,118 @@ def auto_link(
         config = ObsidianSorterConfig()
     
     console.print("[bold blue]🔗 AUTO-LINK TO DAILY NOTES[/bold blue]")
-    console.print("📝 TODO: Implement auto-linking logic")
-    console.print("   - Scan files for edit dates")
-    console.print("   - Find/create corresponding daily notes")
-    console.print("   - Add [[filename]] links to '## Auto Links' section")
+    
+    # Get candidates
+    candidates = get_auto_link_candidates(config)
+    
+    if not candidates:
+        console.print("[green]No files need auto-linking![/green]")
+        return
+    
+    # Categorize by date difference
+    auto_proceed = []    # 0-3 days
+    batch_confirm = []   # 3-20 days  
+    individual_confirm = []  # >20 days
+    
+    for candidate in candidates:
+        diff = candidate["date_diff"]
+        if diff <= 3:
+            auto_proceed.append(candidate)
+        elif diff <= 20:
+            batch_confirm.append(candidate)
+        else:
+            individual_confirm.append(candidate)
+    
+    # Show analysis
+    console.print(f"📄 Total files to process: {len(candidates)}")
+    console.print(f"✅ Auto-proceed (≤3 days diff): {len(auto_proceed)}")
+    console.print(f"⚠️  Batch confirm (3-20 days diff): {len(batch_confirm)}")
+    console.print(f"🔍 Individual confirm (>20 days diff): {len(individual_confirm)}")
+    
+    # Show sample files in table
+    if candidates:
+        table = Table(title="Auto-Link Candidates (Sample)")
+        table.add_column("File", style="cyan")
+        table.add_column("Date Source", style="yellow")
+        table.add_column("Target Date", style="green")
+        table.add_column("Date Diff", style="red")
+        
+        # Show first 5 from each category
+        sample_files = auto_proceed[:2] + batch_confirm[:2] + individual_confirm[:1]
+        for candidate in sample_files:
+            source = "filename" if candidate["filename_date"] else "edit_date"
+            diff_text = f"{candidate['date_diff']}d"
+            
+            table.add_row(
+                candidate["file"].name,
+                source,
+                candidate["suggested_date"],
+                diff_text
+            )
+        
+        console.print(table)
     
     if dry_run:
         console.print("\n[yellow]DRY RUN MODE - No links will be created[/yellow]")
         return
     
-    if not yes:
-        if not typer.confirm("\nProceed with auto-linking? (Currently does nothing)"):
+    # Handle confirmations based on user requirements
+    files_to_process = []
+    
+    # Auto-proceed files (0-3 days)
+    files_to_process.extend(auto_proceed)
+    
+    # Batch confirmation (3-20 days)
+    if batch_confirm and not skip_date_conflicts:
+        if not yes:
+            console.print(f"\n⚠️  {len(batch_confirm)} files have 3-20 day differences between edit/creation dates.")
+            if typer.confirm("Process these files with batch confirmation?"):
+                files_to_process.extend(batch_confirm)
+        else:
+            files_to_process.extend(batch_confirm)
+    
+    # Individual confirmation (>20 days) - TODO: implement individual asking
+    if individual_confirm and not skip_date_conflicts:
+        console.print(f"\n🔍 {len(individual_confirm)} files have >20 day differences.")
+        console.print("TODO: Implement individual file confirmation")
+    
+    if not files_to_process:
+        console.print("[yellow]No files selected for processing.[/yellow]")
+        return
+    
+    # Final confirmation
+    if not yes and not skip_date_conflicts:
+        if not typer.confirm(f"\nProceed with auto-linking {len(files_to_process)} files?"):
             console.print("Operation cancelled.")
             return
     
-    console.print("[green]Auto-linking placeholder completed![/green]")
+    # Execute auto-linking
+    success_count = 0
+    failed_count = 0
+    
+    console.print(f"\n[bold blue]🔗 Processing {len(files_to_process)} files...[/bold blue]")
+    
+    for candidate in files_to_process:
+        file_path = candidate["file"]
+        target_date = candidate["suggested_date"]
+        
+        try:
+            if create_daily_note_link(config, file_path, target_date):
+                success_count += 1
+                console.print(f"[green]✓[/green] Linked {file_path.name} → {target_date}")
+            else:
+                failed_count += 1
+                console.print(f"[red]✗[/red] Failed to link {file_path.name}")
+                
+        except Exception as e:
+            failed_count += 1
+            console.print(f"[red]✗[/red] Error linking {file_path.name}: {e}")
+    
+    # Summary
+    console.print(f"\n[bold green]✅ Auto-linking completed![/bold green]")
+    console.print(f"[green]Successfully linked: {success_count} files[/green]")
+    if failed_count > 0:
+        console.print(f"[red]Failed: {failed_count} files[/red]")
 
 
 @app.command()

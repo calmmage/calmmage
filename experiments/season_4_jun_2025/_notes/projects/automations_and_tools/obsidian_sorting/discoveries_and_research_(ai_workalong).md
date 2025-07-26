@@ -143,6 +143,134 @@ modification.
 
 **Installation**: `npx @smithery/cli install mcp-obsidian --client claude`
 
+## Weekly Notes Discovery Analysis
+
+### Weekly Notes Structure Found
+
+**Location**: `/weekly_workspaces/` folder in vault root
+
+**Naming Pattern**: `Week {number} - {day} {month} {year}.md`
+- Format: "Week 30 - 21 Jul 2025.md"
+- Format: "Week 28 - 07 Jul 2025.md"
+- Pattern: Week number + date of week start
+
+**Archive Structure**:
+- `Archive - 2025 - 1-10/` (weeks 1-10 of 2025)
+- `Archive - 2025 - 11-20/` (weeks 11-20 of 2025)
+- `archive - 2024/` (all 2024 weeks)
+
+**Template**: `templates/weekly_note_template.md` - Simple structure with Priorities table and Plans section
+
+**Content Structure Analysis**:
+```markdown
+## Priorities
+| Date                |                |
+| ------------------- | -------------- |
+| ONE Focus           | Sleep in time! |
+| Focus of the season |                |
+| Daily focus         |                |
+
+## Plans
+![[Outstanding Items#Week 28 - 07 Jul 2025 Plans Week 28]]
+
+## [[07 Jul 2025]]
+## [[08 Jul 2025]]
+## History
+## [[previous date]]
+```
+
+**Weekly Note Characteristics**:
+- Links to daily notes via [[DD MMM YYYY]] format
+- Uses embedded content from "Outstanding Items"
+- Has "History" section for previous days
+- Contains task lists and project planning
+- **No YAML frontmatter detected** in weekly notes (unlike daily notes)
+
+### Note Types Discovery Analysis
+
+**Note**: Any mention of "node" in this document is a voice-to-text artifact and should be read as "note".
+
+**Template-Based Entity Types Found**:
+- `action_template.md` → type: action
+- `artifact_template.md` → type: artifact
+- `project_template.md` → type: project
+- `weekly_note_template.md` → **no type field** (missing `type: weekly`)
+- `troubleshooting_template.md` → **no type field**
+- `contact_person_template.md` → **no type field**
+- `workalong_template.md` → **no type field**
+
+**YAML Frontmatter "type" Values Found in Vault**:
+From grep search across vault:
+- `type: project` (most common - 10+ instances)
+- `type: action` (6+ instances)
+- `type: artifact` (1 instance in template)
+
+**Missing Type Fields Identified**:
+- Daily notes: **missing `type: daily`** (user requirement)
+- Weekly notes: **missing `type: weekly`**
+- Troubleshooting notes: **missing `type: troubleshooting`**
+- Contact person notes: **missing `type: contact`**
+- Workalong notes: **missing `type: workalong`**
+
+**DataView Query Integration**:
+Templates actively use DataView queries:
+```dataview
+TABLE
+WHERE type = "action" or type = "artifact"
+WHERE contains(project, this.file.link)
+SORT created DESC
+```
+
+This confirms the type system is actively used for content organization and automated linking.
+
+### Note Types Discovery Requirements
+
+**User wants 3 discovery sources**:
+1. **Templates analysis** → Extract entity types from template filenames and YAML
+2. **YAML frontmatter scanning** → Find all existing `type:` field values
+3. **YAML config definitions** → Define entity types with characteristics for auto-sorting
+
+**Implementation needs**:
+- Script to scan templates/ folder and extract patterns
+- Script to scan entire vault for YAML frontmatter `type:` values
+- Config system to define new entity types with sorting rules
+- Detection logic to identify which files belong to which entity types
+
+### Note Types Discovery Script Results
+
+**Implemented**: `tools/obsidian_sorter/node_types_discovery.py` - Analysis complete
+
+**Key Findings**:
+
+**Template-Based Entity Types (8 found)**:
+- project_template → project
+- action_template → action
+- artifact_template → artifact
+- weekly_note_template → weekly_note
+- troubleshooting_template → troubleshooting
+- contact_person_template → contact_person
+- workalong_template → workalong
+- chain_template → chain
+
+**YAML Frontmatter Usage (558 files analyzed)**:
+- `type: action` (71 instances)
+- `type: project` (64 instances)
+- `type: artifact` (11 instances)
+- `type: Artifact` (1 instance - inconsistent casing)
+
+**File Detection Results**:
+- **Daily notes**: 128 files detected with DD MMM YYYY pattern
+- **Weekly notes**: 36 files detected with "Week N - DD MMM YYYY" pattern
+
+**Missing Type Fields Confirmed**:
+- All 128 daily notes missing `type: daily`
+- All 36 weekly notes missing `type: weekly`
+- Many template-based entity types (troubleshooting, contact_person, workalong, chain) missing from YAML usage
+
+**Inconsistencies Found**:
+- Case mismatch: `type: Artifact` vs `type: artifact`
+- Template naming: `weekly_note_template` vs expected `type: weekly`
+
 ### Technical Implementation Options
 **For YAML Frontmatter Modification:**
 1. Use python-frontmatter for direct file manipulation
