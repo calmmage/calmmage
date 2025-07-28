@@ -12,6 +12,7 @@ from github.Repository import Repository
 from loguru import logger
 from tqdm.auto import tqdm
 
+from src.lib.coding_projects import Project as BaseProject
 from tools.project_arranger.src.config import ProjectArrangerSettings
 from tools.project_arranger.src.utils import (
     DateFormatSettings,
@@ -36,25 +37,11 @@ class Group(str, Enum):
     ignore = "ignore"
 
 
-class Project(BaseModel):
-    name: str
-    path: Optional[Path] = None
+class Project(BaseProject):
     github_repo: Optional[Repository] = None
 
     class Config:
         arbitrary_types_allowed = True
-
-    def __hash__(self):
-        """Make Project hashable for use in sets and as dict keys"""
-        # Use name and path (if available) as the hash key
-        return hash((self.name, str(self.path) if self.path else None))
-
-    def __eq__(self, other):
-        """Define equality for Project objects"""
-        if not isinstance(other, Project):
-            return False
-        # Projects are equal if they have the same name and path
-        return self.name == other.name and self.path == other.path
 
     @staticmethod
     def _extract_repo_info(url: str) -> tuple[str, str]:

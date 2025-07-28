@@ -3,15 +3,27 @@
 
 from pathlib import Path
 from typing import List, Optional
+from enum import Enum
 import typer
 from rich.console import Console
 from rich.prompt import Confirm, Prompt
 from rich.table import Table
+from loguru import logger
 
 from src.lib.utils import get_resources_dir
 
 app = typer.Typer(help="AI Instructions Tool - Deploy AI instructions to current project")
 console = Console()
+
+class InstructionMode(str, Enum):
+    SLIM = "slim"        # Minimal necessary instructions
+    OPTIMAL = "optimal"  # Important ones (default)
+    FULL = "full"        # All sections
+
+class CustomRulesPosition(str, Enum):
+    START = "start"      # Before base template
+    MIDDLE = "middle"    # After base template, before tech stack  
+    END = "end"          # After everything else
 
 # Available AI tools and their file mappings
 AI_TOOLS = {
@@ -45,27 +57,120 @@ def read_template_file(template_path: Path) -> str:
     
     return template_path.read_text()
 
-def read_tech_stack_files() -> str:
-    """Read and combine all tech stack files."""
+def get_current_aliases() -> str:
+    """Get current shell aliases using myalias command."""
+    try:
+        import subprocess
+        result = subprocess.run(['myalias'], capture_output=True, text=True, shell=True)
+        if result.returncode == 0:
+            return result.stdout.strip()
+        else:
+            logger.warning(f"myalias command failed with return code {result.returncode}, stderr: {result.stderr}")
+            return "# myalias command failed - aliases not available"
+    except subprocess.SubprocessError as e:
+        logger.warning(f"subprocess error running myalias: {e}")
+        return "# myalias subprocess error - aliases not available"
+    except Exception as e:
+        logger.warning(f"unexpected error fetching aliases: {e}")
+        return "# unexpected error - aliases not available"
+
+def read_custom_rules(target_dir: Path) -> str:
+    """Read custom LLM rules if they exist."""
+    custom_rules_file = target_dir / "LLM_RULES.md"
+    if custom_rules_file.exists():
+        content = custom_rules_file.read_text().strip()
+        if content:
+            return f"{content}\n\n"
+    return ""
+
+def read_tech_stack_files(mode: InstructionMode) -> str:
+    """Read and combine tech stack files based on instruction mode."""
     tech_stack_dir = get_tech_stack_dir()
     tech_stack_content = "\n\n"
     
+    # Define which sections to include for each mode
+    section_importance = {
+        "calmmage_ecosystem.md": InstructionMode.OPTIMAL,  # Always include in optimal+
+        "python_libraries.md": InstructionMode.FULL,      # Only in full mode
+        "cloud_services.md": InstructionMode.FULL,        # Only in full mode
+    }
+    
+    # Add static tech stack files based on mode
     for tech_file in sorted(tech_stack_dir.glob("*.md")):
-        content = tech_file.read_text().strip()
-        if content:
-            tech_stack_content += f"{content}\n\n"
+        required_mode = section_importance.get(tech_file.name, InstructionMode.FULL)
+        
+        # Include section if current mode is at or above required level
+        include_section = (
+            mode == InstructionMode.FULL or
+            (mode == InstructionMode.OPTIMAL and required_mode != InstructionMode.FULL) or
+            (mode == InstructionMode.SLIM and required_mode == InstructionMode.SLIM)
+        )
+        
+        if include_section:
+            content = tech_file.read_text().strip()
+            if content:
+                tech_stack_content += f"{content}\n\n"
+    
+    # Add current aliases (include in optimal and full modes)
+    if mode in [InstructionMode.OPTIMAL, InstructionMode.FULL]:
+        aliases_output = get_current_aliases()
+        if aliases_output:
+            tech_stack_content += f"# Current Shell Aliases\n\n```bash\n{aliases_output}\n```\n\n**Note**: Many tools also have Makefiles in their directories with usage examples - check for `Makefile` when using typer CLI tools.\n\n"
     
     return tech_stack_content
 
-def build_final_content(ai_tool_template: str, include_tech_stack: bool = True) -> str:
-    """Build final content by combining AI tool template with tech stack."""
-    final_content = ai_tool_template
+def build_final_content(
+    ai_tool_template: str, 
+    target_dir: Path,
+    include_tech_stack: bool = True,
+    mode: InstructionMode = InstructionMode.OPTIMAL,
+    custom_position: CustomRulesPosition = CustomRulesPosition.START
+) -> str:
+    """Build final content by combining AI tool template with tech stack and custom rules."""
     
+    # Read custom rules
+    custom_rules = read_custom_rules(target_dir)
+    
+    # Read tech stack based on mode
+    tech_stack_content = ""
     if include_tech_stack:
-        tech_stack_content = read_tech_stack_files()
-        final_content += tech_stack_content
+        tech_stack_content = read_tech_stack_files(mode)
     
-    return final_content
+    # Build final content based on custom rules position
+    if custom_position == CustomRulesPosition.START:
+        return custom_rules + ai_tool_template + tech_stack_content
+    elif custom_position == CustomRulesPosition.MIDDLE:
+        return ai_tool_template + custom_rules + tech_stack_content
+    else:  # END
+        return ai_tool_template + tech_stack_content + custom_rules
+
+def update_gitignore(target_dir: Path) -> None:
+    """Add AI instruction files to .gitignore if it exists."""
+    gitignore_path = target_dir / ".gitignore"
+    ai_files = ["CLAUDE.md", "GEMINI.md", ".cursorrules"]
+    
+    if not gitignore_path.exists():
+        logger.info("No .gitignore file found, skipping gitignore update")
+        return
+    
+    # Read existing gitignore
+    existing_content = gitignore_path.read_text()
+    lines_to_add = []
+    
+    for ai_file in ai_files:
+        if ai_file not in existing_content:
+            lines_to_add.append(ai_file)
+    
+    if lines_to_add:
+        # Add AI files section to gitignore
+        new_content = existing_content.rstrip() + "\n\n# AI instruction files (generated)\n"
+        for line in lines_to_add:
+            new_content += f"{line}\n"
+        
+        gitignore_path.write_text(new_content)
+        logger.info(f"Added {len(lines_to_add)} AI files to .gitignore")
+    else:
+        logger.debug("All AI files already in .gitignore")
 
 def deploy_instruction_file(ai_tool: str, target_path: Path, content: str) -> None:
     """Deploy instruction file to target location."""
@@ -81,6 +186,8 @@ def deploy(
     tools: Optional[List[str]] = typer.Option(None, "--tool", "-t", help="AI tools to deploy (claude, cursor, gemini)"),
     current_dir: bool = typer.Option(False, "--current", "-c", help="Deploy to current directory"),
     include_tech_stack: bool = typer.Option(True, "--tech-stack/--no-tech-stack", help="Include tech stack information"),
+    mode: InstructionMode = typer.Option(InstructionMode.OPTIMAL, "--mode", "-m", help="Instruction mode: slim, optimal, or full"),
+    custom_position: CustomRulesPosition = typer.Option(CustomRulesPosition.START, "--custom-position", help="Where to place custom LLM_RULES.md content"),
     interactive: bool = typer.Option(True, "--interactive/--no-interactive", help="Interactive mode for tool selection")
 ) -> None:
     """Deploy AI instructions to current project directory."""
@@ -148,10 +255,19 @@ def deploy(
         
         # Read template and build content
         template_content = read_template_file(template_path)
-        final_content = build_final_content(template_content, include_tech_stack)
+        final_content = build_final_content(
+            template_content, 
+            target_dir, 
+            include_tech_stack, 
+            mode, 
+            custom_position
+        )
         
         # Deploy
         deploy_instruction_file(tool, target_path, final_content)
+    
+    # Update .gitignore to include AI instruction files
+    update_gitignore(target_dir)
     
     console.print("\n[green]✨ Deployment complete![/green]")
 

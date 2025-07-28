@@ -156,7 +156,19 @@ class LocalJobRunner:
             print(f"   💡 To enable: rename without '_' prefix")
             print(f"   💡 To run disabled jobs: use --include-disabled flag")
         
-        return sorted(jobs)
+        # Sort jobs by execution order prefix (0_, 1_, 9_) then alphabetically
+        def job_sort_key(job_path):
+            name = job_path.stem
+            # Extract numeric prefix if exists (e.g., "1_my_job" -> 1)
+            if '_' in name and name.split('_')[0].isdigit():
+                prefix = int(name.split('_')[0])
+                rest = '_'.join(name.split('_')[1:])
+            else:
+                prefix = 5  # Default priority for jobs without prefix
+                rest = name
+            return (prefix, rest)
+        
+        return sorted(jobs, key=job_sort_key)
     
     async def execute_job_async(self, job_path: Path) -> JobResult:
         """Execute a single job and capture results."""
@@ -470,8 +482,8 @@ class LocalJobRunner:
         console.clear()
         console.print(table)
 
-    async def run_all_jobs_async(self) -> None:
-        """Run all jobs concurrently with live progress updates."""
+    async def run_all_jobs_async(self, live_updates: bool = False) -> None:
+        """Run all jobs in batches by prefix order."""
         jobs = self.find_jobs(include_disabled=self._include_disabled)
         
         if not jobs:
@@ -479,50 +491,71 @@ class LocalJobRunner:
             return
         
         print(f"Found {len(jobs)} jobs to run")
-        print("Running jobs concurrently with live updates...")
         print(f"⏰ Job timeout: {JOB_TIMEOUT_SECONDS // 60} minutes ({JOB_TIMEOUT_SECONDS} seconds)")
         print(f"🐍 Python executable: {get_python_executable()}")
         print("(Press Ctrl+C to stop)\n")
         
-        # Start all jobs concurrently
-        tasks = {asyncio.create_task(self.execute_job_async(job_path)): job_path 
-                for job_path in jobs}
+        # Group jobs by prefix for sequential batch execution
+        from collections import defaultdict
+        job_batches = defaultdict(list)
         
-        # Poll for completion with live updates
-        while tasks:
-            # Wait for at least one task to complete (with timeout for updates)
-            done, pending = await asyncio.wait(
-                tasks.keys(), 
-                return_when=asyncio.FIRST_COMPLETED,
-                timeout=2.0  # Update display every 2 seconds
-            )
+        for job_path in jobs:
+            name = job_path.stem
+            if '_' in name and name.split('_')[0].isdigit():
+                prefix = int(name.split('_')[0])
+            else:
+                prefix = 5  # Default priority
+            job_batches[prefix].append(job_path)
+        
+        # Execute batches sequentially, jobs within batch concurrently
+        for batch_prefix in sorted(job_batches.keys()):
+            batch_jobs = job_batches[batch_prefix]
+            print(f"📦 Starting batch {batch_prefix} ({len(batch_jobs)} jobs)...")
             
-            # Process completed tasks
-            for task in done:
-                job_path = tasks[task]
-                try:
-                    result = await task
-                except Exception as e:
-                    # Create failure result for exceptions
-                    job_name = job_path.stem
-                    print(f"  ⚠️  Warning: Job '{job_name}' failed with exception: {e}")
-                    result = JobResult(
-                        job_name=job_name,
-                        job_path=str(job_path),
-                        outcome=JobOutcome.FAIL,
-                        exit_code=-1,
-                        duration_seconds=0.0,
-                        stdout="",
-                        stderr=str(e),
-                        summary=f"Job '{job_name}' failed with exception: {str(e)}",
-                        timestamp=datetime.now().isoformat()
-                    )
+            # Start all jobs in this batch concurrently
+            tasks = {asyncio.create_task(self.execute_job_async(job_path)): job_path 
+                    for job_path in batch_jobs}
+            
+            # Wait for all jobs in this batch to complete
+            while tasks:
+                # Wait for at least one task to complete (with timeout for updates)
+                done, pending = await asyncio.wait(
+                    tasks.keys(), 
+                    return_when=asyncio.FIRST_COMPLETED,
+                    timeout=2.0  # Update display every 2 seconds
+                )
                 
-                self.results.append(result)
-                del tasks[task]
+                # Process completed tasks
+                for task in done:
+                    job_path = tasks[task]
+                    try:
+                        result = await task
+                    except Exception as e:
+                        # Create failure result for exceptions
+                        job_name = job_path.stem
+                        print(f"  ⚠️  Warning: Job '{job_name}' failed with exception: {e}")
+                        result = JobResult(
+                            job_name=job_name,
+                            job_path=str(job_path),
+                            outcome=JobOutcome.FAIL,
+                            exit_code=-1,
+                            duration_seconds=0.0,
+                            stdout="",
+                            stderr=str(e),
+                            summary=f"Job '{job_name}' failed with exception: {str(e)}",
+                            timestamp=datetime.now().isoformat()
+                        )
+                    
+                    self.results.append(result)
+                    del tasks[task]
+                
+                # Update display with current results (only if live updates enabled)
+                if live_updates:
+                    self.print_live_results_table(len(jobs))
             
-            # Update display with current results
-            self.print_live_results_table(len(jobs))
+            print(f"✅ Batch {batch_prefix} completed ({len(batch_jobs)} jobs)")
+            if batch_prefix < max(job_batches.keys()):
+                print("   Moving to next batch...\n")
         
         # Final status update
         print(f"\n🎉 All {len(jobs)} jobs completed!")
@@ -544,9 +577,9 @@ class LocalJobRunner:
         """Synchronous wrapper for single job execution (used by CLI test command)."""
         return asyncio.run(self.execute_job_async(job_path))
     
-    def run_all_jobs(self) -> None:
+    def run_all_jobs(self, live_updates: bool = False) -> None:
         """Synchronous wrapper for async job execution."""
-        asyncio.run(self.run_all_jobs_async())
+        asyncio.run(self.run_all_jobs_async(live_updates=live_updates))
     
     def save_logs(self) -> Path:
         """Save detailed logs to file."""
@@ -591,11 +624,23 @@ class LocalJobRunner:
         table.add_column("Duration", justify="right", style="green")
         table.add_column("Summary", style="white")
         
+        # Sort results to surface warnings and failures to the top
+        def priority_sort_key(result):
+            priority = {
+                JobOutcome.FAIL: 0,        # Highest priority
+                JobOutcome.WARNING: 1,     # Second priority  
+                JobOutcome.OK: 2,          # Normal priority
+                JobOutcome.DONE_NOTHING: 3 # Lowest priority
+            }
+            return priority.get(result.outcome, 99)
+        
+        sorted_results = sorted(self.results, key=priority_sort_key)
+        
         # Count outcomes and total duration
         outcome_counts = {outcome: 0 for outcome in JobOutcome}
         total_duration = 0
         
-        for result in self.results:
+        for result in sorted_results:
             outcome_counts[result.outcome] += 1
             total_duration += result.duration_seconds
             

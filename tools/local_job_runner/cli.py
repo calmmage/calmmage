@@ -38,7 +38,8 @@ def run_jobs(
     jobs_dir: Annotated[Path, typer.Option(help="Directory containing jobs")] = DEFAULT_JOBS_DIR,
     log_dir: Annotated[Optional[Path], typer.Option(help="Log directory")] = None,
     job_pattern: Annotated[Optional[str], typer.Option(help="Run only jobs matching pattern")] = None,
-    include_disabled: Annotated[bool, typer.Option("--include-disabled", help="Include disabled jobs (starting with '_')")] = False
+    include_disabled: Annotated[bool, typer.Option("--include-disabled", help="Include disabled jobs (starting with '_')")] = False,
+    live: Annotated[bool, typer.Option("--live", help="Show live progress updates during execution")] = False
 ):
     """Run all jobs in the specified directory."""
     
@@ -68,8 +69,8 @@ def run_jobs(
         # Set the include_disabled flag for the runner
         runner._include_disabled = include_disabled
     
-    # Run all jobs
-    runner.run_all_jobs()
+    # Run all jobs with live updates if requested
+    runner.run_all_jobs(live_updates=live)
     
     # Save logs
     log_file = runner.save_logs()
