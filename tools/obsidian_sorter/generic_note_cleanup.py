@@ -4,11 +4,28 @@
 import yaml
 from pathlib import Path
 from typing import Dict, List, Optional
+from dataclasses import dataclass
 import typer
 from rich.console import Console
 from rich.table import Table
 
 from tools.obsidian_sorter.config import ObsidianSorterConfig
+
+# Import the result class from daily_simple or define it here
+try:
+    from .daily_simple import ObsidianCleanupResult
+except ImportError:
+    @dataclass
+    class ObsidianCleanupResult:
+        """Result of an obsidian cleanup operation."""
+        files_processed: int = 0
+        files_moved: int = 0
+        files_renamed: int = 0
+        files_linked: int = 0
+        notes_organized: int = 0
+        actions_planned: int = 0
+        actions_executed: int = 0
+        had_work_to_do: bool = False
 
 console = Console()
 app = typer.Typer()
@@ -64,6 +81,15 @@ def get_generic_cleanup_actions(config: ObsidianSorterConfig) -> tuple[List[Dict
         templates_path = config.obsidian_root / config.templates_path if config.templates_path else None
         if templates_path and (file.parent == templates_path or templates_path in file.parents):
             stats["templates_skipped"] += 1
+            continue
+        
+        # Skip files in archive folders (similar to project archive exclusion)
+        file_path_str = str(file.resolve()).lower()
+        if "archive" in file_path_str:
+            # Add to stats if not already tracked
+            if "archive_skipped" not in stats:
+                stats["archive_skipped"] = 0
+            stats["archive_skipped"] += 1
             continue
         
             
@@ -129,7 +155,7 @@ def cleanup_all_types(
     config_path: Path = typer.Option("config.yaml", help="Config file"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Show planned actions without executing"),
     yes: bool = typer.Option(False, "--yes", "-y", help="Execute without confirmation"),
-):
+) -> ObsidianCleanupResult:
     """Clean up all configured note types - organize files by type."""
     
     # Load config
@@ -176,7 +202,7 @@ def cleanup_all_types(
     
     if not actions:
         console.print("\n[green]✅ All files are already in correct locations![/green]")
-        return
+        return ObsidianCleanupResult(had_work_to_do=False)
     
     # Show planned actions
     console.print(f"\n📄 Files needing organization: {len(actions)}")
@@ -217,13 +243,13 @@ def cleanup_all_types(
     
     if dry_run:
         console.print("\n[yellow]DRY RUN MODE - No files will be moved[/yellow]")
-        return
+        return ObsidianCleanupResult(actions_planned=len(actions), had_work_to_do=len(actions) > 0)
     
     # Confirmation
     if not yes:
         if not typer.confirm(f"\nProceed with organizing {len(actions)} files?"):
             console.print("Operation cancelled.")
-            return
+            return ObsidianCleanupResult(actions_planned=len(actions), had_work_to_do=len(actions) > 0)
     
     # Execute actions
     success_count = 0
@@ -282,6 +308,14 @@ def cleanup_all_types(
     console.print(f"[green]Successfully moved: {success_count} files[/green]") 
     if failed_count > 0:
         console.print(f"[red]Failed: {failed_count} files[/red]")
+    
+    return ObsidianCleanupResult(
+        files_processed=success_count + failed_count,
+        files_moved=success_count,
+        actions_planned=len(actions),
+        actions_executed=success_count,
+        had_work_to_do=len(actions) > 0
+    )
 
 
 if __name__ == "__main__":

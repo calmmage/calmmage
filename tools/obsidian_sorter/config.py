@@ -62,65 +62,65 @@ class ObsidianSorterConfig(BaseModel):
     )
     
     # Note type definitions with their target folders
-    note_types: Dict[str, NoteType] = Field(default_factory=lambda: {
-        "daily": NoteType(
-            folder="daily",
-            pattern=r"^\d{1,2} [A-Za-z]{3} \d{4}\.md$",
-            frontmatter_type="daily",
-            description="Daily notes in DD MMM YYYY format"
-        ),
-        "weekly_note": NoteType(
-            folder="weekly_workspaces", 
-            pattern=r"^Week \d+ - \d{1,2} [A-Za-z]{3} \d{4}\.md$",
-            frontmatter_type="weekly_note",
-            description="Weekly notes in Week N - DD MMM YYYY format"
-        ),
-        "project": NoteType(
-            folder="projects",
-            frontmatter_type="project",
-            description="Project files with type: project in frontmatter"
-        ),
-        "action": NoteType(
-            folder="actions",
-            frontmatter_type="action", 
-            description="Action items with type: action in frontmatter"
-        ),
-        "troubleshooting": NoteType(
-            folder="troubleshooting",
-            frontmatter_type="troubleshooting",
-            description="Troubleshooting notes"
-        ),
-        "work_session": NoteType(
-            folder="work/sessions",
-            frontmatter_type="work_session",
-            description="Work session notes"
-        ),
-        "thoughts_dump": NoteType(
-            folder="notes/thoughts",
-            frontmatter_type="thoughts_dump",
-            description="Thought dump notes"
-        ),
-        "person_contact": NoteType(
-            folder="people/contacts",
-            frontmatter_type="person_contact",
-            description="Contact person notes"
-        ),
-        "workalong": NoteType(
-            folder="notes/workalongs",
-            frontmatter_type="workalong",
-            description="AI workalong notes"
-        ),
-        "artifact": NoteType(
-            folder="artifacts",
-            frontmatter_type="artifact",
-            description="Artifact notes"
-        ),
-        "chain": NoteType(
-            folder="chains",
-            frontmatter_type="chain",
-            description="Chain notes"
-        )
-    })
+    note_types: Dict[str, NoteType] = Field(
+        default_factory=lambda: {
+            "daily": NoteType(
+                folder="daily",
+                pattern=r"^\d{1,2} [A-Za-z]{3} \d{4}\.md$",
+                frontmatter_type="daily",
+                description="Daily notes in DD MMM YYYY format",
+            ),
+            "weekly_note": NoteType(
+                folder="weekly_workspaces",
+                pattern=r"^Week \d+ - \d{1,2} [A-Za-z]{3} \d{4}\.md$",
+                frontmatter_type="weekly_note",
+                description="Weekly notes in Week N - DD MMM YYYY format",
+            ),
+            "project": NoteType(
+                folder="projects",
+                frontmatter_type="project",
+                description="Project files with type: project in frontmatter",
+            ),
+            "action": NoteType(
+                folder="actions",
+                frontmatter_type="action",
+                description="Action items with type: action in frontmatter",
+            ),
+            "troubleshooting": NoteType(
+                folder="troubleshooting",
+                frontmatter_type="troubleshooting",
+                description="Troubleshooting notes",
+            ),
+            "work_session": NoteType(
+                folder="work/sessions",
+                frontmatter_type="work_session",
+                description="Work session notes",
+            ),
+            "thoughts_dump": NoteType(
+                folder="dumps",
+                frontmatter_type="thoughts_dump",
+                description="Thought dump notes",
+            ),
+            "person_contact": NoteType(
+                folder="people",
+                frontmatter_type="person_contact",
+                description="Contact person notes",
+            ),
+            "workalong": NoteType(
+                folder="workalongs",
+                frontmatter_type="workalong",
+                description="AI workalong notes",
+            ),
+            "artifact": NoteType(
+                folder="artifacts",
+                frontmatter_type="artifact",
+                description="Artifact notes",
+            ),
+            "chain": NoteType(
+                folder="chains", frontmatter_type="chain", description="Chain notes"
+            ),
+        }
+    )
     
     @property
     def full_inbox_path(self) -> Path:

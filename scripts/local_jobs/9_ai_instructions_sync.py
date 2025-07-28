@@ -85,27 +85,18 @@ def should_deploy_ai_instructions(project_path: Path) -> bool:
     return any((project_path / indicator).exists() for indicator in code_indicators)
 
 
-def deploy_to_project(project_path: Path) -> bool:
+def deploy_to_project(project_path: Path) -> tuple[bool, int]:
     """Deploy AI instructions to a single project.
     
     Args:
         project_path: Path to the project
         
     Returns:
-        tuple of (success: bool, language_info: dict)
+        tuple of (success: bool, files_deployed: int)
     """
     try:
-        # Detect languages before deployment
-        # languages = detect_project_languages(project_path)
-        
-        # Warn about unsupported languages
-        # if languages["unsupported"]:
-        #     unsupported_str = ", ".join(languages["unsupported"])
-        #     print(f"  ⚠️  {project_path.name}: Detected unsupported languages: {unsupported_str}")
-        #     print(f"     Consider creating custom AI instructions for these languages")
-        
         # Use the reusable deployment function
-        deploy_ai_instructions(
+        result = deploy_ai_instructions(
             target_dir=project_path,
             tools=None,  # Deploy all tools
             include_tech_stack=True,
@@ -115,14 +106,13 @@ def deploy_to_project(project_path: Path) -> bool:
             silent=True  # No console output for automation
         )
         
-        # supported_str = ", ".join(languages["supported"]) if languages["supported"] else "none"
-        print(f"  ✅ AI instructions deployed: {project_path.name}")
-        return True
+        print(f"  ✅ AI instructions deployed: {project_path.name} ({result.tools_deployed} tools)")
+        return True, result.tools_deployed
         
     except Exception as e:
         print(f"  ❌ AI instructions failed: {project_path.name}")
         print(f"     Error: {e}")
-        return False, {"supported": [], "unsupported": []}
+        return False, 0
 
 
 def main():
@@ -143,20 +133,18 @@ def main():
         non_archived_projects = [p for p in target_projects if archive_path not in p.path.parents]
         
         success_count = 0
-        projects_with_unsupported = 0
+        total_tools_deployed = 0
 
         for project in non_archived_projects:
             print(f"Deploying AI instructions to {project.name}...")
-            success = deploy_to_project(project.path)
+            success, tools_deployed = deploy_to_project(project.path)
             if success:
                 success_count += 1
+                total_tools_deployed += tools_deployed
         
         # Determine final status
         if success_count == len(non_archived_projects):
-            if projects_with_unsupported > 0:
-                print("🎯 FINAL STATUS: requires_attention")
-            else:
-                print("🎯 FINAL STATUS: success")
+            print("🎯 FINAL STATUS: success")
         elif success_count == 0:
             if len(non_archived_projects) == 0:
                 print("🎯 FINAL STATUS: no_change")
@@ -170,10 +158,7 @@ def main():
         active_projects = [p for p in target_projects if archive_path not in p.path.parents]
         
         # Concise final notes
-        notes = f"{len(active_projects)} projects, {success_count} deployed"
-        # if projects_with_unsupported > 0:
-        #     unsupported_list = ", ".join(sorted(all_unsupported_languages))
-        #     notes += f", {projects_with_unsupported} unsupported langs ({unsupported_list})"
+        notes = f"{len(active_projects)} projects, {success_count} deployed, {total_tools_deployed} tools"
         print(f"📝 FINAL NOTES: {notes}")
         return 0
         

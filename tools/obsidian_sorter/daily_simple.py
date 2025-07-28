@@ -6,11 +6,24 @@ import shutil
 from pathlib import Path
 from typing import List, Dict
 from datetime import datetime, timedelta
+from dataclasses import dataclass
 import typer
 from rich.console import Console
 from rich.table import Table
 
 from tools.obsidian_sorter.config import ObsidianSorterConfig
+
+@dataclass
+class ObsidianCleanupResult:
+    """Result of an obsidian cleanup operation."""
+    files_processed: int = 0
+    files_moved: int = 0
+    files_renamed: int = 0
+    files_linked: int = 0
+    notes_organized: int = 0
+    actions_planned: int = 0
+    actions_executed: int = 0
+    had_work_to_do: bool = False
 
 console = Console()
 
@@ -93,6 +106,9 @@ def get_weekly_planned_actions(config: ObsidianSorterConfig) -> List[Dict]:
         is_old_weekly = is_weekly_old_format(file.name)
         current_location = file.parent
         
+        
+        # We check for archive exclusion in specific actions to avoid moving FROM archive folders
+        
         # Check if file is in weekly_workspaces tree (including archive folders)
         try:
             # Check if current location is weekly_workspaces or a subdirectory of it
@@ -103,15 +119,22 @@ def get_weekly_planned_actions(config: ObsidianSorterConfig) -> List[Dict]:
         
         # Determine action
         if is_weekly and not is_in_weekly_tree:
-            # Weekly note not in weekly tree - move to main weekly folder
-            actions.append({
-                "file": file,
-                "action": "move_to_weekly",
-                "from": current_location,
-                "to": weekly_folder
-            })
+            # Weekly note not in weekly tree - but don't move from archive folders
+            file_path_str = str(file.resolve()).lower()
+            current_location_str = str(current_location.resolve()).lower()
+            
+            # Check if file or its path contains 'archive'
+            is_in_archive = ("archive" in file_path_str or "archive" in current_location_str)
+            
+            if not is_in_archive:
+                actions.append({
+                    "file": file,
+                    "action": "move_to_weekly",
+                    "from": current_location,
+                    "to": weekly_folder
+                })
         elif not is_weekly and not is_old_weekly and current_location == weekly_folder:
-            # Non-weekly note in main weekly folder (not archive) - move out
+            # Non-weekly note in main weekly folder - move out
             actions.append({
                 "file": file,
                 "action": "move_from_weekly",
@@ -676,7 +699,7 @@ def cleanup_weekly(
     
     if not actions:
         console.print("\n[green]No weekly files need organizing![/green]")
-        return
+        return ObsidianCleanupResult(had_work_to_do=False)
     
     # Show planned actions in table
     console.print()
@@ -719,14 +742,17 @@ def cleanup_weekly(
             return
     
     # Execute actions
-    execute_weekly_actions(actions, config, dry_run)
+    result = execute_weekly_actions(actions, config, dry_run)
+    result.actions_planned = len(actions)
+    result.had_work_to_do = len(actions) > 0
+    return result
 
 
-def execute_weekly_actions(actions: List[Dict], config: ObsidianSorterConfig, dry_run: bool = True) -> None:
+def execute_weekly_actions(actions: List[Dict], config: ObsidianSorterConfig, dry_run: bool = True) -> ObsidianCleanupResult:
     """Execute the planned weekly actions with proper link handling."""
     if dry_run:
         console.print("[yellow]DRY RUN MODE - No files will be moved or renamed[/yellow]")
-        return
+        return ObsidianCleanupResult(actions_planned=len(actions), had_work_to_do=len(actions) > 0)
     
     try:
         import obsidiantools.api as otools
@@ -802,6 +828,13 @@ def execute_weekly_actions(actions: List[Dict], config: ObsidianSorterConfig, dr
     if any(action["action"] == "rename_old_weekly" for action in actions):
         console.print("\n[yellow]📝 Note: Renamed files may have broken links.[/yellow]")
         console.print("[yellow]Consider using Obsidian's 'Update links' feature if needed.[/yellow]")
+    
+    return ObsidianCleanupResult(
+        files_processed=success_count + failed_count,
+        files_moved=success_count,  # Includes both moves and renames
+        actions_executed=success_count,
+        had_work_to_do=len(actions) > 0
+    )
 
 
 if __name__ == "__main__":

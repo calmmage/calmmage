@@ -4,12 +4,22 @@
 from pathlib import Path
 from typing import List, Optional
 from enum import Enum
+from dataclasses import dataclass
 import subprocess
 import typer
 from rich.console import Console
 from rich.prompt import Confirm
 from rich.table import Table
 from loguru import logger
+
+@dataclass
+class AIInstructionsResult:
+    """Result of AI instructions deployment."""
+    tools_deployed: int = 0
+    tools_failed: int = 0
+    projects_processed: int = 0
+    files_created: int = 0
+    files_updated: int = 0
 
 from src.lib.utils import get_resources_dir
 
@@ -193,7 +203,7 @@ def deploy_ai_instructions(
     custom_position: CustomRulesPosition = CustomRulesPosition.START,
     force_overwrite: bool = False,
     silent: bool = False,
-) -> None:
+) -> AIInstructionsResult:
     """Deploy AI instructions to a target directory.
 
     Args:
@@ -219,10 +229,16 @@ def deploy_ai_instructions(
     if not tools:
         if not silent:
             console.print("[yellow]No tools selected.[/yellow]")
-        return
+        return AIInstructionsResult()
 
     if not silent:
         console.print(f"🚀 Deploying tools: {', '.join(tools)}")
+
+    # Track deployment results
+    tools_deployed = 0
+    tools_failed = 0
+    files_created = 0
+    files_updated = 0
 
     # Deploy each selected tool
     for tool in tools:
@@ -252,12 +268,21 @@ def deploy_ai_instructions(
 
         # Deploy the file
         try:
+            file_existed = target_path.exists()
             target_path.write_text(final_content)
+            
+            if file_existed:
+                files_updated += 1
+            else:
+                files_created += 1
+            tools_deployed += 1
+            
             if not silent:
                 console.print(
                     f"[green]✅ Deployed {tool} instructions to {target_path}[/green]"
                 )
         except Exception as e:
+            tools_failed += 1
             error_msg = f"Failed to deploy {tool}: {e}"
             if not silent:
                 console.print(f"[red]❌ {error_msg}[/red]")
@@ -266,8 +291,18 @@ def deploy_ai_instructions(
     # Update .gitignore
     update_gitignore(target_dir)
 
+    result = AIInstructionsResult(
+        tools_deployed=tools_deployed,
+        tools_failed=tools_failed,
+        projects_processed=1,
+        files_created=files_created,
+        files_updated=files_updated
+    )
+    
     if not silent:
         console.print("[green]✨ Deployment complete![/green]")
+    
+    return result
 
 @app.command()
 def deploy(

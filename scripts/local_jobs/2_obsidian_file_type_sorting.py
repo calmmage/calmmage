@@ -9,16 +9,21 @@ from tools.obsidian_sorter.generic_note_cleanup import cleanup_all_types
 def main():
     """Run file type sorting as a scheduled job."""
     try:
-        # Run cleanup with auto-yes (no interaction needed for scheduled job)
-        cleanup_all_types(
+        # Run cleanup and get structured result
+        result = cleanup_all_types(
             config_path=Path("config.yaml"),
             dry_run=False,
-            yes=True  # Auto-confirm for scheduled execution
+            yes=True,  # Auto-confirm for scheduled execution
         )
-
-        # Check if any work was actually done by looking at the function result
-        # For now, assume success means work was done - could be enhanced with return value
-        print("🎯 FINAL STATUS: success")
+        
+        # Determine status based on actual work done
+        if not result.had_work_to_do:
+            print("🎯 FINAL STATUS: no_change")
+        elif result.files_moved > 0:
+            print("🎯 FINAL STATUS: success")
+            print(f"📝 FINAL NOTES: {result.files_moved} files moved")
+        else:
+            print("🎯 FINAL STATUS: no_change")
         
     except Exception as e:
         print(f"❌ Error during file type sorting: {e}")
