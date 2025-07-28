@@ -182,19 +182,19 @@ def main():
     # Clear final status message for job runner parsing
     if docker_status["status"] == "running":
         print("\n🎯 FINAL STATUS: success")
-        print(f"📝 FINAL NOTES: Docker daemon running with {docker_status['containers_running']}/{docker_status['containers_total']} containers, {docker_status['images']} images")
+        print(f"📝 FINAL NOTES: {docker_status['containers_running']}/{docker_status['containers_total']} containers, {docker_status['images']} images")
         return 0
     elif docker_status["status"] == "stopped":
         print("\n🎯 FINAL STATUS: requires_attention")
-        print("📝 FINAL NOTES: Docker daemon is not running, needs manual start")
+        print("📝 FINAL NOTES: Daemon not running")
         return 1
     elif docker_status["status"] == "not_installed":
         print("\n🎯 FINAL STATUS: requires_attention")
-        print("📝 FINAL NOTES: Docker is not installed, install from https://docker.com")
+        print("📝 FINAL NOTES: Not installed")
         return 1
     else:
         print("\n🎯 FINAL STATUS: fail")
-        print(f"📝 FINAL NOTES: Docker status check failed - {docker_status['error']}")
+        print(f"📝 FINAL NOTES: Check failed - {docker_status['error']}")
         return 1
 
 

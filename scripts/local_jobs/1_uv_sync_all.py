@@ -108,8 +108,6 @@ def has_uv_project(project_path: Path) -> bool:
 
 def main():
     """Synchronize UV environments across all discovered projects."""
-    print("🎯 FINAL STATUS: Starting UV sync across all projects")
-    
     try:
         projects = get_local_projects()
         uv_projects = [p for p in projects if has_uv_project(p.path)]
@@ -117,29 +115,32 @@ def main():
         print(f"Found {len(uv_projects)} UV projects out of {len(projects)} total projects")
         
         if not uv_projects:
-            print("🎯 FINAL STATUS: success - No UV projects found")
-            print("📝 FINAL NOTES: Scanned all projects, none use UV")
+            print("🎯 FINAL STATUS: success")
+            print("📝 FINAL NOTES: No UV projects found")
             return 0
         
         success_count = 0
+        archive_path = Path.home() / "work/archive"
         for project in uv_projects:
+            if archive_path in project.path.parents:
+                continue
             print(f"Syncing {project.name}...")
             if run_uv_sync(project.path):
                 success_count += 1
         
         if success_count == len(uv_projects):
-            print("🎯 FINAL STATUS: success - All UV projects synchronized")
+            print("🎯 FINAL STATUS: success")
         elif success_count == 0:
-            print("🎯 FINAL STATUS: fail - No UV projects successfully synchronized")
+            print("🎯 FINAL STATUS: fail")
         else:
-            print("🎯 FINAL STATUS: requires_attention - Some UV projects failed to sync")
+            print("🎯 FINAL STATUS: requires_attention")
         
-        print(f"📝 FINAL NOTES: Processed {len(uv_projects)} UV projects, {success_count} successful")
+        print(f"📝 FINAL NOTES: {len(uv_projects)} UV projects, {success_count} successful")
         return 0
         
     except Exception as e:
-        print(f"🎯 FINAL STATUS: fail - UV sync failed: {e}")
-        print("📝 FINAL NOTES: Check project discovery and UV installation")
+        print(f"🎯 FINAL STATUS: fail")
+        print("📝 FINAL NOTES: Check discovery/UV install")
         return 1
 
 

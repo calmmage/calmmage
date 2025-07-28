@@ -8,8 +8,6 @@ from tools.obsidian_sorter.generic_note_cleanup import cleanup_all_types
 
 def main():
     """Run file type sorting as a scheduled job."""
-    print("🎯 FINAL STATUS: Starting file type sorting cleanup")
-    
     try:
         # Run cleanup with auto-yes (no interaction needed for scheduled job)
         cleanup_all_types(
@@ -18,12 +16,11 @@ def main():
             yes=True  # Auto-confirm for scheduled execution
         )
         
-        print("🎯 FINAL STATUS: success - File type sorting completed")
-        print("📝 FINAL NOTES: Organized all configured node types into their designated folders")
+        print("🎯 FINAL STATUS: success")
         
     except Exception as e:
-        print(f"🎯 FINAL STATUS: fail - File type sorting failed: {e}")
-        print("📝 FINAL NOTES: Check file type sorting configuration and node type definitions")
+        print(f"🎯 FINAL STATUS: fail")
+        print("📝 FINAL NOTES: Check config/node types")
         return 1
     
     return 0

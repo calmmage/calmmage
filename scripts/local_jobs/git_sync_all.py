@@ -10,8 +10,6 @@ from tools.git_sync_tool.git_sync import GitSyncManager
 
 def main():
     """Synchronize git repositories across all discovered projects."""
-    print("🎯 FINAL STATUS: Starting git sync across all projects")
-    
     try:
         # Initialize git sync manager with conservative settings for automation
         manager = GitSyncManager(
@@ -29,8 +27,8 @@ def main():
         print(f"Found {len(git_projects)} git repositories out of {len(projects)} total projects")
         
         if not git_projects:
-            print("🎯 FINAL STATUS: success - No git repositories found")
-            print("📝 FINAL NOTES: Scanned all projects, none are git repositories")
+            print("🎯 FINAL STATUS: success")
+            print("📝 FINAL NOTES: No git repos found")
             return 0
         
         # Sync all repositories
@@ -47,18 +45,14 @@ def main():
         # Determine final status
         if stats["fail"] > 0:
             final_status = "fail"
-            status_desc = f"{stats['fail']} repositories failed"
         elif stats["requires_attention"] > 0:
             final_status = "requires_attention"
-            status_desc = f"{stats['requires_attention']} repositories need manual intervention"
         elif stats["success"] > 0:
-            final_status = "success" 
-            status_desc = f"{stats['success']} repositories processed successfully"
+            final_status = "success"
         else:
             final_status = "no_change"
-            status_desc = "All repositories up-to-date"
         
-        print(f"🎯 FINAL STATUS: {final_status} - {status_desc}")
+        print(f"🎯 FINAL STATUS: {final_status}")
         
         # Detailed statistics in FINAL NOTES
         notes_parts = [f"Processed {len(git_projects)} git repositories"]
@@ -75,8 +69,8 @@ def main():
         return 0
         
     except Exception as e:
-        print(f"🎯 FINAL STATUS: fail - Git sync failed: {e}")
-        print("📝 FINAL NOTES: Check git installation and project discovery")
+        print(f"🎯 FINAL STATUS: fail")
+        print("📝 FINAL NOTES: Check git/discovery")
         return 1
 
 

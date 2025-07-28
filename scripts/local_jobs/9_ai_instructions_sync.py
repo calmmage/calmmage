@@ -65,10 +65,6 @@ def detect_project_languages(project_path: Path) -> dict:
 
 def should_deploy_ai_instructions(project_path: Path) -> bool:
     """Check if project should receive AI instructions deployment."""
-    # Skip if project already has custom LLM_RULES.md
-    if (project_path / "LLM_RULES.md").exists():
-        return False
-    
     # Deploy to projects that look like code projects
     code_indicators = [
         "pyproject.toml",
@@ -124,8 +120,6 @@ def deploy_to_project(project_path: Path) -> tuple[bool, dict]:
 
 def main():
     """Deploy AI instructions across all discovered projects."""
-    print("🎯 FINAL STATUS: Starting AI instructions sync across all projects")
-    
     try:
         projects = get_local_projects()
         target_projects = [p for p in projects if should_deploy_ai_instructions(p.path)]
@@ -133,15 +127,19 @@ def main():
         print(f"Found {len(target_projects)} projects needing AI instructions out of {len(projects)} total")
         
         if not target_projects:
-            print("🎯 FINAL STATUS: success - No projects need AI instructions")
-            print("📝 FINAL NOTES: All projects either have custom LLM_RULES.md or are not code projects")
+            print("🎯 FINAL STATUS: success")
+            print("📝 FINAL NOTES: No code projects found")
             return 0
         
         success_count = 0
         projects_with_unsupported = 0
         all_unsupported_languages = set()
-        
+
+        archive_path = Path.home() / "work/archive"
         for project in target_projects:
+            if archive_path in project.path.parents:
+                continue
+
             print(f"Deploying AI instructions to {project.name}...")
             success, languages = deploy_to_project(project.path)
             if success:
@@ -153,25 +151,25 @@ def main():
         # Determine final status
         if success_count == len(target_projects):
             if projects_with_unsupported > 0:
-                print("🎯 FINAL STATUS: requires_attention - All deployed but some have unsupported languages")
+                print("🎯 FINAL STATUS: requires_attention")
             else:
-                print("🎯 FINAL STATUS: success - All projects updated with AI instructions")
+                print("🎯 FINAL STATUS: success")
         elif success_count == 0:
-            print("🎯 FINAL STATUS: fail - No projects successfully updated")
+            print("🎯 FINAL STATUS: fail")
         else:
-            print("🎯 FINAL STATUS: requires_attention - Some projects failed to update")
+            print("🎯 FINAL STATUS: requires_attention")
         
-        # Enhanced FINAL NOTES with language statistics
-        notes = f"Processed {len(target_projects)} projects, {success_count} successful deployments"
+        # Concise final notes
+        notes = f"{len(target_projects)} projects, {success_count} deployed"
         if projects_with_unsupported > 0:
             unsupported_list = ", ".join(sorted(all_unsupported_languages))
-            notes += f", {projects_with_unsupported} projects with unsupported languages ({unsupported_list})"
+            notes += f", {projects_with_unsupported} unsupported langs ({unsupported_list})"
         print(f"📝 FINAL NOTES: {notes}")
         return 0
         
     except Exception as e:
-        print(f"🎯 FINAL STATUS: fail - AI instructions sync failed: {e}")
-        print("📝 FINAL NOTES: Check AI instructions tool and project discovery")
+        print(f"🎯 FINAL STATUS: fail")
+        print("📝 FINAL NOTES: Check AI tool/discovery")
         return 1
 
 
