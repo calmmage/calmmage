@@ -27,7 +27,11 @@ app = typer.Typer(help="Cronicle Job Manager - Schedule and manage jobs via Cron
 console = Console()
 
 # Load environment variables
-env_path = Path.home() / ".env"
+# todo: use calmmage src/ env discovery
+# env_path = Path.home() / ".env"
+# if env_path.exists():
+#     load_dotenv(env_path)
+env_path = Path(__file__).parent / ".env"
 if env_path.exists():
     load_dotenv(env_path)
 
