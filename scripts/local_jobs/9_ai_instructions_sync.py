@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 from src.lib.coding_projects import get_local_projects
-from tools.ai_instructions_tool.cli import deploy_ai_instructions
+from tools.ai_instructions_composer.cli import deploy_ai_instructions
 
 
 def detect_project_languages(project_path: Path) -> dict:
