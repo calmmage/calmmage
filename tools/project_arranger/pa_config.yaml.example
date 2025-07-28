@@ -5,7 +5,6 @@ dry_run: true
 root_paths:
   - ~/work/projects
   - ~/work/archive
-  - ~/work/experiments
 
 # will include only these orgs
 # github_orgs:

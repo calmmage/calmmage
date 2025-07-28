@@ -26,12 +26,12 @@
 ### Tool 1: UV Environment Updater
 - **Purpose**: Go over all discovered projects and run `uv sync`
 - **Target**: Update/synchronize UV environments across all repositories
-- **Location**: `scripts/scheduled_tasks/` (local automation scripts folder)
+- **Location**: `scripts/local_jobs/` (local automation scripts folder)
 
 ### Tool 2: AI Instructions Regenerator  
 - **Purpose**: Go over all projects and regenerate AI instruction files
 - **Files**: `CLAUDE.md`, `GEMINI.md`, `.cursorrules`
-- **Location**: `scripts/scheduled_tasks/` 
+- **Location**: `scripts/local_jobs/` 
 - **Integration**: Uses the AI instructions tool we just built
 
 ### Tool 3: Git Repository Updater
@@ -41,6 +41,7 @@
   - Stage unstaged changes and commit
   - Push to GitHub/remote repositories
 - **Goal**: Bulk GitHub repository updates
+- **Location**: `scripts/local_jobs/`
 
 ## CLI Interface
 
@@ -88,7 +89,7 @@
 - Leverage existing tools: `project_arranger`, `project_discoverer`
 - Build on AI instructions tool
 - Integrate with existing alias system
-- Work with current automation framework (`scripts/scheduled_tasks/`)
+- Work with current automation framework (`scripts/local_jobs/`)
 
 ## Future Considerations
 - Project type detection (Python, web, CLI tool, etc.)
