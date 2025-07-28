@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 """Note Types Discovery Script - Analyze entity types from 3 sources.
-
-Note: Any mention of 'node' in this codebase is a voice-to-text artifact and should be read as 'note'.
 """
 
 import re

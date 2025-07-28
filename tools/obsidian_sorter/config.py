@@ -5,8 +5,8 @@ from typing import List, Optional, Dict
 from pydantic import BaseModel, Field
 
 
-class NodeType(BaseModel):
-    """Configuration for a specific node type."""
+class NoteType(BaseModel):
+    """Configuration for a specific note type."""
     folder: str = Field(description="Target folder path (relative to vault root)")
     pattern: Optional[str] = Field(None, description="Regex pattern for filename detection")
     frontmatter_type: Optional[str] = Field(None, description="Expected 'type:' value in YAML frontmatter")
@@ -61,61 +61,61 @@ class ObsidianSorterConfig(BaseModel):
         description="Where to move non-daily notes from daily folder (relative to obsidian_root)",
     )
     
-    # Node type definitions with their target folders  
-    node_types: Dict[str, NodeType] = Field(default_factory=lambda: {
-        "daily": NodeType(
+    # Note type definitions with their target folders
+    note_types: Dict[str, NoteType] = Field(default_factory=lambda: {
+        "daily": NoteType(
             folder="daily",
             pattern=r"^\d{1,2} [A-Za-z]{3} \d{4}\.md$",
             frontmatter_type="daily",
             description="Daily notes in DD MMM YYYY format"
         ),
-        "weekly_note": NodeType(
+        "weekly_note": NoteType(
             folder="weekly_workspaces", 
             pattern=r"^Week \d+ - \d{1,2} [A-Za-z]{3} \d{4}\.md$",
             frontmatter_type="weekly_note",
             description="Weekly notes in Week N - DD MMM YYYY format"
         ),
-        "project": NodeType(
+        "project": NoteType(
             folder="projects",
             frontmatter_type="project",
             description="Project files with type: project in frontmatter"
         ),
-        "action": NodeType(
+        "action": NoteType(
             folder="actions",
             frontmatter_type="action", 
             description="Action items with type: action in frontmatter"
         ),
-        "troubleshooting": NodeType(
+        "troubleshooting": NoteType(
             folder="troubleshooting",
             frontmatter_type="troubleshooting",
             description="Troubleshooting notes"
         ),
-        "work_session": NodeType(
+        "work_session": NoteType(
             folder="work/sessions",
             frontmatter_type="work_session",
             description="Work session notes"
         ),
-        "thoughts_dump": NodeType(
+        "thoughts_dump": NoteType(
             folder="notes/thoughts",
             frontmatter_type="thoughts_dump",
             description="Thought dump notes"
         ),
-        "person_contact": NodeType(
+        "person_contact": NoteType(
             folder="people/contacts",
             frontmatter_type="person_contact",
             description="Contact person notes"
         ),
-        "workalong": NodeType(
+        "workalong": NoteType(
             folder="notes/workalongs",
             frontmatter_type="workalong",
             description="AI workalong notes"
         ),
-        "artifact": NodeType(
+        "artifact": NoteType(
             folder="artifacts",
             frontmatter_type="artifact",
             description="Artifact notes"
         ),
-        "chain": NodeType(
+        "chain": NoteType(
             folder="chains",
             frontmatter_type="chain",
             description="Chain notes"
@@ -138,24 +138,24 @@ class ObsidianSorterConfig(BaseModel):
         """Get absolute path for a rule's target folder."""
         return self.obsidian_root / rule.target_folder
     
-    def get_node_type_path(self, node_type_name: str) -> Path:
-        """Get absolute path for a node type's target folder."""
-        if node_type_name not in self.node_types:
-            raise ValueError(f"Unknown node type: {node_type_name}")
-        return self.obsidian_root / self.node_types[node_type_name].folder
+    def get_note_type_path(self, note_type_name: str) -> Path:
+        """Get absolute path for a note type's target folder."""
+        if note_type_name not in self.note_types:
+            raise ValueError(f"Unknown note type: {note_type_name}")
+        return self.obsidian_root / self.note_types[note_type_name].folder
     
-    def detect_node_type_by_filename(self, filename: str) -> Optional[str]:
-        """Detect node type based on filename patterns."""
-        for type_name, node_type in self.node_types.items():
-            if node_type.pattern:
+    def detect_note_type_by_filename(self, filename: str) -> Optional[str]:
+        """Detect note type based on filename patterns."""
+        for type_name, note_type in self.note_types.items():
+            if note_type.pattern:
                 import re
-                if re.match(node_type.pattern, filename):
+                if re.match(note_type.pattern, filename):
                     return type_name
         return None
     
-    def detect_node_type_by_frontmatter(self, frontmatter_type: str) -> Optional[str]:
-        """Find node type that matches a frontmatter type value."""
-        for type_name, node_type in self.node_types.items():
-            if node_type.frontmatter_type == frontmatter_type:
+    def detect_note_type_by_frontmatter(self, frontmatter_type: str) -> Optional[str]:
+        """Find note type that matches a frontmatter type value."""
+        for type_name, note_type in self.note_types.items():
+            if note_type.frontmatter_type == frontmatter_type:
                 return type_name
         return None

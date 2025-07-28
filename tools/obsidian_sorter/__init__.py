@@ -1,9 +1,9 @@
 """Obsidian Auto-Sorter Tool."""
 
-from .config import ObsidianSorterConfig, SortingRule, NodeType
+from .config import ObsidianSorterConfig, SortingRule, NoteType
 
 __all__ = [
     "ObsidianSorterConfig",
     "SortingRule",
-    "NodeType"
+    "NoteType"
 ]

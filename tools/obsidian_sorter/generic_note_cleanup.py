@@ -144,8 +144,8 @@ def cleanup_all_types(
     
     # Show configured note types
     console.print(f"\n📋 Configured note types: {len(config.note_types)}")
-    
-    type_table = Table(title="Configured Node Types")
+
+    type_table = Table(title="Configured Note Types")
     type_table.add_column("Type", style="cyan")
     type_table.add_column("Target Folder", style="green")
     type_table.add_column("Detection", style="yellow")

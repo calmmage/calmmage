@@ -35,14 +35,14 @@ auto-link-dry: ## Dry run of auto-linking
 auto-link-yes: ## Auto-linking with auto-confirm (no prompts)
 	uv run python daily_simple.py auto-link --config-path $(CONFIG_PATH) --yes
 
-generic-cleanup: ## Organize all configured node types - move files to correct typed folders
-	uv run python generic_node_cleanup.py --config-path $(CONFIG_PATH)
+generic-cleanup: ## Organize all configured note types - move files to correct typed folders
+	uv run python generic_note_cleanup.py --config-path $(CONFIG_PATH)
 
 generic-cleanup-dry: ## Dry run of generic cleanup
-	uv run python generic_node_cleanup.py --config-path $(CONFIG_PATH) --dry-run
+	uv run python generic_note_cleanup.py --config-path $(CONFIG_PATH) --dry-run
 
 generic-cleanup-yes: ## Generic cleanup with auto-confirm (no prompts)
-	uv run python generic_node_cleanup.py --config-path $(CONFIG_PATH) --yes
+	uv run python generic_note_cleanup.py --config-path $(CONFIG_PATH) --yes
 
 # Combined operations
 run-all: ## Run all operations: daily + weekly + auto-linking
