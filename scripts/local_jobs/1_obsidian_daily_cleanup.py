@@ -20,14 +20,18 @@ def main():
         if hasattr(result, 'files_processed'):
             files_count = result.files_processed
             notes_count = getattr(result, 'notes_organized', 0)
-            print("🎯 FINAL STATUS: success")
-            print(f"📝 FINAL NOTES: {files_count} files, {notes_count} notes")
+            if files_count > 0 or notes_count > 0:
+                print("🎯 FINAL STATUS: success")
+                print(f"📝 FINAL NOTES: {files_count} files, {notes_count} notes")
+            else:
+                print("🎯 FINAL STATUS: no_change")
         else:
-            print("🎯 FINAL STATUS: success")
-        
+            print("🎯 FINAL STATUS: no_change")
+
     except Exception as e:
-        print(f"🎯 FINAL STATUS: fail - Daily cleanup failed: {e}")
-        print("📝 FINAL NOTES: Check config/permissions")
+        print(f"❌ Error during daily cleanup: {e}")
+        print(f"🎯 FINAL STATUS: fail")
+        print(f"📝 FINAL NOTES: {type(e).__name__} - check logs")
         return 1
     
     return 0

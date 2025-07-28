@@ -21,20 +21,23 @@ def main():
         if hasattr(result, 'files_linked'):
             linked_count = result.files_linked
             notes_count = getattr(result, 'notes_processed', 0)
-            
+
+            if linked_count == 0:
+                print("🎯 FINAL STATUS: no_change")
             # Soft warning for high activity (just for fun)
-            if linked_count > 10:
+            elif linked_count > 10:
                 print("🎯 FINAL STATUS: requires_attention")
                 print(f"📝 FINAL NOTES: {linked_count} files linked, {notes_count} notes (busy!)")
             else:
                 print("🎯 FINAL STATUS: success")
                 print(f"📝 FINAL NOTES: {linked_count} linked, {notes_count} notes")
         else:
-            print("🎯 FINAL STATUS: success")
+            print("🎯 FINAL STATUS: no_change")
         
     except Exception as e:
-        print(f"🎯 FINAL STATUS: fail - Auto-linking failed: {e}")
-        print("📝 FINAL NOTES: Check config/permissions")
+        print(f"❌ Error during auto-linking: {e}")
+        print(f"🎯 FINAL STATUS: fail")
+        print(f"📝 FINAL NOTES: {type(e).__name__} - check logs")
         return 1
     
     return 0

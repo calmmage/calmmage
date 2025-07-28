@@ -115,7 +115,7 @@ def main():
         print(f"Found {len(uv_projects)} UV projects out of {len(projects)} total projects")
         
         if not uv_projects:
-            print("🎯 FINAL STATUS: success")
+            print("🎯 FINAL STATUS: no_change")
             print("📝 FINAL NOTES: No UV projects found")
             return 0
         
@@ -128,10 +128,17 @@ def main():
             if run_uv_sync(project.path):
                 success_count += 1
         
-        if success_count == len(uv_projects):
+        # Filter out archived projects for counting
+        archive_path = Path.home() / "work/archive"
+        non_archived_projects = [p for p in uv_projects if archive_path not in p.path.parents]
+        
+        if success_count == len(non_archived_projects):
             print("🎯 FINAL STATUS: success")
         elif success_count == 0:
-            print("🎯 FINAL STATUS: fail")
+            if len(non_archived_projects) == 0:
+                print("🎯 FINAL STATUS: no_change")
+            else:
+                print("🎯 FINAL STATUS: fail")
         else:
             print("🎯 FINAL STATUS: requires_attention")
         
@@ -139,8 +146,9 @@ def main():
         return 0
         
     except Exception as e:
+        print(f"❌ Error during UV sync: {e}")
         print(f"🎯 FINAL STATUS: fail")
-        print("📝 FINAL NOTES: Check discovery/UV install")
+        print(f"📝 FINAL NOTES: {type(e).__name__} - check logs")
         return 1
 
 

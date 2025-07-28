@@ -4,9 +4,10 @@
 from pathlib import Path
 from typing import List, Optional
 from enum import Enum
+import subprocess
 import typer
 from rich.console import Console
-from rich.prompt import Confirm, Prompt
+from rich.prompt import Confirm
 from rich.table import Table
 from loguru import logger
 
@@ -60,7 +61,6 @@ def read_template_file(template_path: Path) -> str:
 def get_current_aliases() -> str:
     """Get current shell aliases using myalias command."""
     try:
-        import subprocess
         result = subprocess.run(['myalias'], capture_output=True, text=True, shell=True)
         if result.returncode == 0:
             return result.stdout.strip()
@@ -115,7 +115,11 @@ def read_tech_stack_files(mode: InstructionMode) -> str:
     if mode in [InstructionMode.OPTIMAL, InstructionMode.FULL]:
         aliases_output = get_current_aliases()
         if aliases_output:
-            tech_stack_content += f"# Current Shell Aliases\n\n```bash\n{aliases_output}\n```\n\n**Note**: Many tools also have Makefiles in their directories with usage examples - check for `Makefile` when using typer CLI tools.\n\n"
+            tech_stack_content += (
+                f"# Current Shell Aliases\n\n```bash\n{aliases_output}\n```\n\n"
+                "**Note**: Many tools also have Makefiles in their directories with usage examples"
+                f" - check for `Makefile` when using typer CLI tools.\n\n"
+            )
     
     return tech_stack_content
 
@@ -181,6 +185,90 @@ def deploy_instruction_file(ai_tool: str, target_path: Path, content: str) -> No
         console.print(f"[red]❌ Failed to deploy {ai_tool}: {e}[/red]")
         raise typer.Exit(1)
 
+def deploy_ai_instructions(
+    target_dir: Path,
+    tools: Optional[List[str]] = None,
+    include_tech_stack: bool = True,
+    mode: InstructionMode = InstructionMode.OPTIMAL,
+    custom_position: CustomRulesPosition = CustomRulesPosition.START,
+    force_overwrite: bool = False,
+    silent: bool = False,
+) -> None:
+    """Deploy AI instructions to a target directory.
+
+    Args:
+        target_dir: Directory to deploy instructions to
+        tools: List of AI tools to deploy (None = all tools)
+        include_tech_stack: Whether to include tech stack information
+        mode: Instruction mode (slim, optimal, full)
+        custom_position: Where to place custom rules
+        force_overwrite: Overwrite existing files without asking
+        silent: Suppress console output
+    """
+    templates_dir = get_templates_dir()
+    if not templates_dir.exists():
+        error_msg = f"Templates directory not found: {templates_dir}"
+        if not silent:
+            console.print(f"[red]{error_msg}[/red]")
+        raise Exception(error_msg)
+
+    # Use all tools if none specified
+    if not tools:
+        tools = list(AI_TOOLS.keys())
+
+    if not tools:
+        if not silent:
+            console.print("[yellow]No tools selected.[/yellow]")
+        return
+
+    if not silent:
+        console.print(f"🚀 Deploying tools: {', '.join(tools)}")
+
+    # Deploy each selected tool
+    for tool in tools:
+        if tool not in AI_TOOLS:
+            if not silent:
+                console.print(f"[red]Unknown tool: {tool}[/red]")
+            continue
+
+        config = AI_TOOLS[tool]
+        template_path = templates_dir / config["template"]
+        target_path = target_dir / config["filename"]
+
+        # Check if file exists and handle overwrite
+        if target_path.exists() and not force_overwrite:
+            if not silent and not Confirm.ask(
+                f"File {target_path.name} exists. Overwrite?"
+            ):
+                if not silent:
+                    console.print(f"[yellow]Skipped {tool}[/yellow]")
+                continue
+
+        # Read template and build content
+        template_content = read_template_file(template_path)
+        final_content = build_final_content(
+            template_content, target_dir, include_tech_stack, mode, custom_position
+        )
+
+        # Deploy the file
+        try:
+            target_path.write_text(final_content)
+            if not silent:
+                console.print(
+                    f"[green]✅ Deployed {tool} instructions to {target_path}[/green]"
+                )
+        except Exception as e:
+            error_msg = f"Failed to deploy {tool}: {e}"
+            if not silent:
+                console.print(f"[red]❌ {error_msg}[/red]")
+            raise Exception(error_msg)
+
+    # Update .gitignore
+    update_gitignore(target_dir)
+
+    if not silent:
+        console.print("[green]✨ Deployment complete![/green]")
+
 @app.command()
 def deploy(
     tools: Optional[List[str]] = typer.Option(None, "--tool", "-t", help="AI tools to deploy (claude, cursor, gemini)"),
@@ -192,17 +280,8 @@ def deploy(
 ) -> None:
     """Deploy AI instructions to current project directory."""
     
-    templates_dir = get_templates_dir()
-    if not templates_dir.exists():
-        console.print(f"[red]Templates directory not found: {templates_dir}[/red]")
-        raise typer.Exit(1)
-    
     # Determine target directory
-    if current_dir:
-        target_dir = Path.cwd()
-    else:
-        target_dir = Path.cwd()
-    
+    target_dir = Path.cwd()
     console.print(f"📁 Target directory: {target_dir}")
     
     # Interactive tool selection if not specified
@@ -227,49 +306,16 @@ def deploy(
         
         tools = selected_tools
     
-    # Use all tools if none specified
-    if not tools:
-        tools = list(AI_TOOLS.keys())
-    
-    if not tools:
-        console.print("[yellow]No tools selected. Exiting.[/yellow]")
-        return
-    
-    # Deploy each selected tool
-    console.print(f"\n🚀 Deploying tools: {', '.join(tools)}")
-    
-    for tool in tools:
-        if tool not in AI_TOOLS:
-            console.print(f"[red]Unknown tool: {tool}[/red]")
-            continue
-        
-        config = AI_TOOLS[tool]
-        template_path = templates_dir / config["template"]
-        target_path = target_dir / config["filename"]
-        
-        # Check if file exists
-        if target_path.exists():
-            if not Confirm.ask(f"File {target_path.name} exists. Overwrite?"):
-                console.print(f"[yellow]Skipped {tool}[/yellow]")
-                continue
-        
-        # Read template and build content
-        template_content = read_template_file(template_path)
-        final_content = build_final_content(
-            template_content, 
-            target_dir, 
-            include_tech_stack, 
-            mode, 
-            custom_position
-        )
-        
-        # Deploy
-        deploy_instruction_file(tool, target_path, final_content)
-    
-    # Update .gitignore to include AI instruction files
-    update_gitignore(target_dir)
-    
-    console.print("\n[green]✨ Deployment complete![/green]")
+    # Use the reusable deployment function
+    deploy_ai_instructions(
+        target_dir=target_dir,
+        tools=tools,
+        include_tech_stack=include_tech_stack,
+        mode=mode,
+        custom_position=custom_position,
+        force_overwrite=False,  # CLI uses interactive prompts
+        silent=False  # CLI shows output
+    )
 
 @app.command()
 def list_templates() -> None:
@@ -293,6 +339,7 @@ def list_templates() -> None:
     console.print("\n📚 Tech stack files:")
     for tech_file in sorted(tech_stack_dir.glob("*.md")):
         console.print(f"  • {tech_file.name}")
+
 
 if __name__ == "__main__":
     app()

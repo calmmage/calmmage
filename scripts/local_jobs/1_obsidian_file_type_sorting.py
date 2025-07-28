@@ -15,12 +15,15 @@ def main():
             dry_run=False,
             yes=True  # Auto-confirm for scheduled execution
         )
-        
+
+        # Check if any work was actually done by looking at the function result
+        # For now, assume success means work was done - could be enhanced with return value
         print("🎯 FINAL STATUS: success")
         
     except Exception as e:
+        print(f"❌ Error during file type sorting: {e}")
         print(f"🎯 FINAL STATUS: fail")
-        print("📝 FINAL NOTES: Check config/node types")
+        print(f"📝 FINAL NOTES: {type(e).__name__} - check logs")
         return 1
     
     return 0

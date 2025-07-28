@@ -182,7 +182,10 @@ def main():
     # Clear final status message for job runner parsing
     if docker_status["status"] == "running":
         print("\n🎯 FINAL STATUS: success")
-        print(f"📝 FINAL NOTES: {docker_status['containers_running']}/{docker_status['containers_total']} containers, {docker_status['images']} images")
+        print(
+            f"📝 FINAL NOTES: {docker_status['containers_running']}/{docker_status['containers_total']} containers, "
+            f"{docker_status['images']} images"
+        )
         return 0
     elif docker_status["status"] == "stopped":
         print("\n🎯 FINAL STATUS: requires_attention")

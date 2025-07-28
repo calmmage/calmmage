@@ -1,4 +1,4 @@
-# Claude Configuration
+# Custom LLM context for this project
 
 ## Current Main Workflow
 

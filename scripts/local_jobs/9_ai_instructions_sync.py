@@ -5,7 +5,11 @@ import sys
 from pathlib import Path
 
 from src.lib.coding_projects import get_local_projects
-from tools.ai_instructions_composer.cli import deploy_ai_instructions
+from tools.ai_instructions_composer.cli import (
+    deploy_ai_instructions,
+    InstructionMode,
+    CustomRulesPosition,
+)
 
 
 def detect_project_languages(project_path: Path) -> dict:
@@ -100,12 +104,15 @@ def deploy_to_project(project_path: Path) -> tuple[bool, dict]:
             print(f"  ⚠️  {project_path.name}: Detected unsupported languages: {unsupported_str}")
             print(f"     Consider creating custom AI instructions for these languages")
         
-        # Use the AI instructions tool with optimal mode
+        # Use the reusable deployment function
         deploy_ai_instructions(
             target_dir=project_path,
-            mode="optimal",
-            custom_rules_position="end",
-            force=True  # Overwrite existing files
+            tools=None,  # Deploy all tools
+            include_tech_stack=True,
+            mode=InstructionMode.OPTIMAL,
+            custom_position=CustomRulesPosition.END,
+            force_overwrite=True,  # Automation overwrites without asking
+            silent=True  # No console output for automation
         )
         
         supported_str = ", ".join(languages["supported"]) if languages["supported"] else "none"
@@ -127,7 +134,7 @@ def main():
         print(f"Found {len(target_projects)} projects needing AI instructions out of {len(projects)} total")
         
         if not target_projects:
-            print("🎯 FINAL STATUS: success")
+            print("🎯 FINAL STATUS: no_change")
             print("📝 FINAL NOTES: No code projects found")
             return 0
         
@@ -148,14 +155,21 @@ def main():
                 projects_with_unsupported += 1
                 all_unsupported_languages.update(languages["unsupported"])
         
+        # Filter out archived projects for counting
+        archive_path = Path.home() / "work/archive"
+        non_archived_projects = [p for p in target_projects if archive_path not in p.path.parents]
+        
         # Determine final status
-        if success_count == len(target_projects):
+        if success_count == len(non_archived_projects):
             if projects_with_unsupported > 0:
                 print("🎯 FINAL STATUS: requires_attention")
             else:
                 print("🎯 FINAL STATUS: success")
         elif success_count == 0:
-            print("🎯 FINAL STATUS: fail")
+            if len(non_archived_projects) == 0:
+                print("🎯 FINAL STATUS: no_change")
+            else:
+                print("🎯 FINAL STATUS: fail")
         else:
             print("🎯 FINAL STATUS: requires_attention")
         
@@ -168,8 +182,9 @@ def main():
         return 0
         
     except Exception as e:
+        print(f"❌ Error during AI instructions sync: {e}")
         print(f"🎯 FINAL STATUS: fail")
-        print("📝 FINAL NOTES: Check AI tool/discovery")
+        print(f"📝 FINAL NOTES: {type(e).__name__} - check logs")
         return 1
 
 

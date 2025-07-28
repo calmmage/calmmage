@@ -2,7 +2,6 @@
 """Git sync automation job - synchronize git repositories across all projects."""
 
 import sys
-from pathlib import Path
 
 from src.lib.coding_projects import get_local_projects
 from tools.git_sync_tool.git_sync import GitSyncManager
@@ -27,7 +26,7 @@ def main():
         print(f"Found {len(git_projects)} git repositories out of {len(projects)} total projects")
         
         if not git_projects:
-            print("🎯 FINAL STATUS: success")
+            print("🎯 FINAL STATUS: no_change")
             print("📝 FINAL NOTES: No git repos found")
             return 0
         
@@ -69,8 +68,9 @@ def main():
         return 0
         
     except Exception as e:
+        print(f"❌ Error during git sync: {e}")
         print(f"🎯 FINAL STATUS: fail")
-        print("📝 FINAL NOTES: Check git/discovery")
+        print(f"📝 FINAL NOTES: {type(e).__name__} - check logs")
         return 1
 
 
