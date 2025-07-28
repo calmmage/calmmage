@@ -16,6 +16,14 @@ help:
 	@echo "  make deploy-gemini       Deploy Gemini instructions only"
 	@echo "  make list                List available templates"
 	@echo ""
+	@echo "Instruction Modes:"
+	@echo "  make deploy-slim         Deploy with minimal instructions"
+	@echo "  make deploy-optimal      Deploy with optimal instructions (default)"
+	@echo "  make deploy-full         Deploy with all instructions"
+	@echo ""
+	@echo "Custom Rules Position:"
+	@echo "  make deploy-custom-end   Deploy with custom rules at the end"
+	@echo ""
 	@echo "Options:"
 	@echo "  make deploy-all-no-tech  Deploy without tech stack information"
 	@echo ""
@@ -46,6 +54,24 @@ deploy-cursor:
 .PHONY: deploy-gemini
 deploy-gemini:
 	uv run typer $(CLI_PATH) run deploy --tool gemini --no-interactive
+
+# Deploy with different instruction modes
+.PHONY: deploy-slim
+deploy-slim:
+	uv run typer $(CLI_PATH) run deploy --tool claude --tool cursor --tool gemini --mode slim --no-interactive
+
+.PHONY: deploy-optimal
+deploy-optimal:
+	uv run typer $(CLI_PATH) run deploy --tool claude --tool cursor --tool gemini --mode optimal --no-interactive
+
+.PHONY: deploy-full
+deploy-full:
+	uv run typer $(CLI_PATH) run deploy --tool claude --tool cursor --tool gemini --mode full --no-interactive
+
+# Deploy with custom rules at different positions
+.PHONY: deploy-custom-end
+deploy-custom-end:
+	uv run typer $(CLI_PATH) run deploy --tool claude --tool cursor --tool gemini --custom-position end --no-interactive
 
 # Deploy without tech stack
 .PHONY: deploy-all-no-tech
