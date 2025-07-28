@@ -12,15 +12,22 @@ def main():
     
     try:
         # Run auto-linking with auto-yes (no interaction needed for scheduled job)
-        auto_link(
+        result = auto_link(
             config_path=Path("config.yaml"),
             dry_run=False,
             yes=True,  # Auto-confirm for scheduled execution
             skip_date_conflicts=False  # Keep full confirmation logic
         )
         
-        print("🎯 FINAL STATUS: success - Auto-linking completed")
-        print("📝 FINAL NOTES: Linked files to daily notes using incremental processing with cutoff dates")
+        # Extract statistics from result if available
+        if hasattr(result, 'files_linked'):
+            linked_count = result.files_linked
+            notes_count = getattr(result, 'notes_processed', 0)
+            print("🎯 FINAL STATUS: success - Auto-linking completed")
+            print(f"📝 FINAL NOTES: Linked {linked_count} files to daily notes, processed {notes_count} notes")
+        else:
+            print("🎯 FINAL STATUS: success - Auto-linking completed")
+            print("📝 FINAL NOTES: Auto-linking completed successfully, check logs for details")
         
     except Exception as e:
         print(f"🎯 FINAL STATUS: fail - Auto-linking failed: {e}")

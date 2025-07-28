@@ -12,14 +12,21 @@ def main():
     
     try:
         # Run cleanup with auto-yes (no interaction needed for scheduled job)
-        cleanup_daily(
+        result = cleanup_daily(
             config_path=Path("config.yaml"),
             dry_run=False,
             yes=True  # Auto-confirm for scheduled execution
         )
         
-        print("🎯 FINAL STATUS: success - Daily cleanup completed")
-        print("📝 FINAL NOTES: Organized daily notes and moved files to correct locations")
+        # Extract statistics from result if available
+        if hasattr(result, 'files_processed'):
+            files_count = result.files_processed
+            notes_count = getattr(result, 'notes_organized', 0)
+            print("🎯 FINAL STATUS: success - Daily cleanup completed")
+            print(f"📝 FINAL NOTES: Processed {files_count} files, organized {notes_count} daily notes")
+        else:
+            print("🎯 FINAL STATUS: success - Daily cleanup completed")
+            print("📝 FINAL NOTES: Daily cleanup completed successfully, check logs for details")
         
     except Exception as e:
         print(f"🎯 FINAL STATUS: fail - Daily cleanup failed: {e}")
