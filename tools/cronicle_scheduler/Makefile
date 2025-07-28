@@ -17,7 +17,9 @@ help:
 	@echo "  make set-plugin-id ID=your_id - Set plugin ID manually"
 	@echo ""
 	@echo "Job Management:"
-	@echo "  make list           - List all Cronicle jobs"
+	@echo "  make list           - List all Cronicle jobs (clean view)"
+	@echo "  make list-full      - List all jobs with ID and target columns"
+	@echo "  make list-enabled   - List only enabled jobs"
 	@echo "  make create NAME='Job Name' JOB=/path/to/script.py - Create new job"
 	@echo "  make run ID=event_id - Run job immediately"
 	@echo "  make delete ID=event_id - Delete job"
@@ -51,6 +53,12 @@ check-env:
 # Job Management Commands
 list: check-env
 	@uv run typer $(CLI_DIR)/cronicle_manager.py run list
+
+list-full: check-env
+	@uv run typer $(CLI_DIR)/cronicle_manager.py run list --full
+
+list-enabled: check-env
+	@uv run typer $(CLI_DIR)/cronicle_manager.py run list --exclude-disabled
 
 create: check-env
 	@if [ -z "$(NAME)" ] || [ -z "$(JOB)" ]; then \

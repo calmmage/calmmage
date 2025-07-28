@@ -266,9 +266,39 @@ def create_job(
 
 
 @app.command("list")
-def list_jobs():
+def list_jobs(
+    full: Annotated[
+        bool,
+        typer.Option("--full", "-f", help="Show full output with job ID and target"),
+    ] = False,
+    show_id: Annotated[
+        bool, typer.Option("--show-id", help="Show job ID column")
+    ] = False,
+    show_target: Annotated[
+        bool, typer.Option("--show-target", help="Show server target column")
+    ] = False,
+    exclude_disabled: Annotated[
+        bool, typer.Option("--exclude-disabled", help="Hide disabled jobs")
+    ] = False,
+):
     """List all scheduled jobs."""
     client = get_client()
+    
+    def map_plugin_name(plugin_id: str) -> str:
+        """Map plugin ID to readable name."""
+        plugin_mappings = {
+            "url": "Web Hook",
+            "shell": "Shell Script", 
+            "node": "Node.js Script"
+        }
+        
+        # Check if it matches common patterns
+        if plugin_id.startswith("http"):
+            return "Web Hook"
+        elif len(plugin_id) > 10:  # Assume custom plugin IDs are long
+            return "Python Job"
+        
+        return plugin_mappings.get(plugin_id, plugin_id)
     
     try:
         response = client.get_schedule()
@@ -280,21 +310,59 @@ def list_jobs():
                 console.print("No scheduled jobs found.")
                 return
             
+            # Filter disabled jobs if requested
+            if exclude_disabled:
+                events = [e for e in events if e.get("enabled", False)]
+            
+            # Sort by enabled status (enabled first, then disabled)
+            events.sort(key=lambda x: (not x.get("enabled", False), x.get("title", "")))
+            
+            # Split events by enabled status for swimlane
+            enabled_events = [e for e in events if e.get("enabled", False)]
+            disabled_events = [e for e in events if not e.get("enabled", False)]
+            
             table = Table(title="Scheduled Jobs")
-            table.add_column("ID", style="cyan")
+            
+            # Add columns based on flags
+            if full or show_id:
+                table.add_column("ID", style="cyan")
             table.add_column("Title", style="magenta")
             table.add_column("Plugin", style="green")
-            table.add_column("Target", style="yellow")
+            if full or show_target:
+                table.add_column("Target", style="yellow")
             table.add_column("Enabled", style="blue")
             
-            for event in events:
-                table.add_row(
-                    event.get("id", ""),
-                    event.get("title", ""),
-                    event.get("plugin", ""),
-                    event.get("target", ""),
-                    "Yes" if event.get("enabled") else "No"
-                )
+            def add_event_row(event):
+                row_data = []
+                if full or show_id:
+                    row_data.append(event.get("id", ""))
+                row_data.append(event.get("title", ""))
+                row_data.append(map_plugin_name(event.get("plugin", "")))
+                if full or show_target:
+                    row_data.append(event.get("target", ""))
+                row_data.append("Yes" if event.get("enabled") else "No")
+                table.add_row(*row_data)
+            
+            # Add enabled jobs
+            for event in enabled_events:
+                add_event_row(event)
+            
+            # Add separator if both enabled and disabled jobs exist
+            if enabled_events and disabled_events and not exclude_disabled:
+                separator_data = []
+                if full or show_id:
+                    separator_data.append("─" * 8)
+                separator_data.append("─" * 20)
+                separator_data.append("─" * 12)
+                if full or show_target:
+                    separator_data.append("─" * 10)
+                separator_data.append("─" * 7)
+                table.add_row(*separator_data, style="dim")
+            
+            # Add disabled jobs
+            if not exclude_disabled:
+                for event in disabled_events:
+                    add_event_row(event)
             
             console.print(table)
         else:
