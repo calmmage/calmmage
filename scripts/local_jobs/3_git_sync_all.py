@@ -2,6 +2,7 @@
 """Git sync automation job - synchronize git repositories across all projects."""
 
 import sys
+from pathlib import Path
 
 from src.lib.coding_projects import get_local_projects
 from tools.git_sync_tool.git_sync import GitSyncManager
@@ -53,14 +54,18 @@ def main():
         
         print(f"🎯 FINAL STATUS: {final_status}")
         
-        # Detailed statistics in FINAL NOTES
-        notes_parts = [f"Processed {len(git_projects)} git repositories"]
+        # Count active (non-archived) repos
+        archive_path = Path.home() / "work/archive"
+        active_repos = [p for p in git_projects if archive_path not in p.path.parents]
+        
+        # Detailed statistics in FINAL NOTES  
+        notes_parts = [f"{len(active_repos)} git repos"]
         if actions["pulled"] > 0:
-            notes_parts.append(f"{actions['pulled']} pulled updates")
+            notes_parts.append(f"{actions['pulled']} pulled")
         if actions["local_only"] > 0:
-            notes_parts.append(f"{actions['local_only']} with local changes")
+            notes_parts.append(f"{actions['local_only']} local changes")
         if actions["complex_case"] > 0:
-            notes_parts.append(f"{actions['complex_case']} need manual merge")
+            notes_parts.append(f"{actions['complex_case']} need merge")
         if stats["fail"] > 0:
             notes_parts.append(f"{stats['fail']} failed")
         

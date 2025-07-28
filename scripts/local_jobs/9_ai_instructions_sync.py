@@ -12,59 +12,59 @@ from tools.ai_instructions_composer.cli import (
 )
 
 
-def detect_project_languages(project_path: Path) -> dict:
-    """Detect programming languages used in a project.
-    
-    Returns:
-        dict with 'supported' and 'unsupported' language lists
-    """
-    language_indicators = {
-        # Supported languages (have AI instructions)
-        "python": ["pyproject.toml", "setup.py", "requirements.txt", "*.py"],
-        
-        # Unsupported languages (need custom AI instructions)
-        "javascript": ["package.json", "*.js", "*.ts", "*.jsx", "*.tsx"],
-        "rust": ["Cargo.toml", "*.rs"],
-        "go": ["go.mod", "*.go"],
-        "java": ["pom.xml", "build.gradle", "*.java"],
-        "c++": ["CMakeLists.txt", "*.cpp", "*.hpp", "*.cc"],
-        "c": ["Makefile", "*.c", "*.h"],
-        "swift": ["Package.swift", "*.swift"],
-        "kotlin": ["build.gradle.kts", "*.kt"],
-        "php": ["composer.json", "*.php"],
-        "ruby": ["Gemfile", "*.rb"],
-        "shell": ["*.sh", "*.bash", "*.zsh"]
-    }
-    
-    supported_languages = {"python"}  # Languages we have AI instructions for
-    detected_supported = []
-    detected_unsupported = []
-    
-    for language, indicators in language_indicators.items():
-        found = False
-        for indicator in indicators:
-            if indicator.startswith("*."):
-                # Check for file extensions
-                pattern = indicator
-                if list(project_path.glob(pattern)) or list(project_path.glob(f"**/{pattern}")):
-                    found = True
-                    break
-            else:
-                # Check for specific files/directories
-                if (project_path / indicator).exists():
-                    found = True
-                    break
-        
-        if found:
-            if language in supported_languages:
-                detected_supported.append(language)
-            else:
-                detected_unsupported.append(language)
-    
-    return {
-        "supported": detected_supported,
-        "unsupported": detected_unsupported
-    }
+# def detect_project_languages(project_path: Path) -> dict:
+#     """Detect programming languages used in a project.
+#
+#     Returns:
+#         dict with 'supported' and 'unsupported' language lists
+#     """
+#     language_indicators = {
+#         # Supported languages (have AI instructions)
+#         "python": ["pyproject.toml", "setup.py", "requirements.txt", "*.py"],
+#
+#         # Unsupported languages (need custom AI instructions)
+#         "javascript": ["package.json", "*.js", "*.ts", "*.jsx", "*.tsx"],
+#         "rust": ["Cargo.toml", "*.rs"],
+#         "go": ["go.mod", "*.go"],
+#         "java": ["pom.xml", "build.gradle", "*.java"],
+#         "c++": ["CMakeLists.txt", "*.cpp", "*.hpp", "*.cc"],
+#         "c": ["Makefile", "*.c", "*.h"],
+#         "swift": ["Package.swift", "*.swift"],
+#         "kotlin": ["build.gradle.kts", "*.kt"],
+#         "php": ["composer.json", "*.php"],
+#         "ruby": ["Gemfile", "*.rb"],
+#         "shell": ["*.sh", "*.bash", "*.zsh"]
+#     }
+#
+#     supported_languages = {"python"}  # Languages we have AI instructions for
+#     detected_supported = []
+#     detected_unsupported = []
+#
+#     for language, indicators in language_indicators.items():
+#         found = False
+#         for indicator in indicators:
+#             if indicator.startswith("*."):
+#                 # Check for file extensions
+#                 pattern = indicator
+#                 if list(project_path.glob(pattern)) or list(project_path.glob(f"**/{pattern}")):
+#                     found = True
+#                     break
+#             else:
+#                 # Check for specific files/directories
+#                 if (project_path / indicator).exists():
+#                     found = True
+#                     break
+#
+#         if found:
+#             if language in supported_languages:
+#                 detected_supported.append(language)
+#             else:
+#                 detected_unsupported.append(language)
+#
+#     return {
+#         "supported": detected_supported,
+#         "unsupported": detected_unsupported
+#     }
 
 
 def should_deploy_ai_instructions(project_path: Path) -> bool:
@@ -85,7 +85,7 @@ def should_deploy_ai_instructions(project_path: Path) -> bool:
     return any((project_path / indicator).exists() for indicator in code_indicators)
 
 
-def deploy_to_project(project_path: Path) -> tuple[bool, dict]:
+def deploy_to_project(project_path: Path) -> bool:
     """Deploy AI instructions to a single project.
     
     Args:
@@ -96,13 +96,13 @@ def deploy_to_project(project_path: Path) -> tuple[bool, dict]:
     """
     try:
         # Detect languages before deployment
-        languages = detect_project_languages(project_path)
+        # languages = detect_project_languages(project_path)
         
         # Warn about unsupported languages
-        if languages["unsupported"]:
-            unsupported_str = ", ".join(languages["unsupported"])
-            print(f"  ⚠️  {project_path.name}: Detected unsupported languages: {unsupported_str}")
-            print(f"     Consider creating custom AI instructions for these languages")
+        # if languages["unsupported"]:
+        #     unsupported_str = ", ".join(languages["unsupported"])
+        #     print(f"  ⚠️  {project_path.name}: Detected unsupported languages: {unsupported_str}")
+        #     print(f"     Consider creating custom AI instructions for these languages")
         
         # Use the reusable deployment function
         deploy_ai_instructions(
@@ -115,9 +115,9 @@ def deploy_to_project(project_path: Path) -> tuple[bool, dict]:
             silent=True  # No console output for automation
         )
         
-        supported_str = ", ".join(languages["supported"]) if languages["supported"] else "none"
-        print(f"  ✅ AI instructions deployed: {project_path.name} (supported: {supported_str})")
-        return True, languages
+        # supported_str = ", ".join(languages["supported"]) if languages["supported"] else "none"
+        print(f"  ✅ AI instructions deployed: {project_path.name}")
+        return True
         
     except Exception as e:
         print(f"  ❌ AI instructions failed: {project_path.name}")
@@ -138,26 +138,18 @@ def main():
             print("📝 FINAL NOTES: No code projects found")
             return 0
         
-        success_count = 0
-        projects_with_unsupported = 0
-        all_unsupported_languages = set()
-
-        archive_path = Path.home() / "work/archive"
-        for project in target_projects:
-            if archive_path in project.path.parents:
-                continue
-
-            print(f"Deploying AI instructions to {project.name}...")
-            success, languages = deploy_to_project(project.path)
-            if success:
-                success_count += 1
-            if languages["unsupported"]:
-                projects_with_unsupported += 1
-                all_unsupported_languages.update(languages["unsupported"])
-        
-        # Filter out archived projects for counting
+        # Filter out archived projects first
         archive_path = Path.home() / "work/archive"
         non_archived_projects = [p for p in target_projects if archive_path not in p.path.parents]
+        
+        success_count = 0
+        projects_with_unsupported = 0
+
+        for project in non_archived_projects:
+            print(f"Deploying AI instructions to {project.name}...")
+            success = deploy_to_project(project.path)
+            if success:
+                success_count += 1
         
         # Determine final status
         if success_count == len(non_archived_projects):
@@ -173,11 +165,15 @@ def main():
         else:
             print("🎯 FINAL STATUS: requires_attention")
         
+        # Count active (non-archived) projects
+        archive_path = Path.home() / "work/archive"
+        active_projects = [p for p in target_projects if archive_path not in p.path.parents]
+        
         # Concise final notes
-        notes = f"{len(target_projects)} projects, {success_count} deployed"
-        if projects_with_unsupported > 0:
-            unsupported_list = ", ".join(sorted(all_unsupported_languages))
-            notes += f", {projects_with_unsupported} unsupported langs ({unsupported_list})"
+        notes = f"{len(active_projects)} projects, {success_count} deployed"
+        # if projects_with_unsupported > 0:
+        #     unsupported_list = ", ".join(sorted(all_unsupported_languages))
+        #     notes += f", {projects_with_unsupported} unsupported langs ({unsupported_list})"
         print(f"📝 FINAL NOTES: {notes}")
         return 0
         
