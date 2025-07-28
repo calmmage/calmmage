@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Generic Obsidian cleanup - scheduled job for all node type organization."""
+"""Obsidian file type sorting - scheduled job for organizing files by node type."""
 
 import sys
 from pathlib import Path
 
-from tools.obsidian_sorter.generic_node_cleanup import cleanup_all_types
+from tools.obsidian_sorter.generic_note_cleanup import cleanup_all_types
 
 def main():
-    """Run generic cleanup as a scheduled job."""
-    print("🎯 FINAL STATUS: Starting generic node type cleanup")
+    """Run file type sorting as a scheduled job."""
+    print("🎯 FINAL STATUS: Starting file type sorting cleanup")
     
     try:
         # Run cleanup with auto-yes (no interaction needed for scheduled job)
@@ -18,12 +18,12 @@ def main():
             yes=True  # Auto-confirm for scheduled execution
         )
         
-        print("🎯 FINAL STATUS: success - Generic cleanup completed")
+        print("🎯 FINAL STATUS: success - File type sorting completed")
         print("📝 FINAL NOTES: Organized all configured node types into their designated folders")
         
     except Exception as e:
-        print(f"🎯 FINAL STATUS: fail - Generic cleanup failed: {e}")
-        print("📝 FINAL NOTES: Check generic cleanup configuration and node type definitions")
+        print(f"🎯 FINAL STATUS: fail - File type sorting failed: {e}")
+        print("📝 FINAL NOTES: Check file type sorting configuration and node type definitions")
         return 1
     
     return 0

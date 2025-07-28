@@ -385,7 +385,7 @@ requires-dist = [
 
 [[package]]
 name = "calmmage"
-version = "2025.4.9"
+version = "2025.4.10"
 source = { editable = "." }
 dependencies = [
     { name = "apscheduler" },

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generic node type cleanup - organize all configured node types."""
+"""Generic note type cleanup - organize all configured note types."""
 
 import yaml
 from pathlib import Path
@@ -14,11 +14,11 @@ console = Console()
 app = typer.Typer()
 
 
-def detect_file_node_type(file_path: Path, config: ObsidianSorterConfig) -> Optional[str]:
-    """Detect node type for a file using filename patterns and frontmatter."""
+def detect_file_note_type(file_path: Path, config: ObsidianSorterConfig) -> Optional[str]:
+    """Detect note type for a file using filename patterns and frontmatter."""
     
     # First try filename pattern detection
-    filename_type = config.detect_node_type_by_filename(file_path.name)
+    filename_type = config.detect_note_type_by_filename(file_path.name)
     if filename_type:
         return filename_type
     
@@ -32,7 +32,7 @@ def detect_file_node_type(file_path: Path, config: ObsidianSorterConfig) -> Opti
                 metadata = yaml.safe_load(yaml_content)
                 if isinstance(metadata, dict) and "type" in metadata:
                     type_value = metadata["type"]
-                    frontmatter_type = config.detect_node_type_by_frontmatter(type_value)
+                    frontmatter_type = config.detect_note_type_by_frontmatter(type_value)
                     if frontmatter_type:
                         return frontmatter_type
     except Exception:
@@ -42,7 +42,7 @@ def detect_file_node_type(file_path: Path, config: ObsidianSorterConfig) -> Opti
 
 
 def get_generic_cleanup_actions(config: ObsidianSorterConfig) -> tuple[List[Dict], Dict[str, int]]:
-    """Get all planned actions for generic node type cleanup."""
+    """Get all planned actions for generic note type cleanup."""
     actions = []
     stats = {"correctly_placed": 0, "needs_move": 0, "untyped": 0, "total_scanned": 0}
     inbox_path = config.obsidian_root / config.inbox_path
@@ -68,11 +68,11 @@ def get_generic_cleanup_actions(config: ObsidianSorterConfig) -> tuple[List[Dict
         
             
         # Detect what type this file should be
-        detected_type = detect_file_node_type(file, config)
+        detected_type = detect_file_note_type(file, config)
         
         if detected_type:
             # File has a detected type
-            target_path = config.get_node_type_path(detected_type)
+            target_path = config.get_note_type_path(detected_type)
             current_location = file.parent
             
             # Check if file needs to move
@@ -81,7 +81,7 @@ def get_generic_cleanup_actions(config: ObsidianSorterConfig) -> tuple[List[Dict
                 actions.append({
                     "file": file,
                     "action": "move_to_typed_folder",
-                    "node_type": detected_type,
+                    "note_type": detected_type,
                     "from": current_location,
                     "to": target_path
                 })
@@ -92,15 +92,15 @@ def get_generic_cleanup_actions(config: ObsidianSorterConfig) -> tuple[List[Dict
             current_location = file.parent
             current_rel_path = str(current_location.relative_to(config.obsidian_root))
             
-            # Check if current location is a configured node type folder (core folders to preserve)
+            # Check if current location is a configured note type folder (core folders to preserve)
             is_in_core_typed_folder = False
-            for node_type in config.node_types.values():
-                if current_rel_path == node_type.folder or current_rel_path.startswith(node_type.folder + "/"):
+            for note_type in config.note_types.values():
+                if current_rel_path == note_type.folder or current_rel_path.startswith(note_type.folder + "/"):
                     is_in_core_typed_folder = True
                     break
             
-            if current_location == inbox_path:
-                # File is untyped and already in inbox - correct
+            if current_location == inbox_path or inbox_path in current_location.parents:
+                # File is untyped and already in inbox (or inbox subdirectory) - correct
                 stats["correctly_placed"] += 1
             elif is_in_core_typed_folder:
                 # File is untyped but in a core typed folder - leave it there
@@ -115,7 +115,7 @@ def get_generic_cleanup_actions(config: ObsidianSorterConfig) -> tuple[List[Dict
                 actions.append({
                     "file": file,
                     "action": "move_folder_to_inbox",
-                    "node_type": "untyped",
+                    "note_type": "untyped",
                     "from": current_location,
                     "to": target_folder_in_inbox,
                     "folder_name": folder_name
@@ -130,7 +130,7 @@ def cleanup_all_types(
     dry_run: bool = typer.Option(False, "--dry-run", help="Show planned actions without executing"),
     yes: bool = typer.Option(False, "--yes", "-y", help="Execute without confirmation"),
 ):
-    """Clean up all configured node types - organize files by type."""
+    """Clean up all configured note types - organize files by type."""
     
     # Load config
     try:
@@ -142,23 +142,23 @@ def cleanup_all_types(
     console.print(f"📁 Vault: {config.obsidian_root}")
     console.print(f"📝 templates path: {config.obsidian_root / config.templates_path if config.templates_path else 'None'}")
     
-    # Show configured node types
-    console.print(f"\n📋 Configured node types: {len(config.node_types)}")
+    # Show configured note types
+    console.print(f"\n📋 Configured note types: {len(config.note_types)}")
     
     type_table = Table(title="Configured Node Types")
     type_table.add_column("Type", style="cyan")
     type_table.add_column("Target Folder", style="green")
     type_table.add_column("Detection", style="yellow")
     
-    for type_name, node_type in config.node_types.items():
+    for type_name, note_type in config.note_types.items():
         detection_methods = []
-        if node_type.pattern:
+        if note_type.pattern:
             detection_methods.append("filename")
-        if node_type.frontmatter_type:
+        if note_type.frontmatter_type:
             detection_methods.append("frontmatter")
         
         detection_text = ", ".join(detection_methods) if detection_methods else "none"
-        type_table.add_row(type_name, node_type.folder, detection_text)
+        type_table.add_row(type_name, note_type.folder, detection_text)
     
     console.print(type_table)
     
@@ -193,7 +193,7 @@ def cleanup_all_types(
         file = action["file"]
         
         if action["action"] == "move_to_typed_folder":
-            action_text = f"→ {action['node_type']} folder"
+            action_text = f"→ {action['note_type']} folder"
         elif action["action"] == "move_folder_to_inbox":
             action_text = f"→ inbox/{action['folder_name']} (folder move)"
         else:
@@ -205,7 +205,7 @@ def cleanup_all_types(
         action_table.add_row(
             file.name,
             action_text,
-            action["node_type"],
+            action["note_type"],
             str(from_path),
             str(to_path)
         )
@@ -270,7 +270,7 @@ def cleanup_all_types(
                 shutil.move(str(file_path), str(new_path))
                 success_count += 1
                 
-                action_desc = f"→ {action['node_type']}" if action["action"] == "move_to_typed_folder" else "→ inbox"
+                action_desc = f"→ {action['note_type']}" if action["action"] == "move_to_typed_folder" else "→ inbox"
                 console.print(f"[green]✓[/green] Moved {file_path.name} {action_desc}")
             
         except Exception as e:
