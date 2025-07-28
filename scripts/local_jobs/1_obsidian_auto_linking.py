@@ -23,8 +23,14 @@ def main():
         if hasattr(result, 'files_linked'):
             linked_count = result.files_linked
             notes_count = getattr(result, 'notes_processed', 0)
-            print("🎯 FINAL STATUS: success - Auto-linking completed")
-            print(f"📝 FINAL NOTES: Linked {linked_count} files to daily notes, processed {notes_count} notes")
+            
+            # Soft warning for high activity (just for fun)
+            if linked_count > 10:
+                print("🎯 FINAL STATUS: requires_attention - Auto-linking completed with high activity")
+                print(f"📝 FINAL NOTES: Linked {linked_count} files to daily notes, processed {notes_count} notes (busy day! 🚀)")
+            else:
+                print("🎯 FINAL STATUS: success - Auto-linking completed")
+                print(f"📝 FINAL NOTES: Linked {linked_count} files to daily notes, processed {notes_count} notes")
         else:
             print("🎯 FINAL STATUS: success - Auto-linking completed")
             print("📝 FINAL NOTES: Auto-linking completed successfully, check logs for details")
