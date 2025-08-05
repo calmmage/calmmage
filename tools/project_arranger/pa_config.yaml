@@ -33,7 +33,6 @@ actual:
   - calmmage-private
   - examples
   - codechat
-  - calmmage
 
   - realistic-ai-bot
   - outstanding-items-bot
@@ -45,6 +44,11 @@ archive:
   - calmmage-gpt-bot
   - mentor-146-bot
   - anna-flower-shop
+  - lessmore
+  - ef-bots
+  - v0-ai-task-tracker
+  - calmmage-notification-manager-bot
+  - calmmage-bot
 
 experiments:
   - taskzilla-cm
@@ -57,6 +61,8 @@ ignore:
   - calmlib
   - dev-env
   - telegram-downloader
+  - calmmage
+  - calmmage-service-registry
 
 # secondary groups
 cool:
