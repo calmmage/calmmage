@@ -36,37 +36,27 @@ class CustomRulesPosition(str, Enum):
     MIDDLE = "middle"    # After base template, before tech stack  
     END = "end"          # After everything else
 
-# Available AI tools and their file mappings
+# Available AI tools - now generate from behavior components
 AI_TOOLS = {
     "claude": {
         "filename": "CLAUDE.md",
-        "template": "CLAUDE.md"
     },
     "cursor": {
-        "filename": ".cursorrules", 
-        "template": ".cursorrules"
+        "filename": ".cursorrules",
     },
     "gemini": {
         "filename": "GEMINI.md",
-        "template": "GEMINI.md"
     }
 }
 
-def get_templates_dir() -> Path:
-    """Get the AI tools templates directory."""
-    return get_resources_dir() / "llm_prompts" / "ai_tools"
+def get_behaviour_dir() -> Path:
+    """Get the behavior components directory."""
+    return get_resources_dir() / "llm_prompts" / "behaviour"
 
 def get_tech_stack_dir() -> Path:
     """Get the tech stack templates directory."""
     return get_resources_dir() / "llm_prompts" / "tech_stack"
 
-def read_template_file(template_path: Path) -> str:
-    """Read template file contents."""
-    if not template_path.exists():
-        console.print(f"[red]Template not found: {template_path}[/red]")
-        raise typer.Exit(1)
-    
-    return template_path.read_text()
 
 def get_current_aliases() -> str:
     """Get current shell aliases using myalias command."""
@@ -93,21 +83,31 @@ def read_custom_rules(target_dir: Path) -> str:
             return f"{content}\n\n"
     return ""
 
-def read_tech_stack_files(mode: InstructionMode) -> str:
-    """Read and combine tech stack files based on instruction mode."""
+def read_content_files(mode: InstructionMode) -> str:
+    """Read and combine behavior and tech stack files based on instruction mode."""
+    behaviour_dir = get_behaviour_dir()
     tech_stack_dir = get_tech_stack_dir()
-    tech_stack_content = "\n\n"
+    content = "\n\n"
     
     # Define which sections to include for each mode
     section_importance = {
-        "calmmage_ecosystem.md": InstructionMode.OPTIMAL,  # Always include in optimal+
-        "python_libraries.md": InstructionMode.FULL,      # Only in full mode
-        "cloud_services.md": InstructionMode.FULL,        # Only in full mode
+        # Behavior files
+        "note_locations.md": InstructionMode.OPTIMAL,
+        "git_worktree.md": InstructionMode.OPTIMAL,
+        "scenarios.md": InstructionMode.OPTIMAL,
+        "note_taking_approach.md": InstructionMode.FULL,
+        # Tech stack files  
+        "calmmage_ecosystem.md": InstructionMode.OPTIMAL,
+        "python_execution.md": InstructionMode.OPTIMAL,
+        "python_libraries.md": InstructionMode.OPTIMAL,
+        "cloud_services.md": InstructionMode.FULL,
     }
     
-    # Add static tech stack files based on mode
-    for tech_file in sorted(tech_stack_dir.glob("*.md")):
-        required_mode = section_importance.get(tech_file.name, InstructionMode.FULL)
+    # Combine all content files from both directories
+    all_files = list(behaviour_dir.glob("*.md")) + list(tech_stack_dir.glob("*.md"))
+    
+    for content_file in sorted(all_files):
+        required_mode = section_importance.get(content_file.name, InstructionMode.FULL)
         
         # Include section if current mode is at or above required level
         include_section = (
@@ -117,46 +117,58 @@ def read_tech_stack_files(mode: InstructionMode) -> str:
         )
         
         if include_section:
-            content = tech_file.read_text().strip()
-            if content:
-                tech_stack_content += f"{content}\n\n"
+            file_content = content_file.read_text().strip()
+            if file_content:
+                content += f"{file_content}\n\n"
     
     # Add current aliases (include in optimal and full modes)
     if mode in [InstructionMode.OPTIMAL, InstructionMode.FULL]:
         aliases_output = get_current_aliases()
         if aliases_output:
-            tech_stack_content += (
+            content += (
                 f"# Current Shell Aliases\n\n```bash\n{aliases_output}\n```\n\n"
                 "**Note**: Many tools also have Makefiles in their directories with usage examples"
                 f" - check for `Makefile` when using typer CLI tools.\n\n"
             )
     
-    return tech_stack_content
+    return content
+
+def generate_ai_tool_header(tool_name: str) -> str:
+    """Generate a basic header for AI tools."""
+    headers = {
+        "claude": "# Claude Configuration\n\n",
+        "cursor": "# Cursor Rules\n\n", 
+        "gemini": "# Gemini Configuration\n\n"
+    }
+    return headers.get(tool_name, f"# {tool_name.title()} Configuration\n\n")
 
 def build_final_content(
-    ai_tool_template: str, 
+    tool_name: str,
     target_dir: Path,
-    include_tech_stack: bool = True,
+    include_content: bool = True,
     mode: InstructionMode = InstructionMode.OPTIMAL,
     custom_position: CustomRulesPosition = CustomRulesPosition.START
 ) -> str:
-    """Build final content by combining AI tool template with tech stack and custom rules."""
+    """Build final content by combining AI tool header with behavior/tech stack and custom rules."""
+    
+    # Generate basic AI tool header
+    ai_tool_header = generate_ai_tool_header(tool_name)
     
     # Read custom rules
     custom_rules = read_custom_rules(target_dir)
     
-    # Read tech stack based on mode
-    tech_stack_content = ""
-    if include_tech_stack:
-        tech_stack_content = read_tech_stack_files(mode)
+    # Read content files based on mode
+    content_files = ""
+    if include_content:
+        content_files = read_content_files(mode)
     
     # Build final content based on custom rules position
     if custom_position == CustomRulesPosition.START:
-        return custom_rules + ai_tool_template + tech_stack_content
+        return custom_rules + ai_tool_header + content_files
     elif custom_position == CustomRulesPosition.MIDDLE:
-        return ai_tool_template + custom_rules + tech_stack_content
+        return ai_tool_header + custom_rules + content_files
     else:  # END
-        return ai_tool_template + tech_stack_content + custom_rules
+        return ai_tool_header + content_files + custom_rules
 
 def update_gitignore(target_dir: Path) -> None:
     """Add AI instruction files to .gitignore if it exists."""
@@ -186,19 +198,11 @@ def update_gitignore(target_dir: Path) -> None:
     else:
         logger.debug("All AI files already in .gitignore")
 
-def deploy_instruction_file(ai_tool: str, target_path: Path, content: str) -> None:
-    """Deploy instruction file to target location."""
-    try:
-        target_path.write_text(content)
-        console.print(f"[green]✅ Deployed {ai_tool} instructions to {target_path}[/green]")
-    except Exception as e:
-        console.print(f"[red]❌ Failed to deploy {ai_tool}: {e}[/red]")
-        raise typer.Exit(1)
 
 def deploy_ai_instructions(
     target_dir: Path,
     tools: Optional[List[str]] = None,
-    include_tech_stack: bool = True,
+    include_content: bool = True,
     mode: InstructionMode = InstructionMode.OPTIMAL,
     custom_position: CustomRulesPosition = CustomRulesPosition.START,
     force_overwrite: bool = False,
@@ -209,15 +213,21 @@ def deploy_ai_instructions(
     Args:
         target_dir: Directory to deploy instructions to
         tools: List of AI tools to deploy (None = all tools)
-        include_tech_stack: Whether to include tech stack information
+        include_content: Whether to include behavior and tech stack information
         mode: Instruction mode (slim, optimal, full)
         custom_position: Where to place custom rules
         force_overwrite: Overwrite existing files without asking
         silent: Suppress console output
     """
-    templates_dir = get_templates_dir()
-    if not templates_dir.exists():
-        error_msg = f"Templates directory not found: {templates_dir}"
+    behaviour_dir = get_behaviour_dir()
+    tech_stack_dir = get_tech_stack_dir()
+    if not behaviour_dir.exists():
+        error_msg = f"Behaviour directory not found: {behaviour_dir}"
+        if not silent:
+            console.print(f"[red]{error_msg}[/red]")
+        raise Exception(error_msg)
+    if not tech_stack_dir.exists():
+        error_msg = f"Tech stack directory not found: {tech_stack_dir}"
         if not silent:
             console.print(f"[red]{error_msg}[/red]")
         raise Exception(error_msg)
@@ -248,7 +258,6 @@ def deploy_ai_instructions(
             continue
 
         config = AI_TOOLS[tool]
-        template_path = templates_dir / config["template"]
         target_path = target_dir / config["filename"]
 
         # Check if file exists and handle overwrite
@@ -260,10 +269,9 @@ def deploy_ai_instructions(
                     console.print(f"[yellow]Skipped {tool}[/yellow]")
                 continue
 
-        # Read template and build content
-        template_content = read_template_file(template_path)
+        # Build content using new approach
         final_content = build_final_content(
-            template_content, target_dir, include_tech_stack, mode, custom_position
+            tool, target_dir, include_content, mode, custom_position
         )
 
         # Deploy the file
@@ -306,12 +314,33 @@ def deploy_ai_instructions(
 
 @app.command()
 def deploy(
-    tools: Optional[List[str]] = typer.Option(None, "--tool", "-t", help="AI tools to deploy (claude, cursor, gemini)"),
-    current_dir: bool = typer.Option(False, "--current", "-c", help="Deploy to current directory"),
-    include_tech_stack: bool = typer.Option(True, "--tech-stack/--no-tech-stack", help="Include tech stack information"),
-    mode: InstructionMode = typer.Option(InstructionMode.OPTIMAL, "--mode", "-m", help="Instruction mode: slim, optimal, or full"),
-    custom_position: CustomRulesPosition = typer.Option(CustomRulesPosition.START, "--custom-position", help="Where to place custom LLM_RULES.md content"),
-    interactive: bool = typer.Option(True, "--interactive/--no-interactive", help="Interactive mode for tool selection")
+    tools: Optional[List[str]] = typer.Option(
+        None, "--tool", "-t", help="AI tools to deploy (claude, cursor, gemini)"
+    ),
+    current_dir: bool = typer.Option(
+        False, "--current", "-c", help="Deploy to current directory"
+    ),
+    include_content: bool = typer.Option(
+        True,
+        "--content/--no-content",
+        help="Include behavior and tech stack information",
+    ),
+    mode: InstructionMode = typer.Option(
+        InstructionMode.OPTIMAL,
+        "--mode",
+        "-m",
+        help="Instruction mode: slim, optimal, or full",
+    ),
+    custom_position: CustomRulesPosition = typer.Option(
+        CustomRulesPosition.START,
+        "--custom-position",
+        help="Where to place custom LLM_RULES.md content",
+    ),
+    interactive: bool = typer.Option(
+        True,
+        "--interactive/--no-interactive",
+        help="Interactive mode for tool selection",
+    ),
 ) -> None:
     """Deploy AI instructions to current project directory."""
     
@@ -345,7 +374,7 @@ def deploy(
     deploy_ai_instructions(
         target_dir=target_dir,
         tools=tools,
-        include_tech_stack=include_tech_stack,
+        include_content=include_content,
         mode=mode,
         custom_position=custom_position,
         force_overwrite=False,  # CLI uses interactive prompts
@@ -354,24 +383,25 @@ def deploy(
 
 @app.command()
 def list_templates() -> None:
-    """List available templates and tech stack files."""
-    templates_dir = get_templates_dir()
+    """List available AI tools and content files."""
+    behaviour_dir = get_behaviour_dir()
     tech_stack_dir = get_tech_stack_dir()
     
-    console.print("📋 Available AI tool templates:")
+    console.print("🤖 Available AI tools:")
     table = Table(show_header=True)
     table.add_column("Tool", style="cyan")
-    table.add_column("Template File", style="yellow")
     table.add_column("Output File", style="green")
     
     for tool, config in AI_TOOLS.items():
-        template_path = templates_dir / config["template"]
-        exists = "✅" if template_path.exists() else "❌"
-        table.add_row(f"{exists} {tool}", config["template"], config["filename"])
+        table.add_row(tool, config["filename"])
     
     console.print(table)
     
-    console.print("\n📚 Tech stack files:")
+    console.print("\n🎭 Behavior files:")
+    for behaviour_file in sorted(behaviour_dir.glob("*.md")):
+        console.print(f"  • {behaviour_file.name}")
+    
+    console.print("\n🛠️  Tech stack files:")
     for tech_file in sorted(tech_stack_dir.glob("*.md")):
         console.print(f"  • {tech_file.name}")
 

@@ -1,23 +1,3 @@
-# Claude Configuration
-
-## Note-Taking Locations
-
-Choose an appropriate location for feature-specific notes:
-
-- **Current directory**: `./dev/[feature_name]/` or `./notes/[feature_name]/` 
-- **Calmmage seasonal notes**: `~/work/projects/calmmage/experiments/[latest_season]/_notes/projects/[project_name]/[feature_name]/`
-
-Use descriptive feature names (e.g., `auth_system`, `api_refactor`, `user_dashboard`). Create markdown files for task tracking and project documentation in the chosen location.
-
-## Git Worktree Workflow
-
-When starting work on a feature, create a git worktree:
-```bash
-git worktree add ~/work/ai_workspaces/[meaningful-name] -b [meaningful-branch-name]
-```
-
-This creates an isolated workspace in the AI workspaces folder with a new branch for the feature.
-
 ## Three Main Scenarios
 
 ### Scenario 1: "simple"
@@ -55,9 +35,3 @@ This creates an isolated workspace in the AI workspaces folder with a new branch
         - Add entry to `outstanding_ideas.md` in appropriate section/inbox
     5. **Context gathering**: Understand existing architecture and integration points
 - **Goal**: Structured approach to extending/improving existing systems
-
-## Python Execution
-
-Use uv for Python commands: `uv run python script.py` or `uv run typer path/to/cli.py run [command]`
-
-Avoid sys.path.append() in tools/ - use direct imports: `from tools.module_name.file import Class`
