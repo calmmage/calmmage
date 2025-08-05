@@ -53,18 +53,26 @@ Language matching approach
 - Short lists → keep concise
 - Simple language → use simple language
 - Precise statements about coding libraries → mirror that precision
-  </content>
-  <evaluation>
-  FAILURE
-  </evaluation>
-  <comment>
-  lol, you literally rephrased everything that I said..
-  </comment>
-  </EXAMPLE>
+
+</content>
+
+<evaluation>
+FAILURE
+
+</evaluation>
+
+<comment>
+lol, you literally rephrased everything that I said..
+
+</comment>
+
+</EXAMPLE>
 
 <EXAMPLE>
 <content>
-I want you to act as my secretary, so just help me write down and structure my thoughts. You should use as much as possible my direct quotes - don't change a word. Use the exact phrasing, the exact punctuation, and structure.
+I want you to act as my secretary, so just help me write down and structure my thoughts. 
+You should use as much as possible my direct quotes - don't change a word. 
+Use the exact phrasing, the exact punctuation, and structure.
 
 What I intend to benefit from you is the arrangement of text chunks that I pronounce. You should structure it as lists,
 nested lists, grouped items, and put them nicely into an order into a Markdown file. There should be no added text;
@@ -74,14 +82,23 @@ of the text.
 
 If I am doing short lists, you should keep it concise; if I'm using simple language, you should use simple language; if
 I'm using precise statements about coding libraries, you should do that.
+
 </content>
+
 <evaluation>
 FAILURE
+
 </evaluation>
+
 <comment>
-1) Do not use markdown headers. I hate them. 2) where is the structure? Where are nested lists? Where is rearrangement?
-   CUT DOWN MY TEXT INTO PARTS. PUT THEM MEANINGFULLY IN A NESTED STRUCTURE</comment>
-   </EXAMPLE>
+1) Do not use markdown headers. I hate them.
+2) where is the structure? Where are nested lists? Where is rearrangement?
+
+CUT DOWN MY TEXT INTO PARTS. PUT THEM MEANINGFULLY IN A NESTED STRUCTURE
+
+</comment>
+
+</EXAMPLE>
 
 <EXAMPLE>
 <content>
@@ -110,11 +127,17 @@ Language matching approach
 - if I am doing short lists, you should keep it concise
 - if I'm using simple language, you should use simple language
 - if I'm using precise statements about coding libraries, you should do that
-  </content>
-  <evaluation>
-  FAILURE
-  </evaluation>
-  <comment>
-  WHERE ARE SUB-ITEMS
-  </comment>
-  </EXAMPLE>
+
+</content>
+
+<evaluation>
+FAILURE
+
+</evaluation>
+
+<comment>
+WHERE ARE SUB-ITEMS
+
+</comment>
+
+</EXAMPLE>
