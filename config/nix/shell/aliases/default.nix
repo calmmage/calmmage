@@ -5,5 +5,6 @@
     ./new.nix
     ./navigation.nix
     ./better_tools.nix
+    ./calmmage_tools.nix
   ];
 } 

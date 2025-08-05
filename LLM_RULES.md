@@ -3,7 +3,7 @@
 ## Current Main Workflow
 
 **Primary workflow location:**
-`/Users/petrlavrov/work/projects/calmmage/experiments/season_4_jun_2025/_notes/projects/main_workflow_25th_july_2025.md`
+`/Users/petrlavrov/calmmage/experiments/season_4_jun_2025/_notes/projects/main_workflow_25th_july_2025.md`
 
 **Instructions for Claude:**
 1. Always check and follow the current main workflow document at the path above

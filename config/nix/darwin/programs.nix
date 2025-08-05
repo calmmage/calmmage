@@ -54,8 +54,11 @@ let name = userConfig.full_name;
       g = "git";
       dc = "docker-compose";
       nixnix= "nix flake update; darwin-rebuild switch --flake .#$USER";
-      nixswitch = "darwin-rebuild switch --flake $CALMMAGE_DIR/config/nix/.#$USER";
+      nixswitch = "darwin-rebuild switch --impure --flake $CALMMAGE_DIR/config/nix/.#$USER";
       nixup = "pushd $CALMMAGE_DIR/config/nix; git stash; git pull; nix flake update; nixswitch; popd";
+      # nixfast = "darwin-rebuild switch --offline --impure --flake $CALMMAGE_DIR/config/nix/.#$USER";
+      nixfast = "darwin-rebuild switch --offline --impure --flake $CALMMAGE_DIR/config/nix/.#$USER";
+
     };
 
     initExtra = ''
