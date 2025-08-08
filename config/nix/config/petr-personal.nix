@@ -20,7 +20,7 @@ in
   use_nix_homebrew = false;
   # use_nix_homebrew = true;
 
-  use_poetry2nix = false;
+
   
   homebrew = {
     brews = shared.homebrew.brews ++ [

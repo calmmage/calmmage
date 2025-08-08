@@ -1,4 +1,4 @@
-{ agenix, config, pkgs, lib, poetry2nix, userConfig, ... }:
+{ agenix, config, pkgs, lib, userConfig, ... }:
 
 let
   inherit (lib) mkEnableOption mkOption types;
@@ -58,28 +58,30 @@ in
       coreutils
       defaultbrowser] ++
       (lib.optional userConfig.use_devenv devenv) ++
-      (lib.optionals userConfig.use_poetry2nix [(pkgs.poetry2nix.mkPoetryEnv {
-        projectDir = ../../..;
-        preferWheels = true;
-        python = python311;
-        # Add overrides to handle git dependencies
-        overrides = pkgs.poetry2nix.overrides.withDefaults (final: prev: {
-          calmlib = prev.calmlib.overridePythonAttrs (old: {
-            buildInputs = (old.buildInputs or [ ]) ++ [
-              pkgs.poetry
-              final.poetry-core
-            ];
-          });
-        });
-        # Add extra packages that might be needed for building
-        extraPackages = ps: with ps; [
-          pip
-          setuptools
-          wheel
-          poetry
-          poetry-core
-        ];
-      })]) ++ pkgs.userPackages;
+      # (lib.optionals userConfig.use_poetry2nix [(pkgs.poetry2nix.mkPoetryEnv {
+      #   projectDir = ../../..;
+      #   preferWheels = true;
+      #   python = python311;
+      #   # Add overrides to handle git dependencies
+      #   overrides = pkgs.poetry2nix.overrides.withDefaults (final: prev: {
+      #     calmlib = prev.calmlib.overridePythonAttrs (old: {
+      #       buildInputs = (old.buildInputs or [ ]) ++ [
+      #         pkgs.poetry
+      #         final.poetry-core
+      #       ];
+      #     });
+      #   });
+      #   # Add extra packages that might be needed for building
+      #   extraPackages = ps: with ps; [
+      #     pip
+      #     setuptools
+      #     wheel
+      #     poetry
+      #     poetry-core
+      #   ];
+      # })]) ++
+        
+      pkgs.userPackages;
 
     systemPath = [
       "/opt/homebrew/bin"

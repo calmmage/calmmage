@@ -49,17 +49,17 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    poetry2nix = {
-      url = "github:nix-community/poetry2nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # poetry2nix = {
+    #   url = "github:nix-community/poetry2nix";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
     # todo: add secrets back
 #    secrets = {
 #      url = "git+ssh://git@github.com/petrlavrov-sl/nix-secrets.git";
 #      flake = false;
 #    };
   };
-  outputs = { self, darwin, nix-homebrew, homebrew-bundle, homebrew-core, homebrew-cask, home-manager, nixpkgs, nixpkgs-unstable, disko, poetry2nix, agenix, ... } @inputs: # , secrets # todo: add secrets back
+  outputs = { self, darwin, nix-homebrew, homebrew-bundle, homebrew-core, homebrew-cask, home-manager, nixpkgs, nixpkgs-unstable, disko, agenix, ... } @inputs: # , secrets # todo: add secrets back
   let
     lib = nixpkgs.lib;
     # Remove the hardcoded system
@@ -109,10 +109,10 @@
       overlays = [
         pythonOverlay
         # Conditionally include poetry2nix overlay
-        (final: prev: 
-          if userConfig.use_poetry2nix 
-          then poetry2nix.overlays.default final prev
-          else {})
+        # (final: prev: 
+        #   if userConfig.use_poetry2nix 
+        #   then poetry2nix.overlays.default final prev
+        #   else {})
         (final: prev: {
           # Convert string package names to actual packages
           userPackages = mkPackageSet prev userConfig.package_names;

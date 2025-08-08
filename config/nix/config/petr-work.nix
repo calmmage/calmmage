@@ -13,12 +13,12 @@ in
 
   enable_sudo_touch_id = true;
 
-  use_direnv = true;
+  use_direnv = false;
   use_devenv = false;
   # pick one or the other
   # use_nix_homebrew = false;
-  use_nix_homebrew = true;
-  use_poetry2nix = false;
+  use_nix_homebrew = false;
+
 
   homebrew = {
     brews = shared.homebrew.brews ++ [
@@ -52,7 +52,7 @@ in
   package_names = shared.package_names ++ [
     # Add work-specific packages here
 
-    "teams"           # Microsoft Teams client
+    # "teams"           # Microsoft Teams client
   ];
 
   npmPackages = shared.npmPackages ++ [

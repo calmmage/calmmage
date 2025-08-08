@@ -16,7 +16,7 @@
   # pick one or the other
    use_nix_homebrew = false;
 #  use_nix_homebrew = true;
-  use_poetry2nix = false;
+
 
   default_browser = "chrome";
 
@@ -257,7 +257,7 @@
     "postman"       # API development environment
 
     # new - clear
-    "awscli2"           # AWS command line interface v2
+    # "awscli2"           # AWS command line interface v2
 
     # new - unclear
     "nixfmt-classic"     # Nix code formatter
@@ -321,6 +321,8 @@
 
   npmPackages = [
     "prettier"
+    "@google/gemini-cli"
+    "@anthropic-ai/claude-code"
     # Add more global npm packages here
   ];
 }
