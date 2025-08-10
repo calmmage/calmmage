@@ -1,0 +1,14 @@
+{
+  "calmmage_knowledge_base": {
+    "title": "Knowledge Base"
+  },
+  "example":  {
+    "title": "Nextra Example"
+  },
+  "contact": {
+    "title": "Contact ↗",
+    "type": "page",
+    "href": "https://x.com/calmmageDev",
+    "newWindow": true
+  }
+}

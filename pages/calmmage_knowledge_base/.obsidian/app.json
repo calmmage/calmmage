@@ -1,0 +1,12 @@
+{
+  "newFileLocation": "current",
+  "newFileFolderPath": "attachments",
+  "alwaysUpdateLinks": true,
+  "showUnsupportedFiles": true,
+  "attachmentFolderPath": "attachments",
+  "userIgnoreFilters": [
+    "_layouts/",
+    "assets/",
+    "docs/"
+  ]
+}

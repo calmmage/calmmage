@@ -1,0 +1,18 @@
+# Accessing Google Drive from Python
+
+Chat with GPT: https://chat.openai.com/share/dadb0434-9fb0-4b9f-8e89-d9e5ce391d3b
+
+Prerequisites: 
+- [[Google Cloud Console account]], 
+- [[GCP Project]]
+  
+Steps:
+- Enable [[Google Drive API]]
+- Generate [[Google API Key]]
+- Add the Key
+  - o1: Add to [[Env Variables]]
+  - o2: Add to [[Secrets Storage]]
+  - o3: Add to [[.env]], `load_dotenv()`
+- Install PyDrive lib
+    - O1: `pip install PyDrive`
+    - O2: add to pyproject.toml, `poetry update`
