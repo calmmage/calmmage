@@ -1,46 +1,76 @@
 'use client';
 // Sidebar.tsx
-import {sections} from '@/lib/sections';
-import {GlobalNavItem} from '@/ui/global-nav';
-import {useLayoutEffect, useState} from "react";
+import { sections } from '@/lib/sections';
+import { GlobalNavItem } from '@/ui/global-nav';
+import { useEffect, useState } from "react";
 import classNames from "classnames";
 import CMIcon from "@/components/Icon";
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
   const onClose = () => setIsOpen(!isOpen);
 
-  useLayoutEffect(() => {
-      // если после рендеринга элемента размер window < 768px (условные размеры окна телефона) то скрываем меню
-      if (window && window.innerWidth <= 768) {
+  useEffect(() => {
+      if (typeof window !== 'undefined' && window.innerWidth <= 768) {
           setIsOpen(false);
+          setIsMobile(true);
       }
   }, []);
 
+  function getSidebarWidthHeader() {
+      if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+          return '100%';
+      } else if (isOpen) {
+          return '300px';
+      }
+
+      return '80px';
+  }
+
+  function getSidebarWidthContent() {
+    if (isOpen) {
+        if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+            return '100%';
+        }
+
+        return '300px';
+    } else if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+        return '0px';
+    }
+
+    return '80px';
+  }
+
   return (
-      <div
+      <section
           style={{
-              height: '64px',
-              width: '300px',
-              // flex flex-col =>
+              height: isMobile ? '64px' : '100svh',
+              width: getSidebarWidthHeader(),
+              minWidth: getSidebarWidthHeader(),
               display: 'flex',
               flexDirection: 'column',
+              background: 'black',
+              transition: '0.4s',
           }}
-          className={classNames(
-              "top-0 z-10 flex h-screen w-[300px] flex-col border-b border-gray-800 bg-black",
-              "lg:bottom-0 lg:z-auto lg:w-72 lg:border-b-0 lg:border-r lg:border-gray-800",
-          )}
       >
           <div
               onClick={onClose}
-              style={{ padding: '20px', cursor: 'pointer' }}
-              className="flex h-14 px-4 py-4 lg:h-auto cursor-pointer"
+              style={{
+                  display: 'flex',
+                  padding: '16px',
+                  width: getSidebarWidthHeader(),
+                  cursor: 'pointer',
+                  justifyContent: 'space-between',
+                  gap: '8px',
+                  transition: '0.4s',
+              }}
           >
-              <div className="group flex w-full">
-                  <h3 className="font-semibold tracking-wide text-gray-400 group-hover:text-gray-50">
-                      Calmmage Home
-                  </h3>
-              </div>
+              <h3 className="font-semibold tracking-wide text-gray-400 group-hover:text-gray-50">
+                  {
+                      (isOpen || isMobile) ? 'Calmmage' : 'C'
+                  }
+              </h3>
 
               <CMIcon iconName={isOpen ? 'close' : 'burger'} />
           </div>
@@ -48,38 +78,53 @@ export function Sidebar() {
           <div
               style={{
                   height: 'calc(100svh - 56px)',
-                  width: '300px',
+                  width: getSidebarWidthContent(),
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '40px',
-                  // это мы делаем анимацию при клике
-                  transform: isOpen ? 'translateX(0)' : 'translateX(-310px)',
-                  // время анимации
-                  transition: '0.8s',
-                  position: 'absolute',
-                  zIndex: '10',
-                  top: '56px',
+                  transition: '0.4s',
                   boxShadow: '5px 6px 10px rgba(255, 255, 255, 0.2)',
+                  position: isMobile ? 'fixed' : 'relative',
+                  top: isMobile ? '64px' : '0',
+                  zIndex: '100'
               }}
               className="bg-gray-900 text-white overflow-auto"
           >
-              {sections.map((section) => (
-                  <div
-                      key={section.name}
-                      style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: '20px'
-                      }}
-                      className="p-4 flex flex-col"
-                  >
-                      <div className="font-bold uppercase mb-2">{section.name}</div>
-                      {section.items.map((item) => (
-                          <GlobalNavItem key={item.slug} item={item} onClose={onClose} />
-                      ))}
-                  </div>
-              ))}
+              {
+                  sections.map((section) => (
+                      <div
+                          key={section.name}
+                          style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              justifyContent: 'center',
+                              gap: '20px',
+                              padding: '12px'
+                          }}
+                      >
+                          <div className={classNames("font-bold p-[8px] uppercase", {
+                              ['mx-auto']: !isOpen
+                          })}>
+                              {
+                                  isOpen ? section.name : 'S'
+                              }
+                          </div>
+
+                          {
+                              section.items.map((item) => (
+                                  <GlobalNavItem
+                                      key={item.slug}
+                                      item={item}
+                                      onClose={onClose}
+                                      isMenuOpen={isOpen}
+                                      iconName={item.iconName}
+                                  />
+                              ))
+                          }
+                      </div>
+                  ))
+              }
           </div>
-      </div>
+      </section>
   );
 };

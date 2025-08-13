@@ -1,20 +1,20 @@
 import '@/styles/globals.css';
 // import "./customized/globals.css";
-import {Sidebar} from '@/ui/sidebar';
 import {Metadata} from 'next';
+import {Sidebar} from '@/ui/sidebar';
 
 export const metadata: Metadata = {
   title: {
-    default: 'Calmmage Home',
-    template: '%s | Calmmage Home',
+    default: 'Calmmage',
+    template: '%s | Calmmage',
   },
   description:
     'What did the cow say? "Moo!"',
   openGraph: {
-    title: 'Calmmage Home Playground',
+    title: 'Calmmage Playground',
     description:
       'Hah! You got me!',
-    images: [`/api/og?title=Calmmage Home`],
+    images: [`/api/og?title=Calmmage`],
   },
   twitter: {
     card: 'summary_large_image',
@@ -30,20 +30,24 @@ export default function RootLayout({
       <html lang="en">
       <body
           style={{
-            flexDirection: 'column',
             height: '100svh',
             backgroundImage: 'url(/grid.svg)'
           }}
-          className="flex bg-gray-1100"
+          className="bg-gray-1100"
       >
-        <Sidebar />
-
-        <div
-            style={{ position: 'relative', height: '100svh' }}
-            className="flex-grow">
-          <div style={{ position: 'relative', height: '100%' }} className="mx-auto max-w-full space-y-8 px-2 lg:px-8 lg:py-8">
+        <div style={{
+          height: '100svh',
+          width: '100%',
+          position: 'relative',
+          display: 'flex',
+        }}>
+          <Sidebar />
+          <div style={{
+            flex: '1',
+            height: '100%',
+            overflow: 'auto'
+          }}>
             {children}
-            {/*<Byline className="fixed sm:hidden"/>*/}
           </div>
         </div>
       </body>
