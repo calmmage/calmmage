@@ -84,9 +84,16 @@ export function GlobalNavItem({
     const segment = useSelectedLayoutSegment();
     const isActive = item.slug === segment;
 
+    const handleClick = () => {
+        // Only close sidebar on mobile when menu is open
+        if (typeof window !== 'undefined' && window.innerWidth <= 768 && isMenuOpen) {
+            onClose();
+        }
+    };
+
     return (
         <Link
-            onClick={onClose}
+            onClick={handleClick}
             href={`/${item.slug}`}
             className={clsx(
                 'flex gap-[12px] items-center rounded-md px-3 py-2 text-sm font-medium hover:text-gray-300',

@@ -16,10 +16,10 @@ export default function HomePage() {
     return (
         <section style={{
             position: 'relative',
-            height: '100%',
             width: '100%',
             maxWidth: '100%',
-            overflow: 'hidden'
+            padding: '20px',
+            minHeight: '100vh'
         }}>
             {/* Three.js Demo - Prominent Position */}
             <div

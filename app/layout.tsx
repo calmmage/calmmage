@@ -1,6 +1,7 @@
 import '@/styles/globals.css';
 // import "./customized/globals.css";
 import {Metadata} from 'next';
+import {Sidebar} from '@/ui/sidebar';
 
 export const metadata: Metadata = {
   title: {
@@ -34,7 +35,21 @@ export default function RootLayout({
           }}
           className="bg-gray-1100"
       >
-        {children}
+        <div style={{
+          height: '100svh',
+          width: '100%',
+          position: 'relative',
+          display: 'flex',
+        }}>
+          <Sidebar />
+          <div style={{
+            flex: '1',
+            height: '100%',
+            overflow: 'auto'
+          }}>
+            {children}
+          </div>
+        </div>
       </body>
       </html>
   );
