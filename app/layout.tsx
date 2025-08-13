@@ -4,16 +4,16 @@ import {Metadata} from 'next';
 
 export const metadata: Metadata = {
   title: {
-    default: 'Calmmage Home',
-    template: '%s | Calmmage Home',
+    default: 'Calmmage',
+    template: '%s | Calmmage',
   },
   description:
     'What did the cow say? "Moo!"',
   openGraph: {
-    title: 'Calmmage Home Playground',
+    title: 'Calmmage Playground',
     description:
       'Hah! You got me!',
-    images: [`/api/og?title=Calmmage Home`],
+    images: [`/api/og?title=Calmmage`],
   },
   twitter: {
     card: 'summary_large_image',

@@ -68,7 +68,7 @@ export function Sidebar() {
           >
               <h3 className="font-semibold tracking-wide text-gray-400 group-hover:text-gray-50">
                   {
-                      (isOpen || isMobile) ? 'Calmmage Home' : 'CH'
+                      (isOpen || isMobile) ? 'Calmmage' : 'C'
                   }
               </h3>
 

@@ -24,9 +24,9 @@ export const sections: { name: string; items: Item[] }[] = [
         iconName: 'profile'
       },
       {
-        name: 'Knowledge Base',
+        name: 'Knowledge',
         slug: 'calmmage_knowledge_base/getting-started',
-        description: 'Separate knowledge base using Foam notes',
+        description: 'Separate knowledge base using Obsidian notes',
         iconName: 'knowledge'
       },
       {
