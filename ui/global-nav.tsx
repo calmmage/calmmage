@@ -7,6 +7,7 @@ import {MenuAlt2Icon, XIcon} from '@heroicons/react/solid';
 import clsx from 'clsx';
 import {useState} from 'react';
 import Byline from './byline';
+import CMIcon, {CMIcons} from "@/components/Icon";
 
 export function GlobalNav() {
     const [isOpen, setIsOpen] = useState(false);
@@ -56,7 +57,7 @@ export function GlobalNav() {
 
                                 <div className="space-y-1">
                                     {section.items.map((item) => (
-                                        <GlobalNavItem key={item.slug} item={item} onClose={onClose} />
+                                        <GlobalNavItem key={item.slug} item={item} onClose={onClose} isMenuOpen={true} iconName={item.iconName} />
                                     ))}
                                 </div>
                             </div>
@@ -72,9 +73,13 @@ export function GlobalNav() {
 export function GlobalNavItem({
     item,
     onClose,
+    isMenuOpen,
+    iconName
 }: {
     item: Item;
     onClose: () => false | void;
+    isMenuOpen: boolean;
+    iconName: keyof typeof CMIcons;
 }) {
     const segment = useSelectedLayoutSegment();
     const isActive = item.slug === segment;
@@ -84,14 +89,19 @@ export function GlobalNavItem({
             onClick={onClose}
             href={`/${item.slug}`}
             className={clsx(
-                'block rounded-md px-3 py-2 text-sm font-medium hover:text-gray-300',
+                'flex gap-[12px] items-center rounded-md px-3 py-2 text-sm font-medium hover:text-gray-300',
                 {
                     'text-gray-400 hover:bg-gray-800': !isActive,
                     'text-white': isActive,
+                    ['mx-auto']: !isMenuOpen
                 },
             )}
         >
-            {item.name}
+            <CMIcon iconName={iconName} />
+
+            {
+                isMenuOpen ? item.name : null
+            }
         </Link>
     );
 }
