@@ -2,9 +2,12 @@
 
 🌐 **Website**: [calmmage.com](https://calmmage.com)
 
-**Петя Лавров** • 30 • Zurich
+**Петя Лавров** • 32 • Zurich
 
-Engineer, experimenter, mentor, student. Looking for deep meaningful connections with people who have energy, wisdom, and drive.
+Husband, Father, Son, Brother, Friend
+Engineer, Experimenter, Mentor, Student. 
+Looking for deep meaningful connections 
+with people who have energy, wisdom, and drive.
 
 ## 🛤️ Journey
 Magic Leap ← Google ← Luxoft ← Yandex ← WorldQuant ← МГУ  
