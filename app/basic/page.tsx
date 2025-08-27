@@ -7,10 +7,13 @@ export default function Page() {
             <div className="space-y-6 text-center">
                 <h1 className="text-4xl font-bold">Hi there! 👋</h1>
                 <p className="text-xl text-gray-300">
-                    <strong>Петя Лавров</strong> • 30 • Zurich
+                    <strong>Петя Лавров</strong> • 32 • Zurich
                 </p>
                 <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-                    Engineer, experimenter, mentor, student. Looking for deep meaningful connections with people who have energy, wisdom, and drive.
+                    Husband, Father, Son, Brother, Friend
+                    Engineer, Experimenter, Mentor, Student.
+                    Looking for deep meaningful connections
+                    with people who have energy, wisdom, and drive.
                 </p>
                 
                 <div className="space-y-4">
@@ -27,8 +30,8 @@ export default function Page() {
                     <div className="space-y-2 text-gray-400">
                         <p><a href="https://constellations.calmmage.com/" className="text-blue-400 hover:text-blue-300">Constellations</a> - Interactive constellation visualizations</p>
                         <p><a href="https://petrlavrov.substack.com/" className="text-blue-400 hover:text-blue-300">Blog</a> - Thoughts on tech and life</p>
-                        <p><a href="https://t.me/petrlavrov" className="text-blue-400 hover:text-blue-300">@petrlavrov</a> - Life and philosophy</p>
-                        <p><a href="https://t.me/calmmageDev" className="text-blue-400 hover:text-blue-300">@calmmageDev</a> - About coding</p>
+                        <p><a href="https://t.me/petrlavrov" className="text-blue-400 hover:text-blue-300">t.me/petrlavrov</a> - Life and philosophy</p>
+                        <p><a href="https://t.me/calmmageDev" className="text-blue-400 hover:text-blue-300">t.me/calmmageDev</a> - About coding</p>
                     </div>
                 </div>
 
