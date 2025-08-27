@@ -38,7 +38,9 @@ export default function Page() {
                 <div className="space-y-4">
                     <h2 className="text-2xl font-semibold">🏔️ Life</h2>
                     <p className="text-gray-400">
-                        📖 Reading • 📜 Poetry • 🛤️ Travel & photography • 🧘🏼 Vipassana • 🏔️ Mountaineering • 🏊 Swimming • ⚔️ Beat Saber • 🤹‍♀️ Juggling • 🤸‍♀️ Yoga23
+                        📖 Reading • 📜 Poetry • 🛤️ <a href="https://www.instagram.com/beware.life_is_awesome/" className="text-blue-400 hover:text-blue-300">Travel & photography</a><br />
+                        🧘 <a href="https://internationalmeditationcentre.org/" className="text-blue-400 hover:text-blue-300">Vipassana</a> • 🏔️ Mountaineering • 🏊 Swimming<br />
+                        ⚔️ <a href="https://youtu.be/Rl65iVOV12U" className="text-blue-400 hover:text-blue-300">Beat Saber</a> • 🤹‍♀️ Juggling • 🤸‍♀️ Yoga23
                     </p>
                 </div>
             </div>
