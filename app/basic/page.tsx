@@ -7,12 +7,12 @@ export default function Page() {
             <div className="space-y-6 text-center">
                 <h1 className="text-4xl font-bold">Hi there! 👋</h1>
                 <p className="text-xl text-gray-300">
-                    <strong>Петя Лавров</strong> • 32 • Zurich
+                    <strong>Петр Лавров</strong> • 32 • Zurich
                 </p>
                 <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-                    Husband, Father, Son, Brother, Friend
-                    Engineer, Experimenter, Mentor, Student.
-                    Looking for deep meaningful connections
+                    Husband, Father, Son, Brother, Friend<br />
+                    Engineer, Experimenter, Mentor, Student.<br />
+                    Looking for deep meaningful connections<br />
                     with people who have energy, wisdom, and drive.
                 </p>
                 
