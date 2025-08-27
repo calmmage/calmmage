@@ -19,9 +19,9 @@ export default function Page() {
                 <div className="space-y-4">
                     <h2 className="text-2xl font-semibold">🛤️ Journey</h2>
                     <div className="space-y-2 text-gray-400">
-                        <p>Magic Leap ← Google ← Luxoft ← Yandex ← WorldQuant ← МГУ</p>
+                        <p>BlankFactor ← Magic Leap ← Google ← Luxoft ← Yandex ← WorldQuant ← МГУ</p>
                         <p>Zürich ← Moscow ← Perm</p>
-                        <p>AR ← SWE ← Finance ← Mathematics ← Physics</p>
+                        <p>LLMs ← AR ← SWE ← Finance ← Mathematics ← Physics</p>
                     </div>
                 </div>
 
