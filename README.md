@@ -15,8 +15,9 @@ Zürich ← Moscow ← Perm
 LLMs ← AR ← SWE ← Finance ← Mathematics ← Physics
 
 ## 🎨 Projects & Writing
-- [Constellations](https://constellations.calmmage.com/) - Interactive constellation visualizations
-- [Blog](https://petrlavrov.substack.com/) - Thoughts on tech and life
+- [constellations.calmmage.com](https://constellations.calmmage.com/) - Art experiments
+- [matrix.calmmage.com](https://matrix.calmmage.com/) - Matrix Animation
+- [Substrack](https://petrlavrov.substack.com/) - Coding experiments
 - [t.me/petrlavrov](https://t.me/petrlavrov) - Life and philosophy
 - [t.me/calmmageDev](https://t.me/calmmageDev) - About coding
 
