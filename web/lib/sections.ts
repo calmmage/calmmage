@@ -23,12 +23,12 @@ export const sections: { name: string; items: Item[] }[] = [
         description: 'About me',
         iconName: 'profile'
       },
-      {
-        name: 'Knowledge',
-        slug: 'calmmage_knowledge_base/getting-started',
-        description: 'Separate knowledge base using Obsidian notes',
-        iconName: 'knowledge'
-      },
+      // {
+      //   name: 'Knowledge',
+      //   slug: 'calmmage_knowledge_base/getting-started',
+      //   description: 'Separate knowledge base using Obsidian notes',
+      //   iconName: 'knowledge'
+      // },
       {
         name: 'Showcase',
         slug: 'showcase',

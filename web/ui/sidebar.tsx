@@ -79,7 +79,7 @@ export function Sidebar() {
               style={{
                   height: 'calc(100svh - 56px)',
                   width: getSidebarWidthContent(),
-                  display: 'flex',
+                  display: (isMobile && !isOpen) ? 'none' : 'flex',
                   flexDirection: 'column',
                   gap: '40px',
                   transition: '0.4s',
