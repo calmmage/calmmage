@@ -1,40 +1,79 @@
-import type { CMIcons } from "@/components/Icon";
-
-export type Item = {
+export type SectionItem = {
   name: string;
-  slug: string;
+  href: string;
   description?: string;
-  iconName: keyof typeof CMIcons;
+  external?: boolean;
 };
 
-export const sections: { name: string; items: Item[] }[] = [
-    {
-        name: 'Sections',
-        items: [
+export type Section = {
+  name: string;
+  items: SectionItem[];
+};
+
+export const sections: Section[] = [
+  {
+    name: "Explore",
+    items: [
       {
-        name: 'Home',
-        slug: '',
-        description: 'Main page of the website',
-        iconName: 'home'
+        name: "Home",
+        href: "/",
+        description: "Start here for highlights and quick navigation.",
       },
       {
-        name: 'Profile',
-        slug: 'basic',
-        description: 'About me',
-        iconName: 'profile'
+        name: "About",
+        href: "/about",
+        description: "Journey, interests, and the people-first story.",
       },
-      // {
-      //   name: 'Knowledge',
-      //   slug: 'calmmage_knowledge_base/getting-started',
-      //   description: 'Separate knowledge base using Obsidian notes',
-      //   iconName: 'knowledge'
-      // },
       {
-        name: 'Showcase',
-        slug: 'showcase',
-        description: 'Showcase some of my personal projects',
-        iconName: 'showCase'
+        name: "Projects",
+        href: "/projects",
+        description: "Interactive demos and engineering experiments.",
       },
-        ],
-    },
+      {
+        name: "Art",
+        href: "/art",
+        description: "Particles, playfulness, and visual explorations.",
+      },
+      {
+        name: "Blog",
+        href: "/blog",
+        description: "Writing, updates, and current curiosities.",
+      },
+    ],
+  },
+  {
+    name: "Elsewhere",
+    items: [
+      {
+        name: "Constellations",
+        href: "https://constellations.calmmage.com/",
+        description: "Navigate an interactive night sky of personal projects.",
+        external: true,
+      },
+      {
+        name: "Substack",
+        href: "https://petrlavrov.substack.com/",
+        description: "Thoughts on tech, life, and meaningful connections.",
+        external: true,
+      },
+      {
+        name: "Telegram — Life",
+        href: "https://t.me/petrlavrov",
+        description: "Philosophy, travel, and daily reflections.",
+        external: true,
+      },
+      {
+        name: "Telegram — Dev",
+        href: "https://t.me/calmmageDev",
+        description: "Engineering notes, experiments, and behind-the-scenes.",
+        external: true,
+      },
+      {
+        name: "Instagram",
+        href: "https://www.instagram.com/beware.life_is_awesome/",
+        description: "Travel, photography, and moments from the trail.",
+        external: true,
+      },
+    ],
+  },
 ];

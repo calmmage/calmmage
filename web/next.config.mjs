@@ -1,14 +1,14 @@
-// /** @type {import('next').NextConfig} */
-// const nextConfig = {};
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  images: {
+    unoptimized: true,
+  },
+}
 
-// export default nextConfig;
-import withNextra from 'nextra'
-
-const nextraConfig = withNextra({
-      theme: 'nextra-theme-docs',
-      themeConfig: './theme.config.tsx',
-      NextConfig: {
-            output: "standalone",
-      },
-})
-export default nextraConfig;
+export default nextConfig

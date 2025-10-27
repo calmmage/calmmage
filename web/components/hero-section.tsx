@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import {ParticleAnimation} from "./particle-animation"
 
 export function HeroSection() {
@@ -13,12 +14,18 @@ export function HeroSection() {
           Crafting digital experiences with precision, creativity, and cutting-edge technology
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <button className="px-8 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors">
+          <Link
+            href="#explore"
+            className="px-8 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
+          >
             View My Work
-          </button>
-          <button className="px-8 py-3 border border-border text-foreground rounded-lg font-medium hover:bg-secondary transition-colors">
+          </Link>
+          <a
+            href="mailto:petrlavrov@calmmage.com"
+            className="px-8 py-3 border border-border text-foreground rounded-lg font-medium hover:bg-secondary transition-colors"
+          >
             Get In Touch
-          </button>
+          </a>
         </div>
       </div>
 

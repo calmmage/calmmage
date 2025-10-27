@@ -1,7 +1,7 @@
 "use client"
 
-import {useState} from "react"
 import Link from "next/link"
+import {usePathname} from "next/navigation"
 import {cn} from "@/lib/utils"
 
 const navItems = [
@@ -9,11 +9,18 @@ const navItems = [
   {name: "Blog", href: "/blog"},
   {name: "Projects", href: "/projects"},
   {name: "Art", href: "/art"},
-  {name: "About Me", href: "/about"},
+  {name: "About", href: "/about"},
 ]
 
 export function Navigation() {
-  const [activeItem, setActiveItem] = useState("Home")
+  const pathname = usePathname()
+
+  const isActive = (href: string) => {
+    if (href === "/") {
+      return pathname === "/"
+    }
+    return pathname.startsWith(href)
+  }
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
@@ -28,10 +35,9 @@ export function Navigation() {
               <Link
                 key={item.name}
                 href={item.href}
-                onClick={() => setActiveItem(item.name)}
                 className={cn(
                   "text-sm font-medium transition-colors hover:text-primary",
-                  activeItem === item.name ? "text-primary" : "text-muted-foreground",
+                  isActive(item.href) ? "text-primary" : "text-muted-foreground",
                 )}
               >
                 {item.name}
