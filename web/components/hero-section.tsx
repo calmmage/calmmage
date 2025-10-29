@@ -9,9 +9,9 @@ export function HeroSection() {
       <ParticleAnimation/>
 
       <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-        <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-6 text-balance">Professional Developer</h1>
+        <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-6 text-balance">Petr Lavrov</h1>
         <p className="text-xl md:text-2xl text-muted-foreground mb-8 text-balance leading-relaxed">
-          Crafting digital experiences with precision, creativity, and cutting-edge technology
+          Beauty. Simplicity. Freedom.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Link
