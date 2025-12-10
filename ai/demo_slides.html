@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Space Deck V3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Three.js Import Map -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;900&family=Space+Mono:wght@400;700&display=swap');
+
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-purple: #bc13fe;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            background-color: #000;
+            color: white;
+            margin: 0;
+            user-select: none;
+            outline: none; /* Remove focus outline */
+        }
+
+        /* --- SLIDE TRANSITIONS --- */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: scale(1.1);
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 10;
+        }
+
+        /* --- PARALLAX LAYERS --- */
+        .parallax-layer {
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            width: 120%;
+            height: 120%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            will-change: transform;
+        }
+
+        .hero-bg {
+            background-image: url('https://images.unsplash.com/photo-1531306728370-e2ebd9d7bb99?q=80&w=2574&auto=format&fit=crop'); 
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Blur Strip - Now BEHIND text but in front of BG */
+        .blur-strip {
+            position: absolute;
+            width: 100%;
+            height: 250px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 2; /* Layer 2 */
+            transform: skewY(-5deg);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+        }
+
+        .knockout-text {
+            color: transparent;
+            -webkit-text-stroke: 3px rgba(255,255,255,0.9);
+            position: relative;
+            z-index: 5; /* Layer 5 - In front of blur */
+            mix-blend-mode: normal; /* Fixed blend mode for visibility */
+            filter: drop-shadow(0 0 20px rgba(0,243,255,0.3));
+        }
+
+        /* --- STICKERS --- */
+        .sticker {
+            position: absolute;
+            filter: drop-shadow(0 20px 50px rgba(0,0,0,0.8)); /* Deeper shadow for height */
+            transition: transform 0.2s;
+        }
+        .sticker svg {
+            overflow: visible;
+        }
+        /* The white outline effect */
+        .sticker-path {
+            stroke: white;
+            stroke-width: 10;
+            stroke-linejoin: round;
+            paint-order: stroke;
+        }
+
+        /* --- UTILITIES --- */
+        .glass-panel {
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .anim-element {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease-out;
+        }
+        .slide.active .anim-element { opacity: 1; transform: translateY(0); }
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+        .delay-300 { transition-delay: 300ms; }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .nav-btn:hover { background: white; color: black; }
+        
+        /* Scanner styles */
+        .matrix-char { font-family: 'Space Mono', monospace; transition: color 0.1s; }
+    </style>
+</head>
+<body tabindex="0" onclick="this.focus()">
+
+    <!-- ============================================ -->
+    <!-- SLIDE 1: PARALLAX HERO (Hyper Speed)         -->
+    <!-- ============================================ -->
+    <div class="slide active" id="slide-0">
+        <!-- Layer 1: BG (Slow) -->
+        <div class="parallax-layer" data-speed="2" style="z-index: 1;">
+            <div class="w-full h-full hero-bg opacity-50"></div>
+        </div>
+
+        <!-- Layer 2: Blur Strip (Mid-Back) -->
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none" style="z-index: 2;">
+            <div class="blur-strip"></div>
+        </div>
+
+        <!-- Layer 3: Nebula Text (Mid-Front) -->
+        <div class="parallax-layer" data-speed="4" style="z-index: 5;">
+             <h1 class="knockout-text text-[18vw] leading-none font-black tracking-tighter uppercase select-none">
+                NEBULA
+            </h1>
+        </div>
+
+        <!-- Layer 4: Floating Sticker Objects (BLAZING SPEED & SIZE) -->
+        <div class="parallax-layer" data-speed="35" style="z-index: 20;">
+            
+            <!-- STICKER: Space Station (HUGE) -->
+            <div class="sticker top-[-10%] right-[-15%] w-[500px] h-[500px] animate-[pulse_4s_ease-in-out_infinite]" style="transform: rotate(-10deg);">
+                <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g filter="url(#sticker-shadow)">
+                         <!-- Solar Panels -->
+                         <rect x="20" y="80" width="60" height="40" fill="#2d3748" stroke="white" stroke-width="4"/>
+                         <rect x="120" y="80" width="60" height="40" fill="#2d3748" stroke="white" stroke-width="4"/>
+                         <!-- Core Module -->
+                         <rect x="80" y="40" width="40" height="120" rx="5" fill="#e2e8f0" stroke="white" stroke-width="4"/>
+                         <circle cx="100" cy="100" r="10" fill="#4299e1"/>
+                         <line x1="50" y1="100" x2="150" y2="100" stroke="white" stroke-width="4"/>
+                    </g>
+                    <!-- Detail lines -->
+                    <path d="M30 80 V120 M40 80 V120 M50 80 V120 M60 80 V120 M70 80 V120" stroke="#4a5568" stroke-width="2"/>
+                    <path d="M130 80 V120 M140 80 V120 M150 80 V120 M160 80 V120 M170 80 V120" stroke="#4a5568" stroke-width="2"/>
+                </svg>
+            </div>
+
+            <!-- STICKER: Asteroid (LARGE) -->
+            <div class="sticker bottom-[-15%] left-[-15%] w-[300px] h-[300px]" style="transform: rotate(45deg);">
+                 <svg viewBox="0 0 100 100" fill="none">
+                    <path d="M20 50 Q30 20 50 25 Q80 10 90 40 Q100 70 70 90 Q40 95 20 80 Q5 65 20 50 Z" 
+                          fill="#4a5568" stroke="white" stroke-width="4"/>
+                    <circle cx="40" cy="50" r="5" fill="#2d3748"/>
+                    <circle cx="60" cy="70" r="8" fill="#2d3748"/>
+                    <circle cx="70" cy="40" r="4" fill="#2d3748"/>
+                 </svg>
+            </div>
+            
+            <!-- STICKER: Planet (MID) -->
+            <div class="sticker top-[50%] left-[30%] w-64 h-64 opacity-80">
+                 <svg viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" fill="#ec4899" stroke="white" stroke-width="4"/>
+                    <path d="M10 50 Q50 80 90 50" stroke="white" stroke-width="4" fill="none"/>
+                 </svg>
+            </div>
+        </div>
+
+        <!-- Layer 5: Foreground Card -->
+        <div class="parallax-layer z-30 flex-col justify-end pb-24" data-speed="12">
+            <div class="glass-panel p-8 rounded-xl max-w-md text-center anim-element delay-300 hover:scale-105 transition-transform duration-300 cursor-pointer">
+                <div class="text-xs font-mono text-cyan-300 mb-2">SYSTEM V3.0</div>
+                <h2 class="text-2xl font-bold mb-2">Hyper Parallax</h2>
+                <p class="text-gray-400 text-sm">
+                    Move your mouse. Objects are now massive and move at 3.5x previous velocity to simulate extreme foreground depth.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- SLIDE 2: 3D SOLAR SYSTEM                     -->
+    <!-- ============================================ -->
+    <div class="slide bg-black" id="slide-1">
+        <div id="three-container" class="absolute inset-0 cursor-move z-0"></div>
+        <div class="absolute top-10 left-10 pointer-events-none z-10">
+            <h2 class="text-5xl font-bold anim-element">Atmosphere</h2>
+            <p class="text-gray-400 font-mono mt-2 anim-element delay-100">
+                EARTH SHADER: UPDATED<br>
+                ATMOSPHERE GLOW: ACTIVE
+            </p>
+        </div>
+        <div id="cursor-label" class="fixed bg-black/80 border border-white/20 px-2 py-1 rounded text-xs font-mono pointer-events-none opacity-0 z-50">Object</div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- SLIDE 3: DATA GRID                           -->
+    <!-- ============================================ -->
+    <div class="slide bg-neutral-900 flex items-center" id="slide-2">
+        <div class="w-full max-w-7xl mx-auto px-12 grid grid-cols-1 md:grid-cols-2 gap-16 items-center relative z-10">
+            <div class="space-y-8">
+                <h2 class="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 anim-element">
+                    Analytics
+                </h2>
+                <div class="space-y-4">
+                    <div class="anim-element delay-100 p-4 border border-gray-700 rounded hover:bg-white/5 transition-colors cursor-pointer group">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xl group-hover:text-blue-400">Velocity Tracking</span>
+                            <span class="font-mono text-gray-500">100%</span>
+                        </div>
+                        <div class="h-1 bg-gray-700 mt-2 rounded overflow-hidden"><div class="h-full bg-blue-500 w-full"></div></div>
+                    </div>
+                    <div class="anim-element delay-200 p-4 border border-gray-700 rounded hover:bg-white/5 transition-colors cursor-pointer group">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xl group-hover:text-purple-400">Orbital Decay</span>
+                            <span class="font-mono text-gray-500">0.04%</span>
+                        </div>
+                        <div class="h-1 bg-gray-700 mt-2 rounded overflow-hidden"><div class="h-full bg-purple-500 w-[10%]"></div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="anim-element delay-300 h-96 bg-gray-800 rounded-xl overflow-hidden relative">
+                <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop" class="w-full h-full object-cover opacity-50">
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="glass-panel p-6 rounded-lg">
+                        <div class="text-4xl font-mono font-bold text-center">8,492</div>
+                        <div class="text-xs text-gray-400 text-center tracking-widest uppercase mt-2">Active Satellites</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- SLIDE 4: WARP SPEED                          -->
+    <!-- ============================================ -->
+    <div class="slide bg-black" id="slide-3">
+        <canvas id="warp-canvas" class="absolute inset-0"></canvas>
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+            <div class="text-center">
+                <h2 class="text-6xl font-black italic tracking-tighter uppercase anim-element mix-blend-difference">Hyperspace</h2>
+                <p class="mt-4 font-mono text-sm anim-element delay-100 bg-black/50 inline-block px-4 py-2 rounded border border-white/20">
+                    CLICK AND HOLD TO ENGAGE
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- SLIDE 5: GRAVITY WELL                        -->
+    <!-- ============================================ -->
+    <div class="slide bg-black" id="slide-4">
+        <canvas id="gravity-canvas" class="absolute inset-0"></canvas>
+        <div class="absolute top-10 right-10 text-right pointer-events-none z-10">
+            <h2 class="text-4xl font-bold text-white anim-element">Singularity</h2>
+            <p class="text-gray-400 font-mono text-sm mt-2 anim-element delay-100">
+                Your cursor is a Black Hole.<br>Particles are trapped in your orbit.
+            </p>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- SLIDE 6: THE SIGNAL                          -->
+    <!-- ============================================ -->
+    <div class="slide bg-black flex items-center justify-center" id="slide-5">
+        <div id="matrix-container" class="grid grid-cols-12 gap-1 text-center font-mono text-sm opacity-30 transition-opacity duration-300 w-2/3 h-2/3 content-center">
+            <!-- Generated via JS -->
+        </div>
+        <div class="scanner-line hidden" id="scanner-line"></div>
+        <div class="absolute bottom-20 left-10 pointer-events-none">
+            <h2 class="text-4xl font-bold text-white anim-element">The Signal</h2>
+            <p class="text-gray-400 mt-2 anim-element delay-100">Move mouse to decrypt the noise.</p>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- SLIDE 7: CONSTELLATIONS                      -->
+    <!-- ============================================ -->
+    <div class="slide bg-[#0a0a12]" id="slide-6">
+        <canvas id="network-canvas" class="absolute inset-0"></canvas>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none text-center">
+            <h2 class="text-5xl font-bold text-white/10 select-none">CONNECT</h2>
+        </div>
+        <div class="absolute bottom-10 right-10 pointer-events-none text-right">
+             <h3 class="text-2xl font-bold text-white anim-element">Constellations</h3>
+             <p class="text-gray-500 text-sm anim-element delay-100">Proximity-based networking.</p>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- SLIDE 8: HOLOGRAPHIC TERRAIN                 -->
+    <!-- ============================================ -->
+    <div class="slide bg-black flex items-center justify-center perspective-1000" id="slide-7">
+        <div id="hologram-container" class="relative w-[600px] h-[600px] border border-green-500/20 rounded-full flex items-center justify-center" style="perspective: 800px;">
+            <div class="absolute inset-0 rounded-full border border-green-500/10 animate-ping"></div>
+            <div id="terrain-grid" class="w-[400px] h-[400px] bg-[linear-gradient(rgba(0,255,100,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,100,0.2)_1px,transparent_1px)] bg-[size:20px_20px]" 
+                 style="transform: rotateX(60deg) rotateZ(0deg); transition: transform 0.1s;">
+            </div>
+            <div class="absolute -top-10 text-green-400 font-mono text-xs animate-pulse">Scanning Terrain...</div>
+        </div>
+        <div class="absolute bottom-10 left-10 anim-element">
+            <h2 class="text-3xl font-bold text-green-500">Surface Scan</h2>
+            <p class="text-green-800 font-mono text-sm">Move mouse to tilt the holographic projection.</p>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- SLIDE 9: FINALE                              -->
+    <!-- ============================================ -->
+    <div class="slide bg-black flex items-center justify-center" id="slide-8">
+        <div class="relative z-10 text-center">
+            <h2 class="text-9xl font-black tracking-tighter anim-element translate-y-full text-white">FIN.</h2>
+            <button onclick="window.slideshow.goTo(0)" class="mt-12 anim-element delay-200 px-8 py-4 border border-white/30 rounded-full hover:bg-white hover:text-black transition-all">
+                Re-Initialize Sequence
+            </button>
+        </div>
+    </div>
+
+    <!-- UI CONTROLS -->
+    <div class="fixed bottom-0 left-0 w-full p-6 z-50 flex justify-between items-end pointer-events-none">
+        <div class="pointer-events-auto">
+            <div class="text-xs font-mono text-gray-500 mb-2">SECTOR <span id="slide-counter">01</span> / 09</div>
+            <div class="w-32 h-[1px] bg-gray-800">
+                <div id="progress-fill" class="h-full bg-white w-0 transition-all duration-300"></div>
+            </div>
+        </div>
+        <div class="flex space-x-2 pointer-events-auto">
+            <button onclick="window.slideshow.prev()" class="nav-btn w-10 h-10 rounded flex items-center justify-center text-white">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <button onclick="window.slideshow.next()" class="nav-btn w-10 h-10 rounded flex items-center justify-center text-white">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        /* --- GLOBAL MANAGERS --- */
+        class Slideshow {
+            constructor() {
+                this.current = 0;
+                this.slides = document.querySelectorAll('.slide');
+                this.total = this.slides.length;
+                this.progress = document.getElementById('progress-fill');
+                this.counter = document.getElementById('slide-counter');
+                this.update();
+                
+                // --- KEYBOARD FIX ---
+                // Attach to window to capture global events regardless of focus
+                window.addEventListener('keydown', (e) => {
+                    // Prevent default scrolling for Space/Arrows
+                    if(['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
+                        e.preventDefault();
+                    }
+                    if(e.code === 'ArrowRight' || e.code === 'Space' || e.code === 'Enter') this.next();
+                    if(e.code === 'ArrowLeft') this.prev();
+                });
+                
+                // Force focus to body on load to ensure keys work immediately
+                window.onload = () => document.body.focus();
+            }
+
+            goTo(index) {
+                if(index < 0) index = 0;
+                if(index >= this.total) index = this.total - 1;
+                this.current = index;
+                this.update();
+            }
+
+            next() { this.goTo(this.current + 1); }
+            prev() { this.goTo(this.current - 1); }
+
+            update() {
+                this.slides.forEach((s, i) => {
+                    if(i === this.current) s.classList.add('active');
+                    else s.classList.remove('active');
+                });
+                this.progress.style.width = `${((this.current + 1) / this.total) * 100}%`;
+                this.counter.innerText = `0${this.current + 1}`;
+            }
+        }
+
+        const slideshow = new Slideshow();
+        window.slideshow = slideshow;
+
+        /* --- SLIDE 1: PARALLAX --- */
+        document.addEventListener('mousemove', (e) => {
+            if(slideshow.current === 0) {
+                const x = (window.innerWidth - e.pageX * 2) / 100;
+                const y = (window.innerHeight - e.pageY * 2) / 100;
+                document.querySelectorAll('.parallax-layer').forEach(el => {
+                    const speed = el.getAttribute('data-speed');
+                    // Reverse rotation for stickers to keep them slightly oriented or add dynamic float
+                    el.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
+                });
+            }
+        });
+
+        /* --- SLIDE 2: THREE.JS SOLAR SYSTEM V2 --- */
+        (function initThree() {
+            const container = document.getElementById('three-container');
+            const scene = new THREE.Scene();
+            // Ambient light so shadows aren't pitch black
+            scene.add(new THREE.AmbientLight(0x333333, 1)); 
+
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+            camera.position.set(10, 5, 10);
+            
+            const renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio); // Sharper render
+            container.appendChild(renderer.domElement);
+            
+            const controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+
+            // SUN
+            const sunGeo = new THREE.SphereGeometry(2, 64, 64);
+            const sunMat = new THREE.MeshBasicMaterial({color: 0xFFAA00});
+            const sun = new THREE.Mesh(sunGeo, sunMat);
+            scene.add(sun);
+            
+            // SUN GLOW
+            const sunGlow = new THREE.Mesh(
+                new THREE.SphereGeometry(2.4, 32, 32),
+                new THREE.MeshBasicMaterial({color: 0xFFD700, transparent: true, opacity: 0.2})
+            );
+            sun.add(sunGlow);
+
+            // LIGHT SOURCE (The Sun)
+            const sunLight = new THREE.PointLight(0xffffff, 2.5, 300);
+            sun.add(sunLight);
+
+            // EARTH GROUP
+            const earthGroup = new THREE.Group();
+            earthGroup.position.x = 8;
+            scene.add(earthGroup);
+
+            // EARTH (Phong for shininess)
+            const earthGeo = new THREE.SphereGeometry(0.8, 64, 64);
+            const earthMat = new THREE.MeshPhongMaterial({
+                color: 0x2233ff,
+                emissive: 0x112244,
+                specular: 0x111111,
+                shininess: 10,
+                map: null // We use color for generated look
+            });
+            const earth = new THREE.Mesh(earthGeo, earthMat);
+            earthGroup.add(earth);
+
+            // EARTH ATMOSPHERE (Glow Outline)
+            // We use a slightly larger sphere with BackSide rendering and additive blending
+            const atmoGeo = new THREE.SphereGeometry(0.85, 64, 64);
+            const atmoMat = new THREE.ShaderMaterial({
+                transparent: true,
+                side: THREE.BackSide,
+                uniforms: {},
+                vertexShader: `
+                    varying vec3 vNormal;
+                    void main() {
+                        vNormal = normalize(normalMatrix * normal);
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    varying vec3 vNormal;
+                    void main() {
+                        float intensity = pow(0.7 - dot(vNormal, vec3(0, 0, 1.0)), 4.0);
+                        gl_FragColor = vec4(0.3, 0.6, 1.0, 1.0) * intensity * 2.0;
+                    }
+                `,
+                blending: THREE.AdditiveBlending
+            });
+            const atmosphere = new THREE.Mesh(atmoGeo, atmoMat);
+            earth.add(atmosphere);
+
+            // MOON
+            const moon = new THREE.Mesh(
+                new THREE.SphereGeometry(0.2, 32, 32),
+                new THREE.MeshStandardMaterial({color: 0xaaaaaa})
+            );
+            moon.position.x = 1.5;
+            earthGroup.add(moon);
+
+            // STARS
+            const starsGeo = new THREE.BufferGeometry();
+            const pos = [];
+            for(let i=0; i<3000; i++) pos.push((Math.random()-0.5)*150);
+            starsGeo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+            scene.add(new THREE.Points(starsGeo, new THREE.PointsMaterial({size: 0.05, color: 0xffffff})));
+
+            // Raycaster
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+            const label = document.getElementById('cursor-label');
+
+            window.addEventListener('mousemove', (e) => {
+                if(slideshow.current !== 1) return;
+                mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+                label.style.left = e.clientX + 15 + 'px';
+                label.style.top = e.clientY + 15 + 'px';
+            });
+
+            function animate() {
+                requestAnimationFrame(animate);
+                if(slideshow.current !== 1) return;
+                
+                controls.update();
+                earthGroup.rotation.y += 0.005; // Orbit
+                earth.rotation.y += 0.02; // Spin
+
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects([sun, earth]);
+                if(intersects.length > 0) {
+                    label.style.opacity = 1;
+                    label.innerText = intersects[0].object === sun ? 'THE SUN' : 'PLANET EARTH';
+                    document.body.style.cursor = 'pointer';
+                } else {
+                    label.style.opacity = 0;
+                    document.body.style.cursor = 'default';
+                }
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        })();
+
+        /* --- SLIDE 4: WARP SPEED --- */
+        (function initWarp() {
+            const canvas = document.getElementById('warp-canvas');
+            const ctx = canvas.getContext('2d');
+            let stars = [], speed = 0.1, active = false;
+            
+            function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+            window.addEventListener('resize', resize); resize();
+
+            for(let i=0; i<500; i++) stars.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, z: Math.random()*canvas.width});
+
+            canvas.addEventListener('mousedown', () => active = true);
+            canvas.addEventListener('mouseup', () => active = false);
+
+            function draw() {
+                if(slideshow.current !== 3) { requestAnimationFrame(draw); return; }
+                
+                ctx.fillStyle = 'rgba(0,0,0,0.3)'; // Trails
+                ctx.fillRect(0,0,canvas.width,canvas.height);
+                
+                // Speed logic
+                const targetSpeed = active ? 40 : 0.5;
+                speed += (targetSpeed - speed) * 0.05;
+
+                const cx = canvas.width/2, cy = canvas.height/2;
+
+                stars.forEach(s => {
+                    s.z -= speed;
+                    if(s.z <= 0) { s.x = Math.random()*canvas.width; s.y = Math.random()*canvas.height; s.z = canvas.width; }
+                    
+                    const k = 128.0 / s.z;
+                    const px = (s.x - cx) * k + cx;
+                    const py = (s.y - cy) * k + cy;
+
+                    if(px >= 0 && px <= canvas.width && py >= 0 && py <= canvas.height) {
+                        const size = (1 - s.z / canvas.width) * 4;
+                        const shade = parseInt((1 - s.z / canvas.width) * 255);
+                        ctx.fillStyle = `rgb(${shade},${shade},${shade})`;
+                        ctx.beginPath();
+                        ctx.arc(px, py, size, 0, Math.PI*2);
+                        ctx.fill();
+                    }
+                });
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+
+        /* --- SLIDE 5: GRAVITY WELL --- */
+        (function initGravity() {
+            const canvas = document.getElementById('gravity-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            const mouse = {x: 0, y: 0};
+            
+            function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+            window.addEventListener('resize', resize); resize();
+            
+            window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+
+            for(let i=0; i<1000; i++) particles.push({
+                x: Math.random()*canvas.width, 
+                y: Math.random()*canvas.height, 
+                vx: 0, vy: 0, 
+                color: `hsl(${Math.random()*360}, 50%, 50%)`
+            });
+
+            function draw() {
+                if(slideshow.current !== 4) { requestAnimationFrame(draw); return; }
+                ctx.fillStyle = 'rgba(0,0,0,0.1)';
+                ctx.fillRect(0,0,canvas.width,canvas.height);
+
+                particles.forEach(p => {
+                    const dx = mouse.x - p.x;
+                    const dy = mouse.y - p.y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    const force = 1000 / (dist*dist + 100);
+                    const angle = Math.atan2(dy, dx);
+                    
+                    p.vx += Math.cos(angle) * force;
+                    p.vy += Math.sin(angle) * force;
+                    p.vx *= 0.95; // Friction
+                    p.vy *= 0.95;
+
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(p.x, p.y, 2, 2);
+                });
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+
+        /* --- SLIDE 6: SCANNER --- */
+        (function initScanner() {
+            const container = document.getElementById('matrix-container');
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&";
+            const cells = [];
+
+            // Build grid
+            for(let i=0; i<600; i++) {
+                const el = document.createElement('div');
+                el.className = 'matrix-char';
+                el.innerText = chars[Math.floor(Math.random()*chars.length)];
+                container.appendChild(el);
+                cells.push(el);
+            }
+
+            container.addEventListener('mousemove', (e) => {
+                if(slideshow.current !== 5) return;
+                const rect = container.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                cells.forEach(cell => {
+                    const cellRect = cell.getBoundingClientRect();
+                    const cx = cellRect.left - rect.left;
+                    const cy = cellRect.top - rect.top;
+                    const dist = Math.sqrt(Math.pow(x-cx,2) + Math.pow(y-cy,2));
+
+                    if(dist < 100) {
+                        cell.style.color = '#fff';
+                        cell.style.opacity = 1;
+                        cell.style.textShadow = '0 0 5px #fff';
+                        if(Math.random() > 0.8) cell.innerText = chars[Math.floor(Math.random()*chars.length)]; // scramble
+                    } else {
+                        cell.style.color = '#00f3ff';
+                        cell.style.opacity = 0.2;
+                        cell.style.textShadow = 'none';
+                    }
+                });
+            });
+        })();
+
+        /* --- SLIDE 7: CONSTELLATIONS --- */
+        (function initNetwork() {
+            const canvas = document.getElementById('network-canvas');
+            const ctx = canvas.getContext('2d');
+            let nodes = [];
+            
+            function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+            window.addEventListener('resize', resize); resize();
+
+            for(let i=0; i<80; i++) nodes.push({
+                x: Math.random()*canvas.width, 
+                y: Math.random()*canvas.height,
+                vx: (Math.random()-0.5), 
+                vy: (Math.random()-0.5)
+            });
+
+            function draw() {
+                if(slideshow.current !== 6) { requestAnimationFrame(draw); return; }
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                
+                ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+                ctx.fillStyle = 'white';
+
+                nodes.forEach((node, i) => {
+                    node.x += node.vx;
+                    node.y += node.vy;
+                    if(node.x < 0 || node.x > canvas.width) node.vx *= -1;
+                    if(node.y < 0 || node.y > canvas.height) node.vy *= -1;
+
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, 2, 0, Math.PI*2);
+                    ctx.fill();
+
+                    // Connect
+                    for(let j=i+1; j<nodes.length; j++) {
+                        const dx = nodes[j].x - node.x;
+                        const dy = nodes[j].y - node.y;
+                        const dist = Math.sqrt(dx*dx+dy*dy);
+                        if(dist < 150) {
+                            ctx.beginPath();
+                            ctx.moveTo(node.x, node.y);
+                            ctx.lineTo(nodes[j].x, nodes[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                });
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+
+        /* --- SLIDE 8: HOLOGRAPHIC TERRAIN --- */
+        (function initHolo() {
+            const grid = document.getElementById('terrain-grid');
+            window.addEventListener('mousemove', (e) => {
+                if(slideshow.current !== 7) return;
+                const x = (e.clientX / window.innerWidth - 0.5) * 40;
+                const y = (e.clientY / window.innerHeight - 0.5) * 40;
+                grid.style.transform = `rotateX(${60 + y}deg) rotateZ(${x}deg)`;
+            });
+        })();
+
+    </script>
+</body>
+</html>
