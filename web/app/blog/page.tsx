@@ -4,19 +4,14 @@ import {getBlogPosts} from "@/lib/blog"
 
 const feeds = [
   {
-    title: "Substack — petrlavrov",
-    href: "https://petrlavrov.substack.com/",
-    description: "Thoughts on tech and life. Long-form reflections, experiments, and essays.",
-  },
-  {
-    title: "Telegram — Life and philosophy",
+    title: "Telegram — Лавров, который из Гугла",
     href: "https://t.me/petrlavrov",
-    description: "Stream-of-consciousness notes, travel fragments, and moments captured in motion.",
+    description: "AI tools I actually use, what I build with them, and life in between.",
   },
   {
-    title: "Telegram — calmmageDev",
-    href: "https://t.me/calmmageDev",
-    description: "Shipping logs, engineering breakdowns, and behind-the-scenes context.",
+    title: "GitHub — calmmage",
+    href: "https://github.com/calmmage",
+    description: "Code, bots and experiments.",
   },
 ]
 

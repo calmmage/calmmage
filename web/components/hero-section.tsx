@@ -27,6 +27,12 @@ export function HeroSection() {
             Get In Touch
           </a>
         </div>
+        <a
+          href="https://petrlavrov.com"
+          className="mt-6 inline-block text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Work with me → petrlavrov.com
+        </a>
       </div>
 
       {/* Scroll indicator */}

@@ -8,7 +8,10 @@ export default function ProjectsPage() {
         <header className="text-center">
           <h1 className="text-4xl font-bold text-foreground md:text-5xl">Projects</h1>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground md:text-lg">
-            Coming soon...
+            Code and experiments live on{" "}
+            <a href="https://github.com/calmmage" className="text-primary hover:underline">GitHub</a>.
+            {" "}AI setups I use every day, and help setting them up:{" "}
+            <a href="https://petrlavrov.com" className="text-primary hover:underline">petrlavrov.com</a>.
           </p>
         </header>
       </div>
