@@ -15,11 +15,6 @@ export const sections: Section[] = [
     name: "Explore",
     items: [
       {
-        name: "Home",
-        href: "/",
-        description: "Start here for highlights and quick navigation.",
-      },
-      {
         name: "About",
         href: "/about",
         description: "Journey, interests, and the people-first story.",
@@ -27,7 +22,7 @@ export const sections: Section[] = [
       {
         name: "Projects",
         href: "/projects",
-        description: "Interactive demos and engineering experiments.",
+        description: "Where the code lives, and how to work with me.",
       },
       {
         name: "Art",
@@ -45,27 +40,27 @@ export const sections: Section[] = [
     name: "Elsewhere",
     items: [
       {
+        name: "Work with me",
+        href: "https://petrlavrov.com",
+        description: "Consulting on LLMs, automation and engineering. Book a call.",
+        external: true,
+      },
+      {
+        name: "Telegram — Лавров, который из Гугла",
+        href: "https://t.me/petrlavrov",
+        description: "AI tools I actually use, what I build with them, and life in between.",
+        external: true,
+      },
+      {
+        name: "GitHub — calmmage",
+        href: "https://github.com/calmmage",
+        description: "Code, bots and experiments.",
+        external: true,
+      },
+      {
         name: "Constellations",
         href: "https://constellations.calmmage.com/",
         description: "Navigate an interactive night sky of personal projects.",
-        external: true,
-      },
-      {
-        name: "Substack",
-        href: "https://petrlavrov.substack.com/",
-        description: "Thoughts on tech, life, and meaningful connections.",
-        external: true,
-      },
-      {
-        name: "Telegram — Life",
-        href: "https://t.me/petrlavrov",
-        description: "Philosophy, travel, and daily reflections.",
-        external: true,
-      },
-      {
-        name: "Telegram — Dev",
-        href: "https://t.me/calmmageDev",
-        description: "Engineering notes, experiments, and behind-the-scenes.",
         external: true,
       },
       {

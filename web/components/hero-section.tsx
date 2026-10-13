@@ -29,7 +29,7 @@ export function HeroSection() {
         </div>
         <a
           href="https://petrlavrov.com"
-          className="mt-6 inline-block text-sm text-muted-foreground hover:text-foreground transition-colors"
+          className="mt-6 inline-block text-base font-medium text-primary hover:underline"
         >
           Work with me → petrlavrov.com
         </a>

@@ -10,7 +10,7 @@ export default function ProjectsPage() {
           <p className="mt-4 text-base leading-relaxed text-muted-foreground md:text-lg">
             Code and experiments live on{" "}
             <a href="https://github.com/calmmage" className="text-primary hover:underline">GitHub</a>.
-            {" "}AI setups I use every day, and help setting them up:{" "}
+            {" "}Consulting on LLMs and automation:{" "}
             <a href="https://petrlavrov.com" className="text-primary hover:underline">petrlavrov.com</a>.
           </p>
         </header>

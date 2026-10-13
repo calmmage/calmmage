@@ -1,5 +1,6 @@
 "use client"
 
+import {useState} from "react"
 import Link from "next/link"
 import {usePathname} from "next/navigation"
 import {LanguageToggle} from "@/components/language-toggle"
@@ -10,6 +11,7 @@ export function Navigation({locale}: {locale?: Locale}) {
   const pathname = usePathname()
   const resolvedLocale = locale ?? localeFromPath(pathname)
   const labels = copy[resolvedLocale].nav
+  const [open, setOpen] = useState(false)
 
   const isActive = (href: string) => {
     if (href === "/") {
@@ -22,7 +24,12 @@ export function Navigation({locale}: {locale?: Locale}) {
   }
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+    <nav
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b border-border",
+        open ? "bg-background" : "bg-background/80",
+      )}
+    >
       <div className="max-w-6xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <Link href="/" className="text-xl font-mono font-bold text-foreground hover:text-primary transition-colors">
@@ -50,6 +57,8 @@ export function Navigation({locale}: {locale?: Locale}) {
               type="button"
               className="md:hidden p-2 text-muted-foreground hover:text-primary transition-colors"
               aria-label="Menu"
+              aria-expanded={open}
+              onClick={() => setOpen(!open)}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16"/>
@@ -57,6 +66,24 @@ export function Navigation({locale}: {locale?: Locale}) {
             </button>
           </div>
         </div>
+
+        {open && (
+          <div className="md:hidden mt-4 flex flex-col border-t border-border pt-2">
+            {navItems.map((item) => (
+              <Link
+                key={item.key}
+                href={localizedHref(item.href, resolvedLocale)}
+                onClick={() => setOpen(false)}
+                className={cn(
+                  "py-3 text-base font-medium transition-colors hover:text-primary",
+                  isActive(item.href) ? "text-primary" : "text-muted-foreground",
+                )}
+              >
+                {labels[item.key]}
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </nav>
   )
