@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="description" content="How Calm Studio uses Google authorization, YouTube data, and private video uploads.">
+<title>Privacy · Calm Studio</title>
+<style>
+:root{color-scheme:light dark;--bg:#faf9f6;--fg:#222520;--muted:#62685e;--line:#d8ddd1;--accent:#315c32}
+@media(prefers-color-scheme:dark){:root{--bg:#171b17;--fg:#e8eee3;--muted:#b1bda9;--line:#394434;--accent:#bbdfaa}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:18px/1.6 system-ui,sans-serif}main{max-width:760px;margin:auto;padding:32px 22px 64px}nav{display:flex;justify-content:space-between;gap:20px;padding-bottom:24px;border-bottom:1px solid var(--line)}a{color:var(--accent);text-underline-offset:4px}a:focus-visible{outline:3px solid var(--accent);outline-offset:5px}h1{font-size:clamp(34px,7vw,52px);letter-spacing:-.03em;line-height:1.1;margin:44px 0 18px}h2{font-size:23px;line-height:1.3;margin-top:32px}p{margin:14px 0}.note,footer{color:var(--muted);font-size:15px}footer{border-top:1px solid var(--line);margin-top:40px;padding-top:22px}
+</style>
+</head>
+<body>
+<main>
+  <nav aria-label="Page navigation"><a href="/calm-studio.html">← Calm Studio</a><a href="mailto:petrlavrov@calmmage.com">Contact</a></nav>
+  <h1>Calm Studio privacy policy</h1>
+  <p class="note">Updated 28 October 2026 · Personal application operated by Petr Lavrov</p>
+  <h2>Purpose and access</h2>
+  <p>Calm Studio uses the YouTube API to upload the owner's finished videos, organize them in a private Morning Show playlist, and verify their channel, privacy and playlist membership.</p>
+  <p>The application reads the authorized channel's ID and title, playlist IDs, titles and privacy settings, and the uploaded video's ID, title, description, duration and status. It sends the selected video file, title, description and privacy settings to YouTube.</p>
+  <p>Google groups uploads and playlist management under a broad YouTube account permission. The uploader uses this permission for the personal video and playlist workflow described above.</p>
+  <h2>Storage and retention</h2>
+  <p>OAuth credentials and refresh tokens are stored in the owner's encrypted Calm Keys store. Local video files and delivery receipts remain on the owner's computers. Receipts contain video and playlist IDs, publication metadata and a file checksum.</p>
+  <p>Uploaded episodes and the Morning Show playlist are set to private. YouTube stores these uploads under the connected account. Local files, receipts and uploads remain until the owner removes them.</p>
+  <h2>Use and sharing</h2>
+  <p>Google user data is used to provide the owner's video upload and playlist workflow. The uploader does not sell Google user data, share it with advertisers, or use it for advertising or training AI models.</p>
+  <p>The public information pages contain no sign-in form, tracking script or embedded video player. The website hosting provider processes ordinary web requests to serve them. YouTube's processing is described in the <a href="https://policies.google.com/privacy">Google Privacy Policy</a>.</p>
+  <h2>Stop access or remove data</h2>
+  <p>The owner can remove Calm Studio's access in <a href="https://myaccount.google.com/permissions">Google Account permissions</a>. This prevents future API access. Existing uploads can be removed in <a href="https://studio.youtube.com/">YouTube Studio</a>; local credentials, files and receipts can be removed from the owner's computers.</p>
+  <p>For questions or a request to remove locally retained data, contact <a href="mailto:petrlavrov@calmmage.com">petrlavrov@calmmage.com</a>.</p>
+  <footer><a href="/calm-studio.html">Return to Calm Studio</a> · <a href="https://www.youtube.com/t/terms">YouTube Terms of Service</a></footer>
+</main>
+</body>
+</html>
